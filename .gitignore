@@ -209,8 +209,8 @@ __marimo__/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+/frontend/app-frontend/node_modules
+/frontend/app-frontend/.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -222,11 +222,11 @@ __marimo__/
 /coverage
 
 # next.js
-/.next/
-/out/
+/frontend/app-frontend/.next/
+/frontend/app-frontend/out/
 
 # production
-/build
+/frontend/app-frontend/build
 
 # misc
 .DS_Store
