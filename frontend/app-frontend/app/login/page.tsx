@@ -8,10 +8,33 @@ import {
   Stack,
   Button
 } from "@chakra-ui/react"
+import { Roboto, Reddit_Mono } from "next/font/google";
+
+const redditMono = Reddit_Mono({
+  variable: "--font-reddit-mono",
+  subsets: ["latin"],
+});
+
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+});
 
 export default function LoginPage(){
-    return (<><Container h="100vh" overflow="hidden">
-      <Heading color={"#002992"}>DAM-N</Heading>
+    return (<>
+    <Container h="100vh" overflow="hidden">
+      <Heading 
+        color={"#002992"}
+        ml={10}
+        mt={10}
+        zIndex="1"
+        position="absolute"
+        top={1}
+        left={4}
+        size={"5xl"}
+      >
+        DAM-N
+      </Heading>
 
       <Box
         bg="#9ac6f27f"
@@ -65,7 +88,7 @@ export default function LoginPage(){
         position="absolute"
         top="47px"
         left="78px"
-        zIndex={0}
+        zIndex="0"
         />
     </Container>
     
@@ -82,7 +105,12 @@ export default function LoginPage(){
             <Field.Label>
               Email:
             </Field.Label>
-            <Input />
+            <Input 
+            borderRadius={8} bg="#D6DBE6" 
+            borderStyle="none"
+            color="black"
+            p={2}
+            />
             <Field.HelperText />
             <Field.ErrorText />
           </Field.Root>
@@ -91,13 +119,20 @@ export default function LoginPage(){
             <Field.Label>
               Password:
             </Field.Label>
-            <Input />
+            <Input 
+            borderRadius={8} 
+            bg="#D6DBE6" 
+            borderStyle="none"
+            color="black"
+            p={2}
+            type="password"
+            />
             <Field.HelperText />
             <Field.ErrorText />
           </Field.Root>
 
-          <Button>
-            Login
+          <Button bg="#7FEAFF" color="black" px={10} borderRadius={10} py={1} h="fit-content">
+            LOGIN
           </Button>
         </Stack>
       </Box>
