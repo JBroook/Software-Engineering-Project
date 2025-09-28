@@ -11,6 +11,7 @@ import {
   Button
 } from "@chakra-ui/react"
 import { Roboto, Reddit_Mono } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const redditMono = Reddit_Mono({
@@ -32,169 +33,170 @@ const getCsrfToken = async () => {
 };
 
 export default function LoginPage(){
-    const [csrfToken, setCsrfToken] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const router = useRouter();
+  const [csrfToken, setCsrfToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    useEffect(()=>{
-      const fetchCsrf = async () => {
-        const csrf = await getCsrfToken();
-        setCsrfToken(csrf);
-      }
-
-      fetchCsrf()
-    });
-
-    const handleLogin = async () => {
-      const res = await fetch('http://localhost:8000/api/login/',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      })
-
-      const data = await res.json();
-      if (res.ok){
-        console.log('Login successful');
-      }else console.log('Login failed');
-
+  useEffect(()=>{
+    const fetchCsrf = async () => {
+      const csrf = await getCsrfToken();
+      setCsrfToken(csrf);
     }
 
-    return (<>
-    {/* background decoration boxes */}
-    <Container h="100vh" overflow="hidden">
-      <Heading 
-        color={"#002992"}
-        ml={10}
-        mt={10}
-        zIndex="1"
-        position="absolute"
-        top={1}
-        left={4}
-        size={"5xl"}
-      >
-        DAM-N
-      </Heading>
+    fetchCsrf()
+  });
 
-      <Box
-        bg="#9ac6f27f"
-        w={400}
-        h={400}
-        position="absolute"
-        top="26px"
-        left="750px"
-        zIndex={0}
-        />
-      <Box
-        bg="#9aa7f281"
-        w={400}
-        h={400}
-        position="absolute"
-        top="273px"
-        left="450px"
-        zIndex={0}
-        />
-      <Box
-        bg="#9ab3f27a"
-        w={100}
-        h={100}
-        position="absolute"
-        top="500px"
-        left="1261px"
-        zIndex={0}
-        />
-      <Box
-        bg="#9ab3f27a"
-        w={100}
-        h={100}
-        position="absolute"
-        top="620px"
-        left="370px"
-        zIndex={0}
-        />
-      <Box
-        bg="#9ac6f27f"
-        w={50}
-        h={50}
-        position="absolute"
-        top="200px"
-        left="1127px"
-        zIndex={0}
-        />
-        <Box
-        bg="#9ac6f27f"
-        w={50}
-        h={50}
-        position="absolute"
-        top="47px"
-        left="78px"
-        zIndex="0"
-        />
-    </Container>
-    
-    <AbsoluteCenter>
-      <Box
-        borderRadius={8}
-        bgGradient="to-br" gradientFrom="#0D238C" gradientTo="#4766B4"
-        px={12}
-        py={6}
-      >
-        <Stack justifyContent="center" alignItems="center">
-          <Heading>LOGIN</Heading>
-          <Field.Root>
-            <Field.Label>
-              Email:
-            </Field.Label>
-            <Input 
-            borderRadius={8} bg="#D6DBE6" 
-            borderStyle="none"
-            color="black"
-            p={2}
-            value={email}
-            onChange={(event)=>setEmail(event.target.value)}
-            />
-            <Field.HelperText />
-            <Field.ErrorText />
-          </Field.Root>
+  const handleLogin = async () => {
+    const res = await fetch('http://localhost:8000/api/login/',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
 
-          <Field.Root>
-            <Field.Label>
-              Password:
-            </Field.Label>
-            <Input 
-            borderRadius={8} 
-            bg="#D6DBE6" 
-            borderStyle="none"
-            color="black"
-            p={2}
-            type="password"
-            value={password}
-            onChange={(event)=>setPassword(event.target.value)}
-            />
-            <Field.HelperText />
-            <Field.ErrorText />
-          </Field.Root>
+    const data = await res.json();
+    if (res.ok){
+      router.push('/main');
+    }else console.log('Login failed');
 
-          <Button 
-            bg="#7FEAFF" 
-            color="black" 
-            px={10} 
-            borderRadius={10} 
-            py={1} 
-            h="fit-content"
-            onClick={handleLogin}
-          >
-            LOGIN
-          </Button>
-        </Stack>
-      </Box>
-    </AbsoluteCenter>
-    
-    </>);
+  }
+
+  return (<>
+  {/* background decoration boxes */}
+  <Container h="100vh" overflow="hidden">
+    <Heading 
+      color={"#002992"}
+      ml={10}
+      mt={10}
+      zIndex="1"
+      position="absolute"
+      top={1}
+      left={4}
+      size={"5xl"}
+    >
+      DAM-N
+    </Heading>
+
+    <Box
+      bg="#9ac6f27f"
+      w={400}
+      h={400}
+      position="absolute"
+      top="26px"
+      left="750px"
+      zIndex={0}
+      />
+    <Box
+      bg="#9aa7f281"
+      w={400}
+      h={400}
+      position="absolute"
+      top="273px"
+      left="450px"
+      zIndex={0}
+      />
+    <Box
+      bg="#9ab3f27a"
+      w={100}
+      h={100}
+      position="absolute"
+      top="500px"
+      left="1261px"
+      zIndex={0}
+      />
+    <Box
+      bg="#9ab3f27a"
+      w={100}
+      h={100}
+      position="absolute"
+      top="620px"
+      left="370px"
+      zIndex={0}
+      />
+    <Box
+      bg="#9ac6f27f"
+      w={50}
+      h={50}
+      position="absolute"
+      top="200px"
+      left="1127px"
+      zIndex={0}
+      />
+      <Box
+      bg="#9ac6f27f"
+      w={50}
+      h={50}
+      position="absolute"
+      top="47px"
+      left="78px"
+      zIndex="0"
+      />
+  </Container>
+  
+  <AbsoluteCenter>
+    <Box
+      borderRadius={8}
+      bgGradient="to-br" gradientFrom="#0D238C" gradientTo="#4766B4"
+      px={12}
+      py={6}
+    >
+      <Stack justifyContent="center" alignItems="center">
+        <Heading>LOGIN</Heading>
+        <Field.Root>
+          <Field.Label>
+            Email:
+          </Field.Label>
+          <Input 
+          borderRadius={8} bg="#D6DBE6" 
+          borderStyle="none"
+          color="black"
+          p={2}
+          value={email}
+          onChange={(event)=>setEmail(event.target.value)}
+          />
+          <Field.HelperText />
+          <Field.ErrorText />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>
+            Password:
+          </Field.Label>
+          <Input 
+          borderRadius={8} 
+          bg="#D6DBE6" 
+          borderStyle="none"
+          color="black"
+          p={2}
+          type="password"
+          value={password}
+          onChange={(event)=>setPassword(event.target.value)}
+          />
+          <Field.HelperText />
+          <Field.ErrorText />
+        </Field.Root>
+
+        <Button 
+          bg="#7FEAFF" 
+          color="black" 
+          px={10} 
+          borderRadius={10} 
+          py={1} 
+          h="fit-content"
+          onClick={handleLogin}
+        >
+          LOGIN
+        </Button>
+      </Stack>
+    </Box>
+  </AbsoluteCenter>
+  
+  </>);
 }
