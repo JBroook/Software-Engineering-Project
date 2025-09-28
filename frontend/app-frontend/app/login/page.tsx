@@ -11,7 +11,7 @@ import {
   Button
 } from "@chakra-ui/react"
 import { Roboto, Reddit_Mono } from "next/font/google";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const redditMono = Reddit_Mono({
   variable: "--font-reddit-mono",
@@ -32,11 +32,20 @@ const getCsrfToken = async () => {
 };
 
 export default function LoginPage(){
+    const [csrfToken, setCsrfToken] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    useEffect(()=>{
+      const fetchCsrf = async () => {
+        const csrf = await getCsrfToken();
+        setCsrfToken(csrf);
+      }
+
+      fetchCsrf()
+    });
+
     const handleLogin = async () => {
-      const csrfToken = await getCsrfToken();
       const res = await fetch('http://localhost:8000/api/login/',{
         method: 'POST',
         headers: {
