@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Enables login/logout in the browsable API
     path('api-auth/',include('rest_framework.urls')),
+    path('api/',include('api.urls'))
 ]

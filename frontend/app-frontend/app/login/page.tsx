@@ -1,3 +1,5 @@
+"use client"
+
 import { 
   AbsoluteCenter, 
   Box, 
@@ -9,6 +11,7 @@ import {
   Button
 } from "@chakra-ui/react"
 import { Roboto, Reddit_Mono } from "next/font/google";
+import { useState } from "react";
 
 const redditMono = Reddit_Mono({
   variable: "--font-reddit-mono",
@@ -20,8 +23,42 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
+const getCsrfToken = async () => {
+  const res = await fetch('http://localhost:8000/api/login/', {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  return data.csrfToken;
+};
+
 export default function LoginPage(){
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = async () => {
+      const csrfToken = await getCsrfToken();
+      const res = await fetch('http://localhost:8000/api/login/',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      })
+
+      const data = await res.json();
+      if (res.ok){
+        console.log('Login successful');
+      }else console.log('Login failed');
+
+    }
+
     return (<>
+    {/* background decoration boxes */}
     <Container h="100vh" overflow="hidden">
       <Heading 
         color={"#002992"}
@@ -110,6 +147,8 @@ export default function LoginPage(){
             borderStyle="none"
             color="black"
             p={2}
+            value={email}
+            onChange={(event)=>setEmail(event.target.value)}
             />
             <Field.HelperText />
             <Field.ErrorText />
@@ -126,12 +165,22 @@ export default function LoginPage(){
             color="black"
             p={2}
             type="password"
+            value={password}
+            onChange={(event)=>setPassword(event.target.value)}
             />
             <Field.HelperText />
             <Field.ErrorText />
           </Field.Root>
 
-          <Button bg="#7FEAFF" color="black" px={10} borderRadius={10} py={1} h="fit-content">
+          <Button 
+            bg="#7FEAFF" 
+            color="black" 
+            px={10} 
+            borderRadius={10} 
+            py={1} 
+            h="fit-content"
+            onClick={handleLogin}
+          >
             LOGIN
           </Button>
         </Stack>

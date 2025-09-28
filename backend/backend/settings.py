@@ -63,6 +63,11 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if cross-origin + HTTPS
+SESSION_COOKIE_SECURE = False    # True in production with HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -138,6 +143,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allows DRF to use session based authentication
 REST_FRAMEWORK = {
      'DEFAULT_AUTHENTICATION_CLASSES': [
-             'rest_framework.authentication.SessionAuthentication',
+             'rest_framework.authentication.BasicAuthentication',
    ],
 }
