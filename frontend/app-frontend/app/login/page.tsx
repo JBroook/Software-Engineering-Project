@@ -8,21 +8,10 @@ import {
   Field, 
   Input, 
   Stack,
-  Button
+  Button,
 } from "@chakra-ui/react"
-import { Roboto, Reddit_Mono } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const redditMono = Reddit_Mono({
-  variable: "--font-reddit-mono",
-  subsets: ["latin"],
-});
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-});
 
 const getCsrfToken = async () => {
   const res = await fetch('http://localhost:8000/api/login/', {
@@ -80,6 +69,7 @@ export default function LoginPage(){
       top={1}
       left={4}
       size={"5xl"}
+      fontFamily="var(--font-roboto-condensed)"
     >
       DAM-N
     </Heading>
@@ -148,7 +138,11 @@ export default function LoginPage(){
       py={6}
     >
       <Stack justifyContent="center" alignItems="center">
-        <Heading>LOGIN</Heading>
+        <Heading
+        size={"4xl"}
+        fontFamily="var(--font-roboto-condensed)">
+          LOGIN
+        </Heading>
         <Field.Root>
           <Field.Label>
             Email:
@@ -191,6 +185,7 @@ export default function LoginPage(){
           py={1} 
           h="fit-content"
           onClick={handleLogin}
+          fontFamily="var(--font-roboto-condensed)"
         >
           LOGIN
         </Button>

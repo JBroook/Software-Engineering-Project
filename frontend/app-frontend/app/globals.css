@@ -1,7 +1,5 @@
 :root {
   --background: #ffffff;
-  --font-roboto: 'Roboto', sans-serif;
-  --font-reddit-mono: 'Reddit Mono', monospace;
 }
 
 
@@ -21,7 +19,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-roboto);
+  font-family: var(--font-reddit-mono);/*#change this to set default font */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
