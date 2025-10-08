@@ -4,3 +4,5 @@ django-cors-headers==4.9.0; python_version >= '3.9'
 djangorestframework==3.16.1; python_version >= '3.9'
 sqlparse==0.5.3; python_version >= '3.8'
 tzdata==2025.2; python_version >= '2'
+django-cors-headers==4.9.0
+python-decouple==3.8
