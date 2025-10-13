@@ -27,7 +27,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
           color={useColorModeValue('black', 'white')}
           _hover={{
             bg: 'cyan.400',
-            color: 'white',
+            color: useColorModeValue('black', 'white'),
           }}
           {...rest}>
           {icon && (
@@ -35,7 +35,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
               mr="4"
               fontSize="16"
               _groupHover={{
-                color: 'black',
+                color: useColorModeValue('black', 'white'),
               }}
               as={icon}
             />
@@ -43,7 +43,9 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
           {children}
         </Flex>
       </Collapsible.Trigger>
-      <Collapsible.Content>A potential path</Collapsible.Content>
+      <Collapsible.Content color={useColorModeValue('black', 'white')}>
+        <Flex mx={'16'} mb={'4'}>A potential path</Flex>
+      </Collapsible.Content>
     </Collapsible.Root>
   )
 }
