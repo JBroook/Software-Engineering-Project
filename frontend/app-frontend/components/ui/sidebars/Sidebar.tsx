@@ -28,7 +28,7 @@ const LinkItems: Array<LinkItemProps> = [
 export default function SimpleSidebar() {
   return (
     <>
-      <Drawer.Root placement={"left"}>
+      <Drawer.Root placement={"start"}>
         <Drawer.Trigger asChild>
           <Button
             bg={useColorModeValue('white', 'gray.900')}
@@ -63,7 +63,7 @@ export default function SimpleSidebar() {
                 borderRight="1px"
                 borderStyle={"solid"}
                 borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-                w={{ base: 'full', md: 60 }}
+                w={{ base: 'full'}}
                 pos="absolute"
                 top={0}
                 left={0}
@@ -73,7 +73,7 @@ export default function SimpleSidebar() {
                     DAM-N
                   </Text>
                 </Flex>
-                <Flex h={"75vh"} overflowY={"auto"} direction="column" mt="4">
+                <Flex overflowY={"auto"} direction="column" mt="4">
                   {LinkItems.map((link) => (
                     <NavItem key={link.name} icon={link.icon}>
                       {link.name}
@@ -98,6 +98,7 @@ export default function SimpleSidebar() {
   )
 }
 
+// below used for reference
 // interface SidebarProps extends BoxProps {
 //   onClose: () => void
 // }

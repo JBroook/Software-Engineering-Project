@@ -20,6 +20,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
           align="center"
           p="4"
           mx="4"
+          w={'full'}
           borderRadius="lg"
           role="group"
           cursor="pointer"
