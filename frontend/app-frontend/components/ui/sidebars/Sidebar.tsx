@@ -1,7 +1,11 @@
 'use client'
 
 import React, { ReactNode } from 'react'
-import { IconButton, Box, Button  , Flex, Icon, Text, Drawer, DrawerContent, useDisclosure, BoxProps, FlexProps, chakra, Collapsible, Portal, CloseButton } from '@chakra-ui/react'
+import { IconButton, Box, Button, BoxProps, FlexProps,
+          Flex, Icon, Text, 
+          Drawer, DrawerContent, 
+          Portal, 
+          CloseButton } from '@chakra-ui/react'
 import { FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings, FiMenu } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
@@ -42,14 +46,14 @@ export default function SimpleSidebar() {
             borderRadius={'8px'}
             h="auto">
             <Flex w='auto' h="40px" alignItems="center" mx="4" justifyContent="space-between">
-              <RxHamburgerMenu color='black' />
+              <RxHamburgerMenu color={useColorModeValue('black', 'white')} />
               </Flex>
           </Button>
         </Drawer.Trigger>
         <Portal>
         <Drawer.Backdrop />
         <Drawer.Positioner>
-          <Drawer.Content size={'lg'}>
+          <Drawer.Content>
             <Drawer.Header>
               <Drawer.Title>
                   <Text fontSize="2xl" fontFamily={"Roboto"} fontWeight="extrabold" fontStyle={"italic"} color={useColorModeValue('blue.700', 'blue.400')}>
@@ -73,7 +77,7 @@ export default function SimpleSidebar() {
                     DAM-N
                   </Text>
                 </Flex>
-                <Flex overflowY={"auto"} direction="column" mt="4">
+                <Flex h={"75vh"} overflowY={"auto"} direction="column" mt="4">
                   {LinkItems.map((link) => (
                     <NavItem key={link.name} icon={link.icon}>
                       {link.name}
