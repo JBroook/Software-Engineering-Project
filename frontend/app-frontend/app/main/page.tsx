@@ -1,21 +1,22 @@
-"use client"
+'use client'
+import { Box } from "@chakra-ui/react";
+import SimpleSidebar from "@/components/ui/sidebars/Sidebar";
+import { useColorModeValue } from "@/components/ui/color-mode";
+// import { usePathname } from 'next/navigation';
 
-import { 
-  AbsoluteCenter, 
-  Box, 
-  Container, 
-  Heading, 
-  Field, 
-  Input, 
-  Stack,
-  Button
-} from "@chakra-ui/react"
-import { Roboto, Reddit_Mono } from "next/font/google";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+export default function Home() {
+  // const pathname = usePathname();
+  // const noSidebarPages = ['/login'];
+  // const renderSidebar = !noSidebarPages.includes(pathname);
 
-export default function MainPage(){
-  return (<>
-  poo eyes 
-  </>);
+  return (
+    <>
+    {/* <Box 
+    w={"100vw"}
+    h={"100vh"}
+    bgGradient="to-b" gradientFrom={useColorModeValue('blue.300', 'blue.800')} gradientTo={useColorModeValue('blue.100', 'blue.950')}>
+      {renderSidebar && <SimpleSidebar  />}
+    </Box> */}
+  </>
+  );
 }
