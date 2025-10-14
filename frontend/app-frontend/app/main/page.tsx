@@ -14,16 +14,12 @@ import {
 export default function Main() {
 
   return (
-    <>
-    <Box 
-    w={"100vw"}
-    h={"100vh"}
-    bgGradient="to-b" gradientFrom={useColorModeValue('blue.300', 'blue.800')} 
-    gradientTo={useColorModeValue('blue.100', 'blue.950')}>
+    <Box bgGradient="to-b" gradientFrom={useColorModeValue('blue.300', 'blue.800')} 
+    gradientTo={useColorModeValue('blue.100', 'blue.950')} minH="100vh">
       {/* Header box for title, search bar and others */}
       <HStack 
-      w="100vw"
-      ml="80px"
+      w="100%"
+      ml={8}
       h="12vh">
         <HStack>
           <Image width={5} src="/folder_icon.png" alt="folder icon" />
@@ -35,7 +31,6 @@ export default function Main() {
           >Your Files</Heading>
         </HStack>
       </HStack>
-    </Box>
-  </>
+  </Box>
   );
 }
