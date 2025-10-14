@@ -31,74 +31,9 @@ const LinkItems: Array<LinkItemProps> = [
 // Main Sidebar Component
 export default function SimpleSidebar() {
   return (
-    <>
-      <Drawer.Root placement={"start"}>
-        <Drawer.Trigger asChild>
-          <Button
-            bg={useColorModeValue('white', 'gray.900')}
-            border={"2px"}
-            borderStyle={"solid"}
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            w={{ base: 'auto' }}
-            pos="absolute"
-            top={{ base: '2.5vh'}}
-            left={'2.5'}
-            borderRadius={'8px'}
-            h="auto">
-            <Flex w='auto' h="40px" alignItems="center" mx="4" justifyContent="space-between">
-              <RxHamburgerMenu color={useColorModeValue('black', 'white')} />
-              </Flex>
-          </Button>
-        </Drawer.Trigger>
-        <Portal>
-        <Drawer.Backdrop />
-        <Drawer.Positioner>
-          <Drawer.Content>
-            <Drawer.Header>
-              <Drawer.Title>
-                  <Text fontSize="2xl" fontFamily={"Roboto"} fontWeight="extrabold" fontStyle={"italic"} color={useColorModeValue('blue.700', 'blue.400')}>
-                    DAM-N
-                  </Text>
-                </Drawer.Title>
-            </Drawer.Header>
-            <Drawer.Body>
-              <Box
-                bg={useColorModeValue('white', 'gray.900')}
-                borderRight="1px"
-                borderStyle={"solid"}
-                borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-                w={{ base: 'full'}}
-                pos="absolute"
-                top={0}
-                left={0}
-                h="100vh">
-                <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-                  <Text fontSize="2xl" fontFamily={"Roboto"} fontWeight="extrabold" fontStyle={"italic"} color={useColorModeValue('blue.700', 'blue.400') }>
-                    DAM-N
-                  </Text>
-                </Flex>
-                <Flex h={"75vh"} overflowY={"auto"} direction="column" mt="4">
-                  {LinkItems.map((link) => (
-                    <NavItem key={link.name} icon={link.icon}>
-                      {link.name}
-                    </NavItem>
-                  ))}
-                </Flex>
-                <Flex direction="column" mt="2">
-                  <ToggleTheme />
-                </Flex>
-              </Box>
-            </Drawer.Body>
-            <Drawer.CloseTrigger asChild>
-              <Button display={{ base: 'flex'}}>
-                <MdKeyboardDoubleArrowLeft style={{ color: useColorModeValue('black', 'white') }}/>
-              </Button>
-            </Drawer.CloseTrigger>
-          </Drawer.Content>
-        </Drawer.Positioner>
-      </Portal>
-      </Drawer.Root>
-    </>
+    <Box width="20vw" bg="black" >
+        Sidebar here
+    </Box>
   )
 }
 

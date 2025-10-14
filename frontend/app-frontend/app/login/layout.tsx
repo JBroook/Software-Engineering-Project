@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Condensed, Reddit_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Provider } from "@/components/ui/provider"
-import SimpleSidebar from "@/components/ui/sidebars/Sidebar";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -21,21 +20,17 @@ const redditMono = Reddit_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DAM-N",
+  title: "Login",
   description: "Your digital solution for asset management",
 };
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
-    <html lang="en" className="no-touch" suppressHydrationWarning>
-      <body className={`${redditMono.variable} ${roboto.variable} ${robotoCondensed.variable}`}>
-        <Provider>{children}
-        </Provider>
-      </body>
-    </html>
+    <>{children}</>
   );
 }
