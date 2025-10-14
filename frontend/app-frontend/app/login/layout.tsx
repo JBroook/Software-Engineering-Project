@@ -31,11 +31,6 @@ export default function LoginLayout({
 }>) {
 
   return (
-    <html lang="en" className="no-touch" suppressHydrationWarning>
-      <body className={`${redditMono.variable} ${roboto.variable} ${robotoCondensed.variable}`}>
-        <Provider>{children}
-        </Provider>
-      </body>
-    </html>
+    <>{children}</>
   );
 }
