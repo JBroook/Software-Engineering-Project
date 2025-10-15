@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react'
-import { Stack, Flex, Image, Heading,
-    Box, Text, HStack
+import { Stack, Flex, Heading,
+    Box, Text, HStack, IconButton
 } from '@chakra-ui/react'
+import { SlOptionsVertical } from "react-icons/sl";
 
 interface GalleryItemProps {
   filename: string;
@@ -17,17 +18,25 @@ export default function GalleryItem(props : GalleryItemProps) {
     bg="white"
     // h={"2xs"}
     borderRadius={"xl"}
-    py={3}
+    py={2}
     px={4}
     color="black"
     direction="column"
-    justify="space-between"
+    justify="space-evenly"
+    cursor="pointer"
+    _hover={{ bg: 'gray.100' }}
     >
         <Flex justify="space-between">
             <Heading fontFamily="var(--font-reddit-mono)">
                 {props.filename}
             </Heading>
-            <Image width={2} src="/options_icon.svg" alt="options icon" m={1}/>
+            <IconButton
+                variant="ghost"
+                _hover={{ bg: 'gray.200' }}
+                borderRadius="100%">
+                <SlOptionsVertical/>
+            </IconButton>
+            {/* <Image width={2} src="/options_icon.svg" alt="options icon" m={1}/> */}
         </Flex>
         <Box
         borderRadius={"xl"}
