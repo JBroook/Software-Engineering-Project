@@ -15,12 +15,13 @@ import { IoIosArrowBack } from "react-icons/io";
 export default function Main() {
 
   return (
-    <Box bg="#9AB3F2" minH="100vh">
+    <Box bg="white" minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
       h="12vh"
       justify="space-between"
+      bg="#9AB3F2"
       >
         <HStack
         ml={8}>
@@ -41,8 +42,9 @@ export default function Main() {
       {/* Gallery view */}
       {/* Folders */}
       <HStack
-      ml={8}
-      mb={3}>
+      bg="#9AB3F2"
+      pl={8}
+      pb={3}>
         <FaFolder 
           color="black"
           size={25}/>
@@ -52,7 +54,7 @@ export default function Main() {
           size={"2xl"}
           >Folders</Heading>
       </ HStack>
-      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} mb={10}>
+      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={10} bg="#9AB3F2" >
         <GalleryFolder
           foldername="sonic.png"
           date="28 September 2025"/>
@@ -76,7 +78,6 @@ export default function Main() {
 
       {/* Files */}
       <HStack
-      bg="white"
       pl={8}
       pb={3}
       pt={5}
@@ -90,7 +91,7 @@ export default function Main() {
           size={"2xl"}
           >Files</Heading>
       </ HStack>
-      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} bg="white" pb={20}>
+      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={20}>
         <GalleryItem 
           filename="sonic.png"
           date="28 September 2025"/>
