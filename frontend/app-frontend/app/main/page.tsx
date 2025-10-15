@@ -1,14 +1,14 @@
 'use client'
-import SimpleSidebar from "@/components/ui/sidebars/Sidebar";
+import GalleryItem from "@/components/ui/item/galleryItem";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { 
   Box, 
   Heading,
   Image,
-  Input, 
-  Stack,
-  Button,
-  HStack
+  Grid,
+  GridItem,
+  HStack,
+  Flex
 } from "@chakra-ui/react"
 
 export default function Main() {
@@ -17,11 +17,13 @@ export default function Main() {
     <Box bgGradient="to-b" gradientFrom={useColorModeValue('blue.300', 'blue.800')} 
     gradientTo={useColorModeValue('blue.100', 'blue.950')} minH="100vh">
       {/* Header box for title, search bar and others */}
-      <HStack 
+      <Flex 
       w="100%"
-      ml={8}
-      h="12vh">
-        <HStack>
+      h="12vh"
+      justify="space-between"
+      >
+        <HStack
+        ml={8}>
           <Image width={5} src="/folder_icon.png" alt="folder icon" />
           <Heading
           fontFamily="var(--font-roboto-condensed)"
@@ -30,7 +32,16 @@ export default function Main() {
           size={"2xl"}
           >Your Files</Heading>
         </HStack>
-      </HStack>
+      </Flex>
+
+      {/* Gallery view */}
+      <Grid>
+        <GridItem>
+          <GalleryItem />
+        </GridItem>
+      </Grid>
+
   </Box>
   );
 }
+
