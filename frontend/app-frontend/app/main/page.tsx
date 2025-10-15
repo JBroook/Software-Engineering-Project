@@ -8,7 +8,8 @@ import {
   Grid,
   GridItem,
   HStack,
-  Flex
+  Flex,
+  SimpleGrid
 } from "@chakra-ui/react"
 
 export default function Main() {
@@ -35,11 +36,23 @@ export default function Main() {
       </Flex>
 
       {/* Gallery view */}
-      <Grid>
-        <GridItem>
-          <GalleryItem />
-        </GridItem>
-      </Grid>
+      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8}>
+        <GalleryItem 
+          filename="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryItem 
+          filename="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryItem 
+          filename="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryItem 
+          filename="sonic.png"
+          date="28 September 2025"/>
+      </SimpleGrid>
 
   </Box>
   );

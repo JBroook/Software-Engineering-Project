@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Roboto, Roboto_Condensed, Reddit_Mono } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/components/ui/provider"
-import SimpleSidebar from "@/components/ui/sidebars/Sidebar";
+
 
 const roboto = Roboto({
   variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ["300"] // light
 });
 const robotoCondensed = Roboto_Condensed({
   variable: "--font-roboto-condensed",
@@ -33,7 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="no-touch" suppressHydrationWarning>
       <body className={`${redditMono.variable} ${roboto.variable} ${robotoCondensed.variable}`}>
-        <Provider>{children}
+        <Provider>
+          {children}
         </Provider>
       </body>
     </html>
