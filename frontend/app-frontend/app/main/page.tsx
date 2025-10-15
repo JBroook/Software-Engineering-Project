@@ -1,22 +1,21 @@
 'use client'
 import GalleryItem from "@/components/ui/item/galleryItem";
+import GalleryFolder from "@/components/ui/item/galleryFolder";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { 
-  Box, 
-  Heading,
-  Image,
-  Grid,
-  GridItem,
-  HStack,
-  Flex,
-  SimpleGrid
+  Box, Heading, Image, Grid,
+  GridItem, HStack, Flex, SimpleGrid,
+  Separator,
+  IconButton
 } from "@chakra-ui/react"
+import { FaFolder } from "react-icons/fa";
+import { FaFile } from "react-icons/fa";
+import { IoIosArrowBack } from "react-icons/io";
 
 export default function Main() {
 
   return (
-    <Box bgGradient="to-b" gradientFrom={useColorModeValue('blue.300', 'blue.800')} 
-    gradientTo={useColorModeValue('blue.100', 'blue.950')} minH="100vh">
+    <Box bg="#9AB3F2" minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
@@ -25,18 +24,73 @@ export default function Main() {
       >
         <HStack
         ml={8}>
-          <Image width={5} src="/folder_icon.png" alt="folder icon" />
+          <IconButton
+          cursor="pointer"
+          _hover={{ bg: 'gray.100' }}>
+            <IoIosArrowBack color="black" size={"md"}/>
+          </IconButton>
+          {/* file path title */}
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          fontStyle="italic"
           color="black"
-          size={"2xl"}
-          >Your Files</Heading>
+          size={"3xl"}
+          >Audio / Animal sounds / Mammal roars</Heading>
         </HStack>
       </Flex>
 
       {/* Gallery view */}
-      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8}>
+      {/* Folders */}
+      <HStack
+      ml={8}
+      mb={3}>
+        <FaFolder 
+          color="black"
+          size={25}/>
+          <Heading
+          fontFamily="var(--font-roboto-condensed)"
+          color="black"
+          size={"2xl"}
+          >Folders</Heading>
+      </ HStack>
+      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} mb={10}>
+        <GalleryFolder
+          foldername="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryFolder 
+          foldername="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryFolder 
+          foldername="sonic.png"
+          date="28 September 2025"/>
+      
+        <GalleryFolder 
+          foldername="sonic.png"
+          date="28 September 2025"/>
+      </SimpleGrid>
+
+      <Separator size={"md"}>
+
+      </Separator>
+
+      {/* Files */}
+      <HStack
+      bg="white"
+      pl={8}
+      pb={3}
+      pt={5}
+      >
+        <FaFile 
+          color="black"
+          size={22}/>
+          <Heading
+          fontFamily="var(--font-roboto-condensed)"
+          color="black"
+          size={"2xl"}
+          >Files</Heading>
+      </ HStack>
+      <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} bg="white" pb={20}>
         <GalleryItem 
           filename="sonic.png"
           date="28 September 2025"/>

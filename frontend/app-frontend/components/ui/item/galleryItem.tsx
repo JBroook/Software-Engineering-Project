@@ -25,6 +25,7 @@ export default function GalleryItem(props : GalleryItemProps) {
     justify="space-evenly"
     cursor="pointer"
     _hover={{ bg: 'gray.100' }}
+    boxShadow="0 0 20px rgba(0, 0, 0, 0.2)"
     >
         <Flex justify="space-between">
             <Heading fontFamily="var(--font-reddit-mono)">
