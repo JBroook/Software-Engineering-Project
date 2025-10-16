@@ -9,9 +9,8 @@ const customConfig = defineConfig({
     "*::selection": {
       bg: "green.200",
     },
-  },
+  }
 })
-
 
 const { globalCss: _, ...restConfig } = defaultConfig
 export const system = createSystem(restConfig, customConfig)
