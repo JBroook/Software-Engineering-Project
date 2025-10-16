@@ -1,7 +1,8 @@
-import { Box, Collapsible, Flex, FlexProps, Icon } from "@chakra-ui/react"
-import { ReactNode } from "react"
+import {  FlexProps, Icon, Link as ChakraLink, Button } from "@chakra-ui/react"
+import { ReactNode, useEffect, useState } from "react"
 import { IconType } from "react-icons"
 import { useColorModeValue } from '../color-mode'
+import NextLink  from "next/link"
 
 // Navigation Item
 interface NavItemProps extends FlexProps {
@@ -10,43 +11,35 @@ interface NavItemProps extends FlexProps {
 }
 const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   return (
-    <Collapsible.Root
-      as="a"
-      // ref="#"
-      style={{ textDecoration: 'none' }}
-      _focus={{ boxShadow: 'none' }}>
-      <Collapsible.Trigger>
-        <Flex
-          align="center"
-          p="4"
-          mx="4"
-          w={'full'}
-          borderRadius="lg"
-          role="group"
-          cursor="pointer"
-          color={useColorModeValue('black', 'white')}
-          _hover={{
-            bg: 'cyan.400',
+    <>
+    <ChakraLink w={'full'} href='/login' _hover={{ textDecoration: 'none' }}>
+      <Button
+      align="center"
+      width="85%"
+      p="4"
+      mx="4"
+      borderRadius="lg"
+      role="group"
+      cursor="pointer"
+      justifyContent={'flex-start'}
+      color={useColorModeValue('black', 'white')}
+      _hover={{
+        bg: 'cyan.400',
+        color: useColorModeValue('black', 'white'),
+      }}
+      {...rest}>
+        <Icon
+          mr="4"
+          fontSize="16"
+          _groupHover={{
             color: useColorModeValue('black', 'white'),
           }}
-          {...rest}>
-          {icon && (
-            <Icon
-              mr="4"
-              fontSize="16"
-              _groupHover={{
-                color: useColorModeValue('black', 'white'),
-              }}
-              as={icon}
-            />
-          )}
-          {children}
-        </Flex>
-      </Collapsible.Trigger>
-      <Collapsible.Content color={useColorModeValue('black', 'white')}>
-        <Flex mx={'16'} mb={'4'}>A potential path</Flex>
-      </Collapsible.Content>
-    </Collapsible.Root>
+          as={icon}
+        />
+        {children}
+      </Button>
+    </ChakraLink>
+    </>
   )
 }
 
