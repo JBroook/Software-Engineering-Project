@@ -12,9 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (<>
-    <Flex minHeight="100vh">
       <SimpleSidebar />
-      <Box w="80vw">{children}</Box>
-    </Flex>
+      <Box w="80vw" ml="20vw">{children}</Box>
   </>);
 }

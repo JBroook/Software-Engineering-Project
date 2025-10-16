@@ -27,7 +27,7 @@ const LinkItems: Array<LinkItemProps> = [
 export default function SimpleSidebar() {
   return (
     <>
-    <Flex w={'20vw'} direction={'column'}>
+    <Flex w={'20vw'} direction={'column'} position="fixed" top="0">
       <Box
         bg={useColorModeValue('white', 'gray.900')}
         borderRight="1px"
