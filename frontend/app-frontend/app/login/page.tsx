@@ -8,10 +8,11 @@ import {
   Field, 
   Input, 
   Stack,
-  Button,
+  Button, Text
 } from "@chakra-ui/react"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Spinner } from "@chakra-ui/react"
 
 const getCsrfToken = async () => {
   const res = await fetch('http://localhost:8000/api/login/', {
@@ -26,6 +27,7 @@ export default function LoginPage(){
   const [csrfToken, setCsrfToken] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginClicked, setLoginClicked] = useState(false);
 
   useEffect(()=>{
     const fetchCsrf = async () => {
@@ -37,6 +39,7 @@ export default function LoginPage(){
   });
 
   const handleLogin = async () => {
+    setLoginClicked(true);
     const res = await fetch('http://localhost:8000/api/login/',{
       method: 'POST',
       headers: {
@@ -54,7 +57,11 @@ export default function LoginPage(){
     if (res.ok){
       router.push('/main');
     }else console.log('Login failed');
+  }
 
+  let loginButtonContent = <Text>LOGIN</Text>
+  if(loginClicked){
+    loginButtonContent = <Spinner />
   }
 
   return (<>
@@ -187,7 +194,7 @@ export default function LoginPage(){
           onClick={handleLogin}
           fontFamily="var(--font-roboto-condensed)"
         >
-          LOGIN
+          {loginButtonContent}
         </Button>
       </Stack>
     </Box>
