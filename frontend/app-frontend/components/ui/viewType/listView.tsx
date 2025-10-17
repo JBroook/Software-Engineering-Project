@@ -8,6 +8,7 @@ import GalleryFolder from "@/components/ui/item/galleryFolder";
 import ListItem from "../item/listItem";
 import ListFolder from "../item/listFolder";
 import { useColorModeValue } from '../color-mode'
+import SortBar from "../searchbar/sortBar";
 
 export default function ListView(){
     return (<>
@@ -39,21 +40,28 @@ export default function ListView(){
       <Separator size={"md"} />
 
       {/* Files */}
-      <HStack
-      pl={8}
-      pb={3}
-      pt={5}
-      bg={useColorModeValue("white", '#0D1835')}
-      >
-        <FaFile 
-          color={useColorModeValue("black", 'white')}
-          size={22}/>
-          <Heading
-          fontFamily="var(--font-roboto-condensed)"
-          color={useColorModeValue("black", 'white')}
-          size={"2xl"}
-          >Files</Heading>
-      </ HStack>
+      <Flex
+        bg={useColorModeValue("white", '#0D1835')}
+        justify="space-between"
+        w="100%">
+
+        <HStack
+        pl={8}
+        pb={3}
+        pt={5}
+        >
+          <FaFile 
+            color={useColorModeValue("black", 'white')}
+            size={22}/>
+            <Heading
+            fontFamily="var(--font-roboto-condensed)"
+            color={useColorModeValue("black", 'white')}
+            size={"2xl"}
+            >Files</Heading>
+        </ HStack>
+
+        <SortBar />
+      </Flex>
       
 
 
