@@ -4,8 +4,8 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { 
   Box, Heading, Image, Grid,
   GridItem, HStack, Flex, SimpleGrid,
-  Separator, IconButton, Input, Popover,
-  Text
+  Stack, IconButton, Input, Popover,
+  Text, Checkbox
 } from "@chakra-ui/react"
 import { IoIosArrowBack } from "react-icons/io";
 import { IoSearchCircleOutline } from "react-icons/io5";
@@ -85,6 +85,32 @@ export default function Main() {
                   <Popover.Body p={3}>
                     <Popover.Title color="black" fontWeight="medium">Filter options</Popover.Title>
                     
+                    <Stack>
+                      <Checkbox.Root>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label color={useColorModeValue("black", 'white')}>png</Checkbox.Label>
+                      </Checkbox.Root>
+
+                      <Checkbox.Root>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label color={useColorModeValue("black", 'white')}>jpg</Checkbox.Label>
+                      </Checkbox.Root>
+
+                      <Checkbox.Root>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label color={useColorModeValue("black", 'white')}>gif</Checkbox.Label>
+                      </Checkbox.Root>
+
+                      <Checkbox.Root>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label color={useColorModeValue("black", 'white')}>mp4</Checkbox.Label>
+                      </Checkbox.Root>
+                    </Stack>
+
                   </Popover.Body>
                 </Popover.Content>
               </Popover.Positioner>
