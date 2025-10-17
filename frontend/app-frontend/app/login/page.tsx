@@ -36,7 +36,7 @@ export default function LoginPage(){
     }
 
     fetchCsrf()
-  });
+  }, []);
 
   const handleLogin = async () => {
     setLoginClicked(true);
