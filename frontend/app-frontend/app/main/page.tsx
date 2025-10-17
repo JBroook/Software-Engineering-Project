@@ -38,25 +38,24 @@ export default function Main() {
   setView()
 
   return (
-    <Box bg="white" minH="100vh">
+    <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
       h="12vh"
       justify="space-between"
-      bg="#9AB3F2"
       >
         <HStack
         ml={8}>
           <IconButton
           cursor="pointer"
           _hover={{ bg: 'gray.100' }}>
-            <IoIosArrowBack color="black" size={"md"}/>
+            <IoIosArrowBack color={useColorModeValue("black", 'white')} size={"md"}/>
           </IconButton>
           {/* file path title */}
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color="black"
+          color={useColorModeValue("black", 'white')}
           size={"3xl"}
           >Audio / Animal sounds / Mammal roars</Heading>
         </HStack>

@@ -4,6 +4,8 @@ import { Stack, Flex, Heading,
 } from '@chakra-ui/react'
 import { SlOptionsVertical } from "react-icons/sl";
 
+import { useColorModeValue } from '../color-mode'
+
 interface GalleryItemProps {
   filename: string;
   date: string;
@@ -14,16 +16,16 @@ export default function GalleryItem(props : GalleryItemProps) {
     <Flex 
     w="100%"
     aspectRatio="4/3"
-    bg="white"
+    bg={useColorModeValue("white", '#383838')}
+    color={useColorModeValue("black", 'white')}
     // h={"2xs"}
     borderRadius={"xl"}
     py={2}
     px={4}
-    color="black"
     direction="column"
     justify="space-evenly"
     cursor="pointer"
-    _hover={{ bg: 'gray.100' }}
+    _hover={{ bg: useColorModeValue("gray.200", '#2a2a2aff') }}
     boxShadow="0 0 20px rgba(0, 0, 0, 0.2)"
     >
         <Flex justify="space-between">
@@ -32,7 +34,7 @@ export default function GalleryItem(props : GalleryItemProps) {
             </Heading>
             <IconButton
                 variant="ghost"
-                _hover={{ bg: 'gray.200' }}
+                _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
                 borderRadius="100%">
                 <SlOptionsVertical/>
             </IconButton>

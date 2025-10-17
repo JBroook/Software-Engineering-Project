@@ -4,6 +4,7 @@ import { Stack, Flex, Heading,
 } from '@chakra-ui/react'
 import { SlOptionsVertical } from "react-icons/sl";
 import { FaFolder } from "react-icons/fa";
+import { useColorModeValue } from '../color-mode'
 
 interface GalleryFolderProps {
   foldername: string;
@@ -15,14 +16,14 @@ export default function GalleryFolder(props : GalleryFolderProps) {
     <Box 
     w="100%"
     h="fit-content"
-    bg="white"
+    bg={useColorModeValue("white", '#383838')}
+    color={useColorModeValue("black", 'white')}
     // h={"2xs"}
     borderRadius={"xl"}
     py={2}
     px={4}
-    color="black"
     cursor="pointer"
-    _hover={{ bg: 'gray.100' }}
+    _hover={{ bg: useColorModeValue("gray.200", '#2a2a2aff') }}
     >
       <Flex justify="space-between" align="center">
         <HStack>
@@ -40,7 +41,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
         </HStack>
         <IconButton
             variant="ghost"
-            _hover={{ bg: 'gray.200' }}
+            _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
             borderRadius="100%">
             <SlOptionsVertical/>
         </IconButton>

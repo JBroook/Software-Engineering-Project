@@ -13,21 +13,21 @@ export default function ListView(){
     return (<>
       {/* Folders */}
       <HStack
-      bg={useColorModeValue("#9AB3F2", 'gray.700')}
+      bg={useColorModeValue("#9AB3F2", '#335098')}
       pl={8}
       pb={3}>
         <FaFolder 
-          color="black"
+          color={useColorModeValue("black", 'white')}
           size={25}/>
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color="black"
+          color={useColorModeValue("black", 'white')}
           size={"2xl"}
           >Folders</Heading>
       </ HStack>
       
       <Stack
-      bg="#9AB3F2"
+      bg={useColorModeValue("#9AB3F2", '#335098')}
       pl={8}
       pb={3}>
         <ListFolder foldername="sonic.png" date="28 September 2025" size="844kb"/>
@@ -43,13 +43,14 @@ export default function ListView(){
       pl={8}
       pb={3}
       pt={5}
+      bg={useColorModeValue("white", '#0D1835')}
       >
         <FaFile 
-          color="black"
+          color={useColorModeValue("black", 'white')}
           size={22}/>
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color="black"
+          color={useColorModeValue("black", 'white')}
           size={"2xl"}
           >Files</Heading>
       </ HStack>
@@ -58,7 +59,8 @@ export default function ListView(){
 
       <Stack
       pl={8}
-      mb={10}>
+      pb={10}
+      bg={useColorModeValue("white", '#0D1835')}>
         <ListItem filename="sonic.png" date="28 September 2025" size="844kb"/>
         <ListItem filename="sonic.png" date="28 September asd asd as" size="844kb"/>
         <ListItem filename="sonic.png" date="28 September 2025" size="4kb"/>
