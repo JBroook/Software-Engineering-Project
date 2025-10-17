@@ -14,11 +14,17 @@ import {Folder, File} from "./interfaces"
 export interface ListViewProps {
   folders : Folder[];
   files : File[];
+  clickEvent : (folderId : number) => void;
 }
 
 export default function ListView(props : ListViewProps){
   const folderComponents = props.folders.map(folder => (
-      <ListFolder key={folder.id} foldername={folder.name} date={folder.date_modified}/>
+      <ListFolder 
+        key={folder.id} 
+        foldername={folder.name} 
+        date={folder.date_modified}
+        clickEvent={() => props.clickEvent(folder.id)}
+      />
     ))
   
   const fileComponents = props.files.map(file => (

@@ -17,8 +17,8 @@ import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 
-const getFolders = async () => {
-  const res = await fetch('http://localhost:8000/api/folders/', {
+const getFolders = async (parentFolder : number) => {
+  const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
     credentials: 'include',
   });
   const data = await res.json();
@@ -37,47 +37,46 @@ const getFiles = async (currentParent: number) => {
 export default function Main() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [currentParent, setCurrentParent] = useState(-1);
+  const [currentParent, setCurrentParent] = useState<number>(-1);
+  const [folderChain, setFolderChain] = useState<number[]>([]);
 
-  const filterFolders = (f: Folder[], currentParent: number) => {
-    if(currentParent===-1){
-      f = f.filter( (folder : any)=> {
-          return folder['parent_folder']===null;
-        });
-      }else{
-        f = folders.filter( (folder)=> {
-          return folder['parent_folder']===currentParent;
-        });
-      }
-    return f;
+  const openFolder = async (newFolderId: number) => {
+    let f = await getFolders(newFolderId);
+    setFolders(f);
+
+    f = await getFiles(newFolderId);
+    setFiles(f);
+
+    const fChain = [...folderChain, currentParent]
+    console.log(fChain);
+    setFolderChain(fChain);
+    setCurrentParent(newFolderId);
   }
 
-  const openFolder = (newFolderId: number) => {
-    setCurrentParent(newFolderId);
-    const f = filterFolders(folders, newFolderId);
-    console.log(f)
-    setFolders(f);
+  const ascendFolderChain = async () => {
+    const fChain = [...folderChain]
+    const lastFolderId = fChain.pop();
+    
+
+    if(lastFolderId!==undefined){
+      console.log("Popped "+lastFolderId.toString())
+      let f = await getFolders(lastFolderId);
+      setFolders(f);
+
+      f = await getFiles(lastFolderId);
+      setFiles(f);
+
+      setCurrentParent(lastFolderId);
+    }
+    setFolderChain(fChain);
   }
 
   useEffect(()=>{
     const fetchAssets = async () =>{
-      let f = await getFolders();
-      //filter out folders not in current parent folder
-      f = filterFolders(f, currentParent)
+      let f = await getFolders(currentParent);
       setFolders(f);
 
       f = await getFiles(currentParent);
-      console.log(f);
-      //filter out files not in current parent folder
-      if(currentParent===-1){
-        f = f.filter( (folder : any)=> {
-          return folder['parent_folder']===null;
-        });
-      }else{
-        f = folders.filter( (folder)=> {
-          return folder['parent_folder']===currentParent;
-        });
-      }
       setFiles(f);
     }
 
@@ -92,7 +91,7 @@ export default function Main() {
     if(viewType=="gallery"){
       view = <GalleryView folders={folders} files={files} clickEvent={openFolder}/>
     }else{
-      view = <ListView folders={folders} files={files} /*clickEvent={openFolder}*//>
+      view = <ListView folders={folders} files={files} clickEvent={openFolder}/>
     }
   }
 
@@ -115,7 +114,8 @@ export default function Main() {
         ml={8}>
           <IconButton
           cursor="pointer"
-          _hover={{ bg: 'gray.100' }}>
+          _hover={{ bg: 'gray.100' }}
+          onClick={ascendFolderChain}>
             <IoIosArrowBack color={useColorModeValue("black", 'white')} size={"md"}/>
           </IconButton>
           {/* file path title */}
