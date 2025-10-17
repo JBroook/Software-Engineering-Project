@@ -10,7 +10,6 @@ interface GalleryFolderProps {
   date: string;
 }
 
-// Main Sidebar Component
 export default function GalleryFolder(props : GalleryFolderProps) {
   return (
     <Box 

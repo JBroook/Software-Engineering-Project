@@ -9,7 +9,6 @@ interface GalleryItemProps {
   date: string;
 }
 
-// Main Sidebar Component
 export default function GalleryItem(props : GalleryItemProps) {
   return (
     <Flex 

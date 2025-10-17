@@ -15,6 +15,7 @@ import { IoIosList } from "react-icons/io";
 import { useState } from "react";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import GalleryFolder from "@/components/ui/item/galleryFolder";
+import ListView from "@/components/ui/viewType/listView";
 
 export default function Main() {
   const [searchbar, setSearchbar] = useState(true);
@@ -25,9 +26,7 @@ export default function Main() {
     if(viewType=="gallery"){
       view = <GalleryView />
     }else{
-      view = <GalleryFolder
-            foldername="sonic.png"
-            date="28 September 2025" />
+      view = <ListView />
     }
   }
 
