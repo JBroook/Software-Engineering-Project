@@ -12,11 +12,18 @@ import {Folder, File} from './interfaces'
 export interface GalleryViewProps {
   folders : Folder[];
   files : File[];
+  clickEvent : (folderId : number) => void;
 }
 
 export default function GalleryView(props : GalleryViewProps){
   const folderComponents = props.folders.map(folder => (
-    <GalleryFolder key={folder.id} foldername={folder.name} date={folder.date_modified}/>
+    <GalleryFolder 
+      id={folder.id}
+      key={folder.id} 
+      foldername={folder.name} 
+      date={folder.date_modified}
+      clickEvent={() => props.clickEvent(folder.id)}
+    />
   ))
 
   const fileComponents = props.files.map(file => (

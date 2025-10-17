@@ -15,6 +15,7 @@ import { IoIosList } from "react-icons/io";
 import { useEffect, useState } from "react";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
+import { Folder, File } from "@/components/ui/viewType/interfaces";
 
 const getFolders = async () => {
   const res = await fetch('http://localhost:8000/api/folders/', {
@@ -34,16 +35,13 @@ const getFiles = async (currentParent: number) => {
 
 
 export default function Main() {
-  const [folders, setFolders] = useState([]);
-  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [currentParent, setCurrentParent] = useState(-1);
 
-  useEffect(()=>{
-    const fetchAssets = async () =>{
-      let f = await getFolders();
-      //filter out folders not in current parent folder
-      if(currentParent===-1){
-        f = f.filter( (folder : any)=> {
+  const filterFolders = (f: Folder[], currentParent: number) => {
+    if(currentParent===-1){
+      f = f.filter( (folder : any)=> {
           return folder['parent_folder']===null;
         });
       }else{
@@ -51,6 +49,21 @@ export default function Main() {
           return folder['parent_folder']===currentParent;
         });
       }
+    return f;
+  }
+
+  const openFolder = (newFolderId: number) => {
+    setCurrentParent(newFolderId);
+    const f = filterFolders(folders, newFolderId);
+    console.log(f)
+    setFolders(f);
+  }
+
+  useEffect(()=>{
+    const fetchAssets = async () =>{
+      let f = await getFolders();
+      //filter out folders not in current parent folder
+      f = filterFolders(f, currentParent)
       setFolders(f);
 
       f = await getFiles(currentParent);
@@ -77,9 +90,9 @@ export default function Main() {
 
   const setView = () => {
     if(viewType=="gallery"){
-      view = <GalleryView folders={folders} files={files}/>
+      view = <GalleryView folders={folders} files={files} clickEvent={openFolder}/>
     }else{
-      view = <ListView folders={folders} files={files}/>
+      view = <ListView folders={folders} files={files} /*clickEvent={openFolder}*//>
     }
   }
 
