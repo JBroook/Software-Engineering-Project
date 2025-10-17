@@ -59,10 +59,7 @@ export default function LoginPage(){
     }else console.log('Login failed');
   }
 
-  let loginButtonContent = <Text>LOGIN</Text>
-  if(loginClicked){
-    loginButtonContent = <Spinner />
-  }
+  const loginButtonContent = loginClicked ? <Spinner /> : <Text>LOGIN</Text>;
 
   return (<>
   {/* background decoration boxes */}
