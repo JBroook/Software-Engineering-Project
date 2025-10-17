@@ -12,21 +12,74 @@ import { IoSearchCircleOutline } from "react-icons/io5";
 import { IoFilter } from "react-icons/io5";
 import { RiGalleryView2 } from "react-icons/ri";
 import { IoIosList } from "react-icons/io";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GalleryView from "@/components/ui/viewType/galleryView";
-import GalleryFolder from "@/components/ui/item/galleryFolder";
 import ListView from "@/components/ui/viewType/listView";
 
+const getFolders = async () => {
+  const res = await fetch('http://localhost:8000/api/folders/', {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  return data;
+};
+
+const getFiles = async (currentParent: number) => {
+  const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${currentParent}`, {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  return data;
+};
+
+
 export default function Main() {
+  const [folders, setFolders] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [currentParent, setCurrentParent] = useState(-1);
+
+  useEffect(()=>{
+    const fetchAssets = async () =>{
+      let f = await getFolders();
+      //filter out folders not in current parent folder
+      if(currentParent===-1){
+        f = f.filter( (folder : any)=> {
+          return folder['parent_folder']===null;
+        });
+      }else{
+        f = folders.filter( (folder)=> {
+          return folder['parent_folder']===currentParent;
+        });
+      }
+      setFolders(f);
+
+      f = await getFiles(currentParent);
+      console.log(f);
+      //filter out files not in current parent folder
+      if(currentParent===-1){
+        f = f.filter( (folder : any)=> {
+          return folder['parent_folder']===null;
+        });
+      }else{
+        f = folders.filter( (folder)=> {
+          return folder['parent_folder']===currentParent;
+        });
+      }
+      setFiles(f);
+    }
+
+    fetchAssets()
+  }, []);
+
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
   let view;
 
   const setView = () => {
     if(viewType=="gallery"){
-      view = <GalleryView />
+      view = <GalleryView folders={folders} files={files}/>
     }else{
-      view = <ListView />
+      view = <ListView folders={folders} files={files}/>
     }
   }
 

@@ -4,7 +4,7 @@ from assets.models import File, Folder
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ['id', 'name', 'file', 'size', 'filetype', 'data', 'date_created', 'date_modified', 'parent_folder']
+        fields = ['id', 'name', 'size', 'filetype', 'data', 'date_created', 'date_modified', 'parent_folder']
 
 class FolderSerializer(serializers.ModelSerializer):
     subfolders = serializers.SerializerMethodField()

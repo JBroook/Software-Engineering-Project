@@ -10,7 +10,7 @@ import { useColorModeValue } from '../color-mode'
 interface ListItemProps {
   filename: string;
   date: string;
-  size: string;
+  size: number;
 }
 
 export default function ListItem(props : ListItemProps) {

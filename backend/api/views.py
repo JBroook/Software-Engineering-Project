@@ -32,3 +32,16 @@ class LoginView(APIView):
 class FolderViewSet(ReadOnlyModelViewSet):
     queryset = Folder.objects.all()
     serializer_class = serializers.FolderSerializer
+
+class FileViewSet(ReadOnlyModelViewSet):
+    queryset = File.objects.all()
+    serializer_class = serializers.FileSerializer
+
+    def get_queryset(self):
+        parent_id = self.request.query_params.get('parent_folder')
+        if parent_id is not None:
+            if parent_id!="-1":
+                return File.objects.filter(parent_folder=parent_id)
+            else:
+                return File.objects.filter(parent_folder__isnull=True)
+        return File.objects.all()
