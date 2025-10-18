@@ -4,6 +4,7 @@ import { Input
 
 interface SearchbarProps {
   placeholder: string;
+  inputEvent: (keyword : string) => void;
 }
 
 export default function Searchbar(props: SearchbarProps){
@@ -15,6 +16,7 @@ export default function Searchbar(props: SearchbarProps){
         color="white"
         _placeholder={{ color: "white"}}
         data-state="open"
+        onChange={(event) => props.inputEvent(event.target.value)}
         _open={{
             animationName: "fade-in, scale-in",
             animationDuration: "300ms",

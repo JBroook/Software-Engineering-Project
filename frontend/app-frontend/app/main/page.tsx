@@ -38,6 +38,8 @@ export default function Main() {
   const [loading, setLoading] = useState<boolean>(true);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [renderFolders, setRenderFolders] = useState<Folder[]>([]);
+  const [renderFiles, setRenderFiles] = useState<File[]>([]);
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
@@ -46,9 +48,11 @@ export default function Main() {
   const openFolder = async (newFolderId: number, newFolderName: string) => {
     let f = await getFolders(newFolderId);
     setFolders(f);
+    setRenderFolders(f);
 
     f = await getFiles(newFolderId);
     setFiles(f);
+    setRenderFiles(f);
 
     const fChain = [...folderChain, currentParent]
     setFolderChain(fChain);
@@ -66,9 +70,11 @@ export default function Main() {
     if(lastFolderId!==undefined){
       let f = await getFolders(lastFolderId);
       setFolders(f);
+      setRenderFolders(f);
 
       f = await getFiles(lastFolderId);
       setFiles(f);
+      setRenderFiles(f);
 
       setCurrentParent(lastFolderId);
     }
@@ -83,9 +89,11 @@ export default function Main() {
     const fetchAssets = async () =>{
       let f = await getFolders(currentParent);
       setFolders(f);
+      setRenderFolders(f);
 
       f = await getFiles(currentParent);
       setFiles(f);
+      setRenderFiles(f);
 
       setLoading(false);
     }
@@ -98,15 +106,15 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
-        folders={folders} 
-        files={files} 
+        folders={renderFolders} 
+        files={renderFiles} 
         clickEvent={openFolder}
         loading={loading}
       />
   ) : (
       <ListView 
-        folders={folders} 
-        files={files} 
+        folders={renderFolders} 
+        files={renderFiles} 
         clickEvent={openFolder}
         loading={loading}
       />
@@ -118,6 +126,17 @@ export default function Main() {
 
   //controls text and arrow color
   const arrowTextColor = useColorModeValue("black", 'white');
+
+  //search function
+  const searchKeyword = (keyword : string) => {
+    const newFolders = folders.filter((item) =>
+    item.name.toLowerCase().includes(keyword.toLowerCase()));
+    setRenderFolders(newFolders);
+
+    const newFiles = files.filter((item) =>
+    item.name.toLowerCase().includes(keyword.toLowerCase()));
+    setRenderFiles(newFiles);
+  }
 
   return (
     <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
@@ -154,7 +173,7 @@ export default function Main() {
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
             </IconButton>
             
-            {searchbar && <Searchbar placeholder="Search a file"/>}
+            {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
 
             <Popover.Root>
               <Popover.Trigger asChild>

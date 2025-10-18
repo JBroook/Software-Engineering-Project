@@ -42,7 +42,14 @@ export default function GalleryView(props : ViewProps){
         color={useColorModeValue("black", 'white')}
         >Folders</Heading>
     </ HStack>
-    <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={10} bg={useColorModeValue("#9AB3F2", '#335098')} >
+    <SimpleGrid 
+    w="100%" 
+    minChildWidth={80} 
+    gap="6" 
+    px={8} 
+    pb={10} 
+    bg={useColorModeValue("#9AB3F2", '#335098')} 
+    >
       <ContentLoader 
         loading={props.loading}
         color="white"
