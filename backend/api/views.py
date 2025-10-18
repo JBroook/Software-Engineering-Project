@@ -39,7 +39,7 @@ class FolderViewSet(ReadOnlyModelViewSet):
                 return Folder.objects.filter(parent_folder=parent_id)
             else:
                 return Folder.objects.filter(parent_folder__isnull=True)
-        return Folder.objects.all()
+        return Folder.objects.none()
 
 class FileViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FileSerializer
@@ -51,4 +51,4 @@ class FileViewSet(ReadOnlyModelViewSet):
                 return File.objects.filter(parent_folder=parent_id)
             else:
                 return File.objects.filter(parent_folder__isnull=True)
-        return File.objects.all()
+        return File.objects.none()

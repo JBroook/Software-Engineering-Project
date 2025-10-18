@@ -9,21 +9,16 @@ import ListItem from "../item/listItem";
 import ListFolder from "../item/listFolder";
 import { useColorModeValue } from '../color-mode'
 import SortBar from "../searchbar/sortBar";
-import {Folder, File} from "./interfaces"
+import {ViewProps} from "./interfaces"
+import ContentLoader from "./contentLoader";
 
-export interface ListViewProps {
-  folders : Folder[];
-  files : File[];
-  clickEvent : (folderId : number) => void;
-}
-
-export default function ListView(props : ListViewProps){
+export default function ListView(props : ViewProps){
   const folderComponents = props.folders.map(folder => (
       <ListFolder 
         key={folder.id} 
         foldername={folder.name} 
         date={folder.date_modified}
-        clickEvent={() => props.clickEvent(folder.id)}
+        clickEvent={() => props.clickEvent(folder.id, folder.name)}
       />
     ))
   
@@ -54,8 +49,11 @@ export default function ListView(props : ListViewProps){
     bg={useColorModeValue("#9AB3F2", '#335098')}
     pl={8}
     pb={3}>
-      {folderComponents.length>0 ? folderComponents : centeredSpinner}
-      {/* <ListFolder foldername="sonic.png" date="28 September 2025" size="844kb"/> */}
+      <ContentLoader 
+        loading={props.loading}
+        color="white"
+        content={folderComponents}
+      />
     </Stack>
 
     <Separator size={"md"} />
@@ -90,11 +88,11 @@ export default function ListView(props : ListViewProps){
     pl={8}
     pb={10}
     bg={useColorModeValue("white", '#0D1835')}>
-      {fileComponents.length>0 ? fileComponents : darkCenteredSpinner}
-      {/* <ListItem filename="sonic.png" date="28 September 2025" size="844kb"/>
-      <ListItem filename="sonic.png" date="28 September asd asd as" size="844kb"/>
-      <ListItem filename="sonic.png" date="28 September 2025" size="4kb"/>
-      <ListItem filename="sonic.png" date="28 September 2025" size="844kb"/> */}
+      <ContentLoader 
+        loading={props.loading}
+        color="black"
+        content={fileComponents}
+      />
     </Stack>
     </>);
 }

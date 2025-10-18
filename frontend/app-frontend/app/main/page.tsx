@@ -35,12 +35,15 @@ const getFiles = async (currentParent: number) => {
 
 
 export default function Main() {
+  const [loading, setLoading] = useState<boolean>(true);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
+  const [nameChain, setNameChain] = useState<string[]>(["All files"]);
 
-  const openFolder = async (newFolderId: number) => {
+  // handles entering a folder when it is clicked
+  const openFolder = async (newFolderId: number, newFolderName: string) => {
     let f = await getFolders(newFolderId);
     setFolders(f);
 
@@ -48,18 +51,19 @@ export default function Main() {
     setFiles(f);
 
     const fChain = [...folderChain, currentParent]
-    console.log(fChain);
     setFolderChain(fChain);
     setCurrentParent(newFolderId);
+
+    const nChain = [...nameChain, newFolderName]
+    setNameChain(nChain);
   }
 
+  // goes to previous folder if it exists
   const ascendFolderChain = async () => {
     const fChain = [...folderChain]
     const lastFolderId = fChain.pop();
-    
 
     if(lastFolderId!==undefined){
-      console.log("Popped "+lastFolderId.toString())
       let f = await getFolders(lastFolderId);
       setFolders(f);
 
@@ -69,8 +73,12 @@ export default function Main() {
       setCurrentParent(lastFolderId);
     }
     setFolderChain(fChain);
+    const nChain = [...nameChain];
+    nChain.pop();
+    setNameChain(nChain);
   }
 
+  // fetch current folder's child items, fetch items with no parents if at root folder
   useEffect(()=>{
     const fetchAssets = async () =>{
       let f = await getFolders(currentParent);
@@ -78,29 +86,38 @@ export default function Main() {
 
       f = await getFiles(currentParent);
       setFiles(f);
+
+      setLoading(false);
     }
 
     fetchAssets()
   }, []);
 
+  // handles gallery vs list view
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
-  let view;
-
-  const setView = () => {
-    if(viewType=="gallery"){
-      view = <GalleryView folders={folders} files={files} clickEvent={openFolder}/>
-    }else{
-      view = <ListView folders={folders} files={files} clickEvent={openFolder}/>
-    }
-  }
+  const view = viewType=="gallery" ? (
+      <GalleryView 
+        folders={folders} 
+        files={files} 
+        clickEvent={openFolder}
+        loading={loading}
+      />
+  ) : (
+      <ListView 
+        folders={folders} 
+        files={files} 
+        clickEvent={openFolder}
+        loading={loading}
+      />
+  );
 
   const changeViewType = () => {
     setViewType(viewType=="gallery"?"list" : "gallery" );
-    setView
   }
 
-  setView()
+  //controls text and arrow color
+  const arrowTextColor = useColorModeValue("black", 'white');
 
   return (
     <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
@@ -110,20 +127,24 @@ export default function Main() {
       h="12vh"
       justify="space-between"
       >
+      
         <HStack
         ml={8}>
-          <IconButton
-          cursor="pointer"
-          _hover={{ bg: 'gray.100' }}
-          onClick={ascendFolderChain}>
-            <IoIosArrowBack color={useColorModeValue("black", 'white')} size={"md"}/>
-          </IconButton>
+          {/* Remove back button if in root folder */}
+          { (currentParent!=-1) &&
+            <IconButton
+            cursor="pointer"
+            _hover={{ bg: 'gray.100' }}
+            onClick={ascendFolderChain}>
+              <IoIosArrowBack color={arrowTextColor} size={"md"}/>
+            </IconButton>
+          }
           {/* file path title */}
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color={useColorModeValue("black", 'white')}
+          color={arrowTextColor}
           size={"3xl"}
-          >Audio / Animal sounds / Mammal roars</Heading>
+          >{nameChain.join(" / ")}</Heading>
         </HStack>
 
         <HStack mr={10}>
@@ -155,25 +176,25 @@ export default function Main() {
                       <Checkbox.Root>
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label color={useColorModeValue("black", 'white')}>png</Checkbox.Label>
+                        <Checkbox.Label color={arrowTextColor}>png</Checkbox.Label>
                       </Checkbox.Root>
 
                       <Checkbox.Root>
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label color={useColorModeValue("black", 'white')}>jpg</Checkbox.Label>
+                        <Checkbox.Label color={arrowTextColor}>jpg</Checkbox.Label>
                       </Checkbox.Root>
 
                       <Checkbox.Root>
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label color={useColorModeValue("black", 'white')}>gif</Checkbox.Label>
+                        <Checkbox.Label color={arrowTextColor}>gif</Checkbox.Label>
                       </Checkbox.Root>
 
                       <Checkbox.Root>
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label color={useColorModeValue("black", 'white')}>mp4</Checkbox.Label>
+                        <Checkbox.Label color={arrowTextColor}>mp4</Checkbox.Label>
                       </Checkbox.Root>
                     </Stack>
 

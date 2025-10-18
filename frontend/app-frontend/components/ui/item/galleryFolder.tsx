@@ -45,7 +45,8 @@ export default function GalleryFolder(props : GalleryFolderProps) {
         <IconButton
             variant="ghost"
             _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
-            borderRadius="100%">
+            borderRadius="100%"
+            onClick={(event)=>{console.log("click");event.stopPropagation();}}>
             <SlOptionsVertical/>
         </IconButton>
       </Flex>

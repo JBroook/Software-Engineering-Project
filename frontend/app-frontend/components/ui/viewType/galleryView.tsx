@@ -7,31 +7,24 @@ import { FaFile } from "react-icons/fa";
 import GalleryItem from "@/components/ui/item/galleryItem";
 import GalleryFolder from "@/components/ui/item/galleryFolder";
 import { useColorModeValue } from '../color-mode'
-import {Folder, File} from './interfaces'
+import {ViewProps} from './interfaces'
+import ContentLoader from "./contentLoader";
 
-export interface GalleryViewProps {
-  folders : Folder[];
-  files : File[];
-  clickEvent : (folderId : number) => void;
-}
 
-export default function GalleryView(props : GalleryViewProps){
+export default function GalleryView(props : ViewProps){
   const folderComponents = props.folders.map(folder => (
     <GalleryFolder 
       id={folder.id}
       key={folder.id} 
       foldername={folder.name} 
       date={folder.date_modified}
-      clickEvent={() => props.clickEvent(folder.id)}
+      clickEvent={() => props.clickEvent(folder.id, folder.name)}
     />
   ))
 
   const fileComponents = props.files.map(file => (
       <GalleryItem key={file.id} filename={file.name} date={file.date_modified}/>
     ))
-    
-  const centeredSpinner = (<Flex justify="center" w="100%"><Spinner/></Flex>);
-  const darkCenteredSpinner = (<Flex justify="center" w="100%"><Spinner color="black"/></Flex>);
 
   return (<>
   {/* Gallery view */}
@@ -50,7 +43,11 @@ export default function GalleryView(props : GalleryViewProps){
         >Folders</Heading>
     </ HStack>
     <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={10} bg={useColorModeValue("#9AB3F2", '#335098')} >
-      {folderComponents.length>0 ? folderComponents : centeredSpinner}
+      <ContentLoader 
+        loading={props.loading}
+        color="white"
+        content={folderComponents}
+      />
     </SimpleGrid>
 
     <Separator size={"md"} />
@@ -72,11 +69,11 @@ export default function GalleryView(props : GalleryViewProps){
         >Files</Heading>
     </ HStack>
     <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={20} bg={useColorModeValue("white", '#0D1835')}>
-      {fileComponents.length>0 ? fileComponents : darkCenteredSpinner}
-      {/* <GalleryItem 
-        filename="sonic.png"
-        date="28 September 2025"/>
-     */}
+      <ContentLoader 
+        loading={props.loading}
+        color="black"
+        content={fileComponents}
+      />
     </SimpleGrid>
     </>);
 }
