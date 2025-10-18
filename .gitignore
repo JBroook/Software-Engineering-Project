@@ -249,3 +249,4 @@ yarn-error.log*
 next-env.d.ts
 /frontend/app-frontend/node_modules
 /backend/media/uploads
+/backend/media/uploads
