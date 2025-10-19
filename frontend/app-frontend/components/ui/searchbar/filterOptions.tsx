@@ -52,9 +52,9 @@ export default function FilterOptions(props : FilterOptionsProps){
                         clickEvent={handleMediaClick}
                         label="Media Type"
                         options={[
-                            {label : 'Image', value : 'image', toggle : false},
-                            {label : 'Video', value : 'video', toggle : false},
-                            {label : 'Audio', value : 'audio', toggle : false},
+                            {label : 'Image', value : 'image'},
+                            {label : 'Video', value : 'video'},
+                            {label : 'Audio', value : 'audio'},
                         ]}
                     />
 
@@ -64,11 +64,11 @@ export default function FilterOptions(props : FilterOptionsProps){
                         clickEvent={handleExtensionClick}
                         label="File Extension"
                         options={[
-                            {label : 'png', value : 'png', toggle : false},
-                            {label : 'jpg', value : 'jpg', toggle : false},
-                            {label : 'gif', value : 'gif', toggle : false},
-                            {label : 'mp3', value : 'mp3', toggle : false},
-                            {label : 'mp4', value : 'mp4', toggle : false},
+                            {label : 'png', value : 'png'},
+                            {label : 'jpg', value : 'jpg'},
+                            {label : 'gif', value : 'gif'},
+                            {label : 'mp3', value : 'mp3'},
+                            {label : 'mp4', value : 'mp4'},
                         ]}
                     />
                 </Stack>

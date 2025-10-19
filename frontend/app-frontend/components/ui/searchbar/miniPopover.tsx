@@ -1,16 +1,19 @@
 import {
   Stack, IconButton,Popover, Checkbox,
-  Menu, Button, Portal
+  Menu, Button, Portal, Field, HStack,
+  Text, Code
 } from "@chakra-ui/react"
 import { useColorModeValue } from "../color-mode";
 import { useState, useEffect } from "react";
 import { MdSelectAll } from "react-icons/md";
 import { MdDeselect } from "react-icons/md";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { Controller, useForm } from "react-hook-form"
+import { z } from "zod"
 
 type option = {
     label : string;
     value : string;
-    toggle : boolean;
 }
 
 interface miniPopoverProps {
@@ -21,48 +24,48 @@ interface miniPopoverProps {
 }
 
 export default function MiniPopover(props : miniPopoverProps){
-    const [options, setOptions] = useState<option[]>(props.options);
-    const [canSelectAll, setCanSelectAll] = useState<boolean>(true);
-    const [checkList, setCheckList] = useState<boolean[]>([]);
+    // Form schema: an array of booleans
+    const formSchema = z.object({
+    checkboxes: z.array(z.boolean()).length(props.options.length),
+    })
 
-    useEffect(()=>{
-        const newOptions = [...props.options];
-        const filteredValues = newOptions
-            .map(option => option.toggle);
-        setCheckList(filteredValues);
-    }, [])
+    type FormData = z.infer<typeof formSchema>
 
-    const returnNewOptions = (index : number) => {
-        const newOptions = [...options];
-        newOptions[index].toggle = !newOptions[index].toggle;
-        const filteredValues = newOptions
-            .filter(option => option.toggle) // keep only those with toggle === true
-            .map(option => option.value);
-        
-        // if all options selected, disable canSelectAll
-        setCanSelectAll(filteredValues.length!==options.length);
+    const form = useForm<FormData>({
+        resolver: standardSchemaResolver(formSchema),
+        defaultValues: {
+        checkboxes: Array(props.options.length).fill(false),
+        },
+    })
 
-        props.clickEvent(filteredValues);
-        setOptions(newOptions);
+    const { control, handleSubmit, setValue, watch } = form
+    const values = watch("checkboxes")
+
+    useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+        if (name?.startsWith("checkboxes")) {
+        const checkboxes = form.getValues("checkboxes")
+
+        const selectedValues = props.options
+            .filter((_, i) => checkboxes[i])
+            .map((opt) => opt.value)
+
+        props.clickEvent?.(selectedValues)
+        }
+    })
+
+    return () => subscription.unsubscribe()
+    }, [form, props.options, props.clickEvent])
+
+    // Toggle all checkboxes: if all are checked, uncheck all; else check all
+    const toggleAll = () => {
+        const allChecked = values.every((v) => v === true)
+        setValue("checkboxes", values.map(() => !allChecked), {
+        shouldValidate: true,
+        })
     }
 
-    const selectAll = () => {
-        const newOptions = [...options];
-        newOptions.forEach(option => {
-            option.toggle = canSelectAll ? false : true;
-        });
-
-        setCanSelectAll(!canSelectAll);
-        setOptions(newOptions);
-    }
-
-    const optionCheckboxes = options.map( (option : option, index : number) => 
-        <Checkbox.Root key={index}>
-            <Checkbox.HiddenInput onChange={() => returnNewOptions(index)} checked/>
-            <Checkbox.Control />
-            <Checkbox.Label color={props.iconTextColor}>{option.label}</Checkbox.Label>
-        </Checkbox.Root>
-    );
+    const allChecked = values.every((v) => v === true)
 
     return (
     <Popover.Root positioning={{ placement: "left" }}>
@@ -82,17 +85,35 @@ export default function MiniPopover(props : miniPopoverProps){
             </Popover.Arrow>
             <Popover.Body p={3}>
             
-            <Stack color={props.iconTextColor}>
-                <Button 
-                variant="outline"
-                _hover={{bg : "#e4e4e4ff"}}
-                onClick={selectAll}
-                >
-                    {canSelectAll ? (<><MdSelectAll /> Select All</>) : (<><MdDeselect />Deselect All</>)}
-                </Button>
-                {optionCheckboxes}
-            </Stack>
-
+             <form onSubmit={handleSubmit((data) => console.log(data))} >
+                <Stack align="flex-start" gap={4} color={props.iconTextColor}>
+                    <Button w="100%" variant="outline" onClick={toggleAll}>
+                         {!allChecked ? (<><MdSelectAll /> Select All</>) : (<><MdDeselect />Deselect All</>)}
+                    </Button>
+                    {/* List of checkboxes */}
+                    {values.map((value, index) => (
+                    <Controller
+                        key={index}
+                        name={`checkboxes.${index}`}
+                        control={control}
+                        render={({ field }) => (
+                        <Field.Root>
+                            <Checkbox.Root
+                            checked={field.value}
+                            onCheckedChange={({ checked }) => {
+                                field.onChange(checked)
+                            }}
+                            >
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                            <Checkbox.Label>{props.options[index].label}</Checkbox.Label>
+                            </Checkbox.Root>
+                        </Field.Root>
+                        )}
+                    />
+                    ))}
+                </Stack>
+            </form>
             </Popover.Body>
         </Popover.Content>
         </Popover.Positioner>

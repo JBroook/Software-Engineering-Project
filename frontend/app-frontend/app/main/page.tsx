@@ -145,7 +145,6 @@ export default function Main() {
       credentials: 'include',
     });
     const folderData = await folderRes.json();
-    console.log(folderData)
     setFolders(folderData)
 
     const url = new URL('http://localhost:8000/api/files/');
