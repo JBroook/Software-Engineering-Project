@@ -50,20 +50,26 @@ class FolderViewSet(ReadOnlyModelViewSet):
         if name:
             queryset = queryset.filter(name__icontains=name)
 
-        owner = self.request.query_params.get('owner')
-        if owner:
-            queryset = queryset.filter(owner=owner)
-
         return queryset
 
 class FileViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FileSerializer
 
     def get_queryset(self):
+        queryset = File.objects.all()
         parent_id = self.request.query_params.get('parent_folder')
-        if parent_id is not None:
-            if parent_id!="-1":
-                return File.objects.filter(parent_folder=parent_id)
+
+        if parent_id:
+            if parent_id != "-1":
+                queryset = queryset.filter(parent_folder=parent_id)
             else:
-                return File.objects.filter(parent_folder__isnull=True)
-        return File.objects.none()
+                queryset = queryset.filter(parent_folder__isnull=True)
+        else:
+            queryset = queryset.none() 
+
+        # Apply other filters 
+        name = self.request.query_params.get('name')
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset

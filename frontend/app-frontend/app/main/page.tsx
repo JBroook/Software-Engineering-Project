@@ -39,9 +39,6 @@ export default function Main() {
   //folders and files are the actual array of items
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  //renderFolders and renderFiles are what are displayed
-  const [renderFolders, setRenderFolders] = useState<Folder[]>([]);
-  const [renderFiles, setRenderFiles] = useState<File[]>([]);
 
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
@@ -52,11 +49,9 @@ export default function Main() {
   const openFolder = async (newFolderId: number, newFolderName: string) => {
     let f = await getFolders(newFolderId);
     setFolders(f);
-    setRenderFolders(f);
 
     f = await getFiles(newFolderId);
     setFiles(f);
-    setRenderFiles(f);
 
     const fChain = [...folderChain, currentParent]
     setFolderChain(fChain);
@@ -74,11 +69,9 @@ export default function Main() {
     if(lastFolderId!==undefined){
       let f = await getFolders(lastFolderId);
       setFolders(f);
-      setRenderFolders(f);
 
       f = await getFiles(lastFolderId);
       setFiles(f);
-      setRenderFiles(f);
 
       setCurrentParent(lastFolderId);
     }
@@ -93,11 +86,9 @@ export default function Main() {
     const fetchAssets = async () =>{
       let f = await getFolders(currentParent);
       setFolders(f);
-      setRenderFolders(f);
 
       f = await getFiles(currentParent);
       setFiles(f);
-      setRenderFiles(f);
 
       setLoading(false);
     }
@@ -110,15 +101,15 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
-        folders={renderFolders} 
-        files={renderFiles} 
+        folders={folders} 
+        files={files} 
         clickEvent={openFolder}
         loading={loading}
       />
   ) : (
       <ListView 
-        folders={renderFolders} 
-        files={renderFiles} 
+        folders={folders} 
+        files={files} 
         clickEvent={openFolder}
         loading={loading}
       />
@@ -133,19 +124,17 @@ export default function Main() {
 
   //search function
   const searchKeyword = async (keyword : string) => {
-    const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}`, {
+    const folderRes = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}&name=${keyword}`, {
       credentials: 'include',
     });
-    const data = await res.json();
-    return data;
-    
-    // const newFolders = folders.filter((item) =>
-    // item.name.toLowerCase().includes(keyword.toLowerCase()));
-    // setRenderFolders(newFolders);
+    const folderData = await folderRes.json();
+    setFolders(folderData)
 
-    // const newFiles = files.filter((item) =>
-    // item.name.toLowerCase().includes(keyword.toLowerCase()));
-    // setRenderFiles(newFiles);
+    const fileRes = await fetch(`http://localhost:8000/api/files/?parent_folder=${currentParent}&name=${keyword}`, {
+      credentials: 'include',
+    });
+    const fileData = await fileRes.json();
+    setFiles(fileData)
   }
 
   //filter function
