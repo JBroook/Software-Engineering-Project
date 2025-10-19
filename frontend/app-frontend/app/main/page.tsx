@@ -33,6 +33,21 @@ const getFiles = async (currentParent: number) => {
   return data;
 };
 
+type SFSParams = {
+  searchKeyword : string;
+  mediaType : string[];
+  fileExtension : string[];
+  sortMethod : string;
+  sortOrder : boolean;
+}
+
+const defaultSFSParams : SFSParams = {
+    searchKeyword : "",
+    mediaType : [],
+    fileExtension : [],
+    sortMethod : "",
+    sortOrder : false
+  }
 
 export default function Main() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -43,7 +58,8 @@ export default function Main() {
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
-  const [filterOptions, setFilterOptions] = useState<boolean[]>([]);
+  // SFS=Search Filter Sort, controls the search filter sort params
+  const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
 
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
@@ -122,23 +138,43 @@ export default function Main() {
   //controls text and arrow color
   const iconTextColor = useColorModeValue("black", 'white');
 
-  //search function
-  const searchKeyword = async (keyword : string) => {
-    const folderRes = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}&name=${keyword}`, {
+  //search-filter-sort function
+  const fetchSFS = async (SFS : SFSParams) => {
+    
+    const folderRes = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}&name=${SFS.searchKeyword}`, {
       credentials: 'include',
     });
     const folderData = await folderRes.json();
+    console.log(folderData)
     setFolders(folderData)
 
-    const fileRes = await fetch(`http://localhost:8000/api/files/?parent_folder=${currentParent}&name=${keyword}`, {
+    const url = new URL('http://localhost:8000/api/files/');
+    url.searchParams.set('parent_folder', currentParent.toString());
+    url.searchParams.set('name', SFS.searchKeyword);
+    url.searchParams.set('media_type', SFS.mediaType.join("_"));
+    const fileRes = await fetch(url.toString(), {
       credentials: 'include',
     });
     const fileData = await fileRes.json();
+    console.log(fileData)
     setFiles(fileData)
   }
 
-  //filter function
-  // const filterExtension
+  const searchKeyword = (keyword : string) => {
+    const newSFS = {...SFS};
+    newSFS.searchKeyword = keyword;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterMediaType = (mediaTypes : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.mediaType = mediaTypes;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
 
   return (
     <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
@@ -177,7 +213,7 @@ export default function Main() {
             
             {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
 
-            {/* <FilterOptions iconTextColor={iconTextColor} /> */}
+            <FilterOptions iconTextColor={iconTextColor} mediaTypeEvent={filterMediaType}/>
 
             <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}

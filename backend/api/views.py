@@ -71,5 +71,10 @@ class FileViewSet(ReadOnlyModelViewSet):
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
+    
+        media_type = self.request.query_params.get('media_type')
+        if media_type:
+            media_type = media_type.split('_')
+            queryset = queryset.filter(media_type__in=media_type)
 
         return queryset
