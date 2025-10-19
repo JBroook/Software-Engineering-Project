@@ -11,57 +11,21 @@ import MiniPopover from "./miniPopover";
 interface FilterOptionsProps {
     iconTextColor : string;
     mediaTypeEvent : (mediaTypes : string[]) => void;
-    fileExtensionEvent : () => void;
+    fileExtensionEvent : (fileExtensions : string[]) => void;
 }
 
-
-// function FileExtensionPopover(props : PopoverOptionProps){
-//     const options = [
-//         'jpg',
-//         'png',
-//         'webp',
-//         'gif',
-//         'mp4',
-//         'mp3'
-//     ];
-//     const optionCheckboxes = options.map( (option : string, index : number) => 
-//         <Checkbox.Root key={index}>
-//             <Checkbox.HiddenInput />
-//             <Checkbox.Control />
-//             <Checkbox.Label color={props.iconTextColor}>{option}</Checkbox.Label>
-//         </Checkbox.Root>
-//     );
-
-//     return (
-//     <Popover.Root positioning={{ placement: "left" }}>
-//         <Popover.Trigger asChild>
-//         <Button variant="solid" color="white" 
-//         bg={useColorModeValue("#9AB3F2", '#335098')}
-//         _hover={{bg : useColorModeValue("#8ba2dbff", '#3d5eb2ff')}}>File Extension</Button>
-//         </Popover.Trigger>
-//         <Popover.Positioner>
-//         <Popover.Content>
-//             <Popover.CloseTrigger />
-//             <Popover.Arrow>
-//             <Popover.ArrowTip />
-//             </Popover.Arrow>
-//             <Popover.Body p={3}>
-            
-//             <Stack color={props.iconTextColor}>
-//                 {optionCheckboxes}
-//             </Stack>
-
-//             </Popover.Body>
-//         </Popover.Content>
-//         </Popover.Positioner>
-//     </Popover.Root>);
-// }
 
 export default function FilterOptions(props : FilterOptionsProps){
     const [mediaTypes, setMediaTypes] = useState<string[]>([]);
     const handleMediaClick = (newMediaTypes : string[]) => {
         setMediaTypes(newMediaTypes);
         props.mediaTypeEvent(newMediaTypes);
+    }
+
+    const [extensionTypes, setExtensionTypes] = useState<string[]>([]);
+    const handleExtensionClick = (newExtensions : string[]) => {
+        setExtensionTypes(newExtensions);
+        props.fileExtensionEvent(newExtensions);
     }
 
     return (<>
@@ -86,6 +50,7 @@ export default function FilterOptions(props : FilterOptionsProps){
                     <MiniPopover 
                         iconTextColor={props.iconTextColor}
                         clickEvent={handleMediaClick}
+                        label="Media Type"
                         options={[
                             {label : 'Image', value : 'image', toggle : false},
                             {label : 'Video', value : 'video', toggle : false},
@@ -93,7 +58,19 @@ export default function FilterOptions(props : FilterOptionsProps){
                         ]}
                     />
 
-                    {/* <FileExtensionPopover iconTextColor={props.iconTextColor}  clickEvent={props.fileExtensionEvent}/> */}
+                    {/* File extension filtering */}
+                    <MiniPopover 
+                        iconTextColor={props.iconTextColor}
+                        clickEvent={handleExtensionClick}
+                        label="File Extension"
+                        options={[
+                            {label : 'png', value : 'png', toggle : false},
+                            {label : 'jpg', value : 'jpg', toggle : false},
+                            {label : 'gif', value : 'gif', toggle : false},
+                            {label : 'mp3', value : 'mp3', toggle : false},
+                            {label : 'mp4', value : 'mp4', toggle : false},
+                        ]}
+                    />
                 </Stack>
 
                 </Popover.Body>

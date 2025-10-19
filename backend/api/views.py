@@ -67,7 +67,6 @@ class FileViewSet(ReadOnlyModelViewSet):
         else:
             queryset = queryset.none() 
 
-        # Apply other filters 
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -76,5 +75,11 @@ class FileViewSet(ReadOnlyModelViewSet):
         if media_type:
             media_type = media_type.split('_')
             queryset = queryset.filter(media_type__in=media_type)
+
+        file_type = self.request.query_params.get('file_type')
+        if file_type:
+            file_type = file_type.split('_')
+            queryset = queryset.filter(filetype__in=file_type)
+
 
         return queryset

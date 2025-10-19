@@ -152,6 +152,7 @@ export default function Main() {
     url.searchParams.set('parent_folder', currentParent.toString());
     url.searchParams.set('name', SFS.searchKeyword);
     url.searchParams.set('media_type', SFS.mediaType.join("_"));
+    url.searchParams.set('file_type', SFS.fileExtension.join("_"));
     const fileRes = await fetch(url.toString(), {
       credentials: 'include',
     });
@@ -171,6 +172,14 @@ export default function Main() {
   const filterMediaType = (mediaTypes : string[]) => {
     const newSFS = {...SFS};
     newSFS.mediaType = mediaTypes;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterFileExtension = (fileExtensions : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.fileExtension = fileExtensions;
     setSFS(newSFS)
 
     fetchSFS(newSFS)
@@ -213,7 +222,11 @@ export default function Main() {
             
             {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
 
-            <FilterOptions iconTextColor={iconTextColor} mediaTypeEvent={filterMediaType}/>
+            <FilterOptions 
+            iconTextColor={iconTextColor} 
+            mediaTypeEvent={filterMediaType}
+            fileExtensionEvent={filterFileExtension}
+            />
 
             <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
