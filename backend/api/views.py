@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from assets.models import Folder, File
 from . import serializers
-from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 class LoginView(APIView):
     #user logging in
@@ -32,18 +32,29 @@ class LoginView(APIView):
     
 class FolderViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FolderSerializer
-    queryset = Folder.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['parent_folder', 'name']
 
-    # def get_queryset(self):
-    #     parent_id = self.request.query_params.get('parent_folder')
-    #     if parent_id is not None:
-    #         if parent_id!="-1":
-    #             return Folder.objects.filter(parent_folder=parent_id)
-    #         else:
-    #             return Folder.objects.filter(parent_folder__isnull=True)
-    #     return Folder.objects.none()
+    def get_queryset(self):
+        queryset = Folder.objects.all()
+        parent_id = self.request.query_params.get('parent_folder')
+
+        if parent_id is not None:
+            if parent_id != "-1":
+                queryset = queryset.filter(parent_folder=parent_id)
+            else:
+                queryset = queryset.filter(parent_folder__isnull=True)
+        else:
+            queryset = queryset.none() 
+
+        # Apply other filters 
+        name = self.request.query_params.get('name')
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        owner = self.request.query_params.get('owner')
+        if owner:
+            queryset = queryset.filter(owner=owner)
+
+        return queryset
 
 class FileViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FileSerializer
