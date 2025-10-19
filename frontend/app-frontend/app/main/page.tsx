@@ -157,7 +157,7 @@ export default function Main() {
     const url1 = new URL('http://localhost:8000/api/folders/');
     url1.searchParams.set('parent_folder', currentParent.toString());
     url1.searchParams.set('name', SFS.searchKeyword);
-    if(SFS.sortMethod==='name'){
+    if(SFS.sortMethod==='name' || SFS.sortMethod==='date_modified'){
       url1.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
     }
     const folderRes = await fetch(url1, {

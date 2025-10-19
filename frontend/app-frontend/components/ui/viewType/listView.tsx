@@ -45,7 +45,8 @@ export default function ListView(props : ViewProps){
       </HStack>
 
       <SortBar onChange={props.sortFolderEvent} sortOptions={[
-        { label : "Filename", value : "name"},]}/>
+        { label : "Filename", value : "name"},
+        { label : "Last modified", value : "date_modified"}]}/>
     </ HStack>
     
     <Stack
