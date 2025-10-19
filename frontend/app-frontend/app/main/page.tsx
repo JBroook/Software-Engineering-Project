@@ -38,7 +38,7 @@ type SFSParams = {
   mediaType : string[];
   fileExtension : string[];
   sortMethod : string;
-  sortOrder : boolean;
+  sortOrder : string;
 }
 
 const defaultSFSParams : SFSParams = {
@@ -46,7 +46,7 @@ const defaultSFSParams : SFSParams = {
     mediaType : [],
     fileExtension : [],
     sortMethod : "",
-    sortOrder : false
+    sortOrder : "asc"
   }
 
 export default function Main() {
@@ -112,6 +112,16 @@ export default function Main() {
     fetchAssets()
   }, []);
 
+  // sort function
+  const sortFiles = (sortMethod : string, sortOrder : string) => {
+    const newSFS = {...SFS};
+    newSFS.sortMethod = sortMethod;
+    newSFS.sortOrder = sortOrder;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
   // handles gallery vs list view
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
@@ -121,6 +131,8 @@ export default function Main() {
         files={files} 
         clickEvent={openFolder}
         loading={loading}
+        sortFileEvent={sortFiles}
+        sortFolderEvent={sortFiles}
       />
   ) : (
       <ListView 
@@ -128,6 +140,8 @@ export default function Main() {
         files={files} 
         clickEvent={openFolder}
         loading={loading}
+        sortFileEvent={sortFiles}
+        sortFolderEvent={sortFiles}
       />
   );
 
@@ -140,19 +154,25 @@ export default function Main() {
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
-    
-    const folderRes = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}&name=${SFS.searchKeyword}`, {
+    const url1 = new URL('http://localhost:8000/api/folders/');
+    url1.searchParams.set('parent_folder', currentParent.toString());
+    url1.searchParams.set('name', SFS.searchKeyword);
+    if(SFS.sortMethod==='name'){
+      url1.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    }
+    const folderRes = await fetch(url1, {
       credentials: 'include',
     });
     const folderData = await folderRes.json();
     setFolders(folderData)
 
-    const url = new URL('http://localhost:8000/api/files/');
-    url.searchParams.set('parent_folder', currentParent.toString());
-    url.searchParams.set('name', SFS.searchKeyword);
-    url.searchParams.set('media_type', SFS.mediaType.join("_"));
-    url.searchParams.set('file_type', SFS.fileExtension.join("_"));
-    const fileRes = await fetch(url.toString(), {
+    const url2 = new URL('http://localhost:8000/api/files/');
+    url2.searchParams.set('parent_folder', currentParent.toString());
+    url2.searchParams.set('name', SFS.searchKeyword);
+    url2.searchParams.set('media_type', SFS.mediaType.join("_"));
+    url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    const fileRes = await fetch(url2.toString(), {
       credentials: 'include',
     });
     const fileData = await fileRes.json();

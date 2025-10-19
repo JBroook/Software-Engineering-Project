@@ -45,10 +45,15 @@ class FolderViewSet(ReadOnlyModelViewSet):
         else:
             queryset = queryset.none() 
 
-        # Apply other filters 
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
+
+        sort_method = self.request.query_params.get('sort_method')
+        if sort_method:
+            sort_method, sort_order = sort_method.split('__')
+            sort_order = "-" if sort_order=="asc" else ""
+            queryset = queryset.order_by(sort_order+sort_method)
 
         return queryset
 
@@ -80,6 +85,12 @@ class FileViewSet(ReadOnlyModelViewSet):
         if file_type:
             file_type = file_type.split('_')
             queryset = queryset.filter(filetype__in=file_type)
+
+        sort_method = self.request.query_params.get('sort_method')
+        if sort_method:
+            sort_method, sort_order = sort_method.split('__')
+            sort_order = "-" if sort_order=="asc" else ""
+            queryset = queryset.order_by(sort_order+sort_method)
 
 
         return queryset

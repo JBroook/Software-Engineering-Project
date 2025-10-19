@@ -9,6 +9,7 @@ import GalleryFolder from "@/components/ui/item/galleryFolder";
 import { useColorModeValue } from '../color-mode'
 import {ViewProps} from './interfaces'
 import ContentLoader from "./contentLoader";
+import SortBar from "../searchbar/sortBar";
 
 
 export default function GalleryView(props : ViewProps){
@@ -32,15 +33,21 @@ export default function GalleryView(props : ViewProps){
     <HStack
     bg={useColorModeValue("#9AB3F2", '#335098')}
     pl={8}
-    pb={3}>
-      <FaFolder 
-        color={useColorModeValue("black", 'white')}
-        size={25}/>
+    pb={3}
+    justify="space-between">
+      <HStack>
+        <FaFolder 
+          color={useColorModeValue("black", 'white')}
+          size={25}/>
         <Heading
         fontFamily="var(--font-roboto-condensed)"
         size={"2xl"}
         color={useColorModeValue("black", 'white')}
         >Folders</Heading>
+      </HStack>
+
+      <SortBar onChange={props.sortFolderEvent} sortOptions={[
+        { label : "Filename", value : "name"},]}/>
     </ HStack>
     <SimpleGrid 
     w="100%" 
@@ -60,21 +67,32 @@ export default function GalleryView(props : ViewProps){
     <Separator size={"md"} />
 
     {/* Files */}
-    <HStack
-    pl={8}
-    pb={3}
-    pt={5}
-    bg={useColorModeValue("white", '#0D1835')}
-    >
-      <FaFile 
-        color={useColorModeValue("black", 'white')}
-        size={22}/>
-        <Heading
-        fontFamily="var(--font-roboto-condensed)"
-        color={useColorModeValue("black", 'white')}
-        size={"2xl"}
-        >Files</Heading>
-    </ HStack>
+    <Flex
+      bg={useColorModeValue("white", '#0D1835')}
+      justify="space-between"
+      w="100%">
+
+      <HStack
+      pl={8}
+      pb={3}
+      pt={5}
+      >
+        <FaFile 
+          color={useColorModeValue("black", 'white')}
+          size={22}/>
+          <Heading
+          fontFamily="var(--font-roboto-condensed)"
+          color={useColorModeValue("black", 'white')}
+          size={"2xl"}
+          >Files</Heading>
+      </ HStack>
+
+      <SortBar onChange={props.sortFileEvent} sortOptions={[
+        { label : "Filename", value : "name"},
+        { label : "Size", value : "size"},
+        { label : "Last modified", value : "date_modified"}]}/>
+    </Flex>
+
     <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={20} bg={useColorModeValue("white", '#0D1835')}>
       <ContentLoader 
         loading={props.loading}
