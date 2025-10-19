@@ -9,13 +9,13 @@ import {
 } from "@chakra-ui/react"
 import { IoIosArrowBack } from "react-icons/io";
 import { IoSearchCircleOutline } from "react-icons/io5";
-import { IoFilter } from "react-icons/io5";
 import { RiGalleryView2 } from "react-icons/ri";
 import { IoIosList } from "react-icons/io";
 import { useEffect, useState } from "react";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
+import FilterOptions from "@/components/ui/searchbar/filterOptions";
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -36,13 +36,17 @@ const getFiles = async (currentParent: number) => {
 
 export default function Main() {
   const [loading, setLoading] = useState<boolean>(true);
+  //folders and files are the actual array of items
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  //renderFolders and renderFiles are what are displayed
   const [renderFolders, setRenderFolders] = useState<Folder[]>([]);
   const [renderFiles, setRenderFiles] = useState<File[]>([]);
+
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
+  const [filterOptions, setFilterOptions] = useState<boolean[]>([]);
 
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
@@ -125,18 +129,27 @@ export default function Main() {
   }
 
   //controls text and arrow color
-  const arrowTextColor = useColorModeValue("black", 'white');
+  const iconTextColor = useColorModeValue("black", 'white');
 
   //search function
-  const searchKeyword = (keyword : string) => {
-    const newFolders = folders.filter((item) =>
-    item.name.toLowerCase().includes(keyword.toLowerCase()));
-    setRenderFolders(newFolders);
+  const searchKeyword = async (keyword : string) => {
+    const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentParent}`, {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    return data;
+    
+    // const newFolders = folders.filter((item) =>
+    // item.name.toLowerCase().includes(keyword.toLowerCase()));
+    // setRenderFolders(newFolders);
 
-    const newFiles = files.filter((item) =>
-    item.name.toLowerCase().includes(keyword.toLowerCase()));
-    setRenderFiles(newFiles);
+    // const newFiles = files.filter((item) =>
+    // item.name.toLowerCase().includes(keyword.toLowerCase()));
+    // setRenderFiles(newFiles);
   }
+
+  //filter function
+  // const filterExtension
 
   return (
     <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
@@ -155,13 +168,13 @@ export default function Main() {
             cursor="pointer"
             _hover={{ bg: 'gray.100' }}
             onClick={ascendFolderChain}>
-              <IoIosArrowBack color={arrowTextColor} size={"md"}/>
+              <IoIosArrowBack color={iconTextColor} size={"md"}/>
             </IconButton>
           }
           {/* file path title */}
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color={arrowTextColor}
+          color={iconTextColor}
           size={"3xl"}
           >{nameChain.join(" / ")}</Heading>
         </HStack>
@@ -175,52 +188,7 @@ export default function Main() {
             
             {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
 
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-                  _hover={{ bg: '#e0e0e0ff' }}>
-                  <IoFilter color="#9AB3F2"/>
-                </IconButton>
-              </Popover.Trigger>
-              <Popover.Positioner>
-                <Popover.Content>
-                  <Popover.CloseTrigger />
-                  <Popover.Arrow>
-                    <Popover.ArrowTip />
-                  </Popover.Arrow>
-                  <Popover.Body p={3}>
-                    <Popover.Title color="black" fontWeight="medium">Filter options</Popover.Title>
-                    
-                    <Stack>
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>png</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>jpg</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>gif</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>mp4</Checkbox.Label>
-                      </Checkbox.Root>
-                    </Stack>
-
-                  </Popover.Body>
-                </Popover.Content>
-              </Popover.Positioner>
-            </Popover.Root>
+            {/* <FilterOptions iconTextColor={iconTextColor} /> */}
 
             <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
