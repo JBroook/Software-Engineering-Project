@@ -2,29 +2,53 @@
 
 import React from 'react'
 import { Box, Flex, Text, 
-          Drawer,Portal, } from '@chakra-ui/react'
+          Drawer,Portal, Button,
+        Icon } from '@chakra-ui/react'
 import { FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings, FiMenu } from 'react-icons/fi'
+import { RiLogoutBoxLine } from "react-icons/ri";
 import { IconType } from 'react-icons'
 import { useColorModeValue } from '../color-mode'
 import ToggleTheme from '../toggleTheme'
 import NavItem from './NavLinks'
+import { useRouter } from 'next/navigation';
 
 interface LinkItemProps {
-  name: string
-  icon: IconType
+  name: string;
+  icon: IconType;
+  href: string;
 }
 
 // List of navigation items
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Home', icon: FiHome },
-  { name: 'Trending', icon: FiTrendingUp },
-  { name: 'Explore', icon: FiCompass },
-  { name: 'Favourites', icon: FiStar },
-  { name: 'Settings', icon: FiSettings },
+  { name: 'Home', icon: FiHome, href: '/main' },
+  { name: 'Trending', icon: FiTrendingUp, href: '/main' },
+  { name: 'Explore', icon: FiCompass, href: '/main' },
+  { name: 'Favourites', icon: FiStar, href: '/main' },
+  { name: 'Settings', icon: FiSettings, href: '/main' },
 ]
+
+function getCookie(name:string) {
+  const value = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return value ? decodeURIComponent(value.split('=')[1]) : "";
+}
 
 // Main Sidebar Component
 export default function SimpleSidebar() {
+  // logout user logic
+  const router = useRouter();
+  const handleLogout = async () => {
+    await fetch('http://localhost:8000/api/logout/', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+    },
+    });
+    router.push('/login');
+  };
+
   return (
     <>
     <Flex w={'20vw'} direction={'column'} position="fixed" top="0">
@@ -45,10 +69,36 @@ export default function SimpleSidebar() {
         </Flex>
         <Flex h={"75vh"} overflowY={"auto"} direction="column" mt="4">
           {LinkItems.map((link) => (
-            <NavItem key={link.name} icon={link.icon}>
+            <NavItem key={link.name} icon={link.icon} href={link.href}>
               {link.name}
             </NavItem>
           ))}
+
+          {/* logout */}
+          <Button
+            // align="center"
+            width="85%"
+            p="4"
+            mx="4"
+            borderRadius="lg"
+            role="group"
+            cursor="pointer"
+            justifyContent={'flex-start'}
+            color={useColorModeValue('black', 'white')}
+            _hover={{
+              bg: 'cyan.400',
+              color: useColorModeValue('black', 'white'),
+            }}
+            onClick={handleLogout}>
+              <Icon
+                mr="4"
+                fontSize="16"
+                _groupHover={{
+                  color: useColorModeValue('black', 'white'),
+                }}
+                as={RiLogoutBoxLine}
+              /> Logout
+          </Button>
         </Flex>
         <Flex direction="column" mt="2">
           <ToggleTheme />

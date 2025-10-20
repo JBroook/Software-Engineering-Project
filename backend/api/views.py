@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -9,6 +9,18 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from assets.models import Folder, File
 from . import serializers
 from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated
+
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "email": user.email,
+            "username": user.username,
+            "id": user.id
+        }, status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     #user logging in
@@ -30,7 +42,14 @@ class LoginView(APIView):
         csrf_token = get_token(request)
         return Response({'csrfToken':csrf_token})
     
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        print("Logged out")
+        return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
+    
 class FolderViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
 
     def get_queryset(self):
@@ -58,6 +77,7 @@ class FolderViewSet(ReadOnlyModelViewSet):
         return queryset
 
 class FileViewSet(ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = serializers.FileSerializer
 
     def get_queryset(self):

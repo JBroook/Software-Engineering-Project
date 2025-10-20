@@ -16,6 +16,7 @@ import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
+import { useRouter } from "next/navigation";
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -97,8 +98,18 @@ export default function Main() {
     setNameChain(nChain);
   }
 
-  // fetch current folder's child items, fetch items with no parents if at root folder
+  // check if user is logged in, else return to login page
+  const router = useRouter();
   useEffect(()=>{
+    fetch('http://localhost:8000/api/user', { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) {
+        router.push('/login');
+        return;
+      }
+    });
+
+    // fetch current folder's child items, fetch items with no parents if at root folder
     const fetchAssets = async () =>{
       let f = await getFolders(currentParent);
       setFolders(f);
