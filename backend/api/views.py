@@ -52,7 +52,26 @@ class LogoutView(APIView):
 class EmployeeViewSet(ModelViewSet):
     # permission_classes = [IsAuthenticated]
     serializer_class = serializers.EmployeeSerializer
-    queryset = Employee.objects.all()
+
+    def get_queryset(self):
+        queryset = Employee.objects.all()
+
+        sort_criteria = self.request.query_params.get('sort_criteria')
+        sort_order = self.request.query_params.get('sort_order')
+        if sort_criteria:
+            sort_order = "-" if sort_order=="desc" else ""
+            if sort_criteria!='name':
+                user_fields = ['email','username']
+                # extra handling for fields from user model
+                if sort_criteria in user_fields:
+                    sort_criteria = "user__" + sort_criteria
+
+                queryset = queryset.order_by(sort_order+sort_criteria)
+            else:
+                # name field has to be handled differently as it is two fields combined (first and last name)
+                queryset = queryset.order_by(sort_order+'user__first_name', sort_order+'user__last_name')
+
+        return queryset
     
 class FolderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]

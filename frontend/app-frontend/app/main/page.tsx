@@ -101,6 +101,7 @@ export default function Main() {
   // check if user is logged in, else return to login page
   const router = useRouter();
   useEffect(()=>{
+    // extra layer of protection in case the middleware doesn't catch unauthenticated users
     fetch('http://localhost:8000/api/user', { credentials: 'include' })
     .then(res => {
       if (!res.ok) {

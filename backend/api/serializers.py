@@ -19,7 +19,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id','role','full_name', 'email', 'username']
+        fields = ['id','role','full_name', 'email', 'username', 'last_active', 'join_date']
 
     def get_full_name(self, obj):
         return obj.user.first_name+" "+obj.user.last_name
