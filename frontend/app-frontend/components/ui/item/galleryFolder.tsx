@@ -17,6 +17,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
   return (
     <Box 
     w="100%"
+    maxW="400px"
     h="fit-content"
     bg={useColorModeValue("white", '#383838')}
     color={useColorModeValue("black", 'white')}

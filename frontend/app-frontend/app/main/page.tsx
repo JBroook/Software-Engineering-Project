@@ -16,6 +16,7 @@ import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
+import { useRouter } from "next/navigation";
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -97,8 +98,18 @@ export default function Main() {
     setNameChain(nChain);
   }
 
-  // fetch current folder's child items, fetch items with no parents if at root folder
+  // check if user is logged in, else return to login page
+  const router = useRouter();
   useEffect(()=>{
+    fetch('http://localhost:8000/api/user', { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) {
+        router.push('/login');
+        return;
+      }
+    });
+
+    // fetch current folder's child items, fetch items with no parents if at root folder
     const fetchAssets = async () =>{
       let f = await getFolders(currentParent);
       setFolders(f);
@@ -171,7 +182,9 @@ export default function Main() {
     url2.searchParams.set('name', SFS.searchKeyword);
     url2.searchParams.set('media_type', SFS.mediaType.join("_"));
     url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
-    url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    if(SFS.sortMethod!==""){
+      url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    }
     const fileRes = await fetch(url2.toString(), {
       credentials: 'include',
     });
@@ -233,7 +246,7 @@ export default function Main() {
         </HStack>
 
         <HStack mr={10}>
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
@@ -247,10 +260,10 @@ export default function Main() {
             fileExtensionEvent={filterFileExtension}
             />
 
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={changeViewType}>
-              {viewType=="gallery"?<RiGalleryView2 color="#9AB3F2"/>:<IoIosList color="#9AB3F2"/>}
+              {viewType=="gallery"?<IoIosList color="#9AB3F2"/>:<RiGalleryView2 color="#9AB3F2"/>}
             </IconButton>
 
           </HStack>

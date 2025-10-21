@@ -7,12 +7,13 @@ import NextLink  from "next/link"
 // Navigation Item
 interface NavItemProps extends FlexProps {
   icon: IconType
-  children: String | ReactNode
+  children: String | ReactNode,
+  href : string;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, children, href, ...rest }: NavItemProps) => {
   return (
     <>
-    <ChakraLink w={'full'} href='/login' _hover={{ textDecoration: 'none' }}>
+    <ChakraLink w={'full'} href={href} _hover={{ textDecoration: 'none' }}>
       <Button
       align="center"
       width="85%"
