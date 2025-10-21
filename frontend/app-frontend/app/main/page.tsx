@@ -244,7 +244,7 @@ export default function Main() {
         </HStack>
 
         <HStack mr={10}>
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <IconButton borderRadius={"xl"} bg="useColorModeValue("#F6F6F6", '#0D1835') cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
