@@ -5,8 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from assets.models import Folder, File
+from users.models import Employee
 from . import serializers
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
@@ -48,7 +49,12 @@ class LogoutView(APIView):
         print("Logged out")
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
     
-class FolderViewSet(ReadOnlyModelViewSet):
+class EmployeeViewSet(ModelViewSet):
+    # permission_classes = [IsAuthenticated]
+    serializer_class = serializers.EmployeeSerializer
+    queryset = Employee.objects.all()
+    
+class FolderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
 
@@ -76,7 +82,7 @@ class FolderViewSet(ReadOnlyModelViewSet):
 
         return queryset
 
-class FileViewSet(ReadOnlyModelViewSet):
+class FileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.FileSerializer
 
