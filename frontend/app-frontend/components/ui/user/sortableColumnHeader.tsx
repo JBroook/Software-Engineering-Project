@@ -12,7 +12,7 @@ type SortableColumnHeaderProps = {
 
 export default function SortableColumnHeader(props : SortableColumnHeaderProps){
   return (<>
-    <Table.ColumnHeader p={2}>
+    <Table.ColumnHeader p={1}>
       <HStack justify="space-between">
         {props.label}
         <IconButton onClick={props.clickEvent}>

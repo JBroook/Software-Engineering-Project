@@ -56,6 +56,10 @@ class EmployeeViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = Employee.objects.all()
 
+        search_keyword = self.request.query_params.get('search')
+        if search_keyword:
+            queryset = queryset.filter(Q(user__first_name__icontains=search_keyword) | Q(user__last_name__icontains=search_keyword))
+
         sort_criteria = self.request.query_params.get('sort_criteria')
         sort_order = self.request.query_params.get('sort_order')
         if sort_criteria:

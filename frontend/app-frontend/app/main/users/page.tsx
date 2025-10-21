@@ -13,6 +13,7 @@ import { useState, useEffect } from "react"
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import SortableColumnHeader from "@/components/ui/user/sortableColumnHeader";
+import { IoSearchCircleOutline } from "react-icons/io5";
 
 type user = {
   id : number;
@@ -24,11 +25,26 @@ type user = {
   last_active : string;
 }
 
+type SFSParams = {
+  searchKeyword : string;
+  sortCriteria : string;
+  sortOrder : string;
+  roleFilter : string;
+}
+
+const defaultSFSParams : SFSParams = {
+  searchKeyword : "",
+  sortCriteria : "",
+  sortOrder : "asc",
+  roleFilter : ""
+}
+
+
 export default function UsersPage(){
   //controls text and arrow color
   const iconTextColor = useColorModeValue("black", 'white');
   const [users, setUsers] = useState<user[]>([]);
-  const [sortOrder, setSortOrder] = useState<boolean>(false);
+  const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
 
   useEffect(()=>{
     const fetchUsers = async () =>{
@@ -58,18 +74,50 @@ export default function UsersPage(){
     { label : "Last Active", value : "last_active"},
   ]
 
-  const sortTable = async (sortCriteria : string) => {
-    setSortOrder(!sortOrder)
-    const url = new URL('http://localhost:8000/api/employees/');
-    url.searchParams.set('sort_criteria', sortCriteria);
-    url.searchParams.set('sort_order', sortOrder ? "desc" : "asc");
-    const res = await fetch(url, {
-      credentials : 'include',
-      method : 'GET',
-    });
-    const data = await res.json()
+  // const sortTable = async (sortCriteria : string) => {
+  //   setSortOrder(!sortOrder)
+  //   const url = new URL('http://localhost:8000/api/employees/');
+  //   url.searchParams.set('sort_criteria', sortCriteria);
+  //   url.searchParams.set('sort_order', sortOrder ? "desc" : "asc");
+  //   const res = await fetch(url, {
+  //     credentials : 'include',
+  //     method : 'GET',
+  //   });
+  //   const data = await res.json()
 
-    setUsers(data);
+  //   setUsers(data);
+  // }
+
+  //search-filter-sort function
+  const fetchSFS = async (SFS : SFSParams) => {
+    const url = new URL('http://localhost:8000/api/employees/');
+    if(SFS.searchKeyword!==""){
+      url.searchParams.set('search', SFS.searchKeyword);
+    }
+    if(SFS.sortCriteria!==""){
+      url.searchParams.set('sort_criteria', SFS.sortCriteria);
+      url.searchParams.set('sort_order', SFS.sortOrder);
+    }
+    const res = await fetch(url.toString(), {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    setUsers(data)
+  }
+
+  const sort = (sortCriteria : string) => {
+    const newSFS = {...SFS};
+    newSFS.sortCriteria = sortCriteria;
+    newSFS.sortOrder = (newSFS.sortOrder==="asc") ? "desc" : "asc";
+    setSFS(newSFS);
+    fetchSFS(newSFS);
+  }
+
+  const searchKeyword = (keyword : string) => {
+    const newSFS = {...SFS};
+    newSFS.searchKeyword = keyword;
+    setSFS(newSFS);
+    fetchSFS(newSFS);
   }
 
   return (<>
@@ -114,11 +162,20 @@ export default function UsersPage(){
           </HStack>
       </Flex>
 
+      <HStack ml={8} w="200px" mb={3} >
+        <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+          _hover={{ bg: '#e0e0e0ff' }}>
+            <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
+        </IconButton>
+        <Searchbar color={iconTextColor} placeholder="Search users" inputEvent={searchKeyword}/>
+      </HStack>
+
+
       <Table.Root ml={8} w="95%">
       <Table.Header>
         <Table.Row bg={useColorModeValue("#9AB3F2", '#335098')}>
           {columnHeaders.map((item, index)=>
-            <SortableColumnHeader key={index} label={item.label} clickEvent={()=>sortTable(item.value)}/>
+            <SortableColumnHeader key={index} label={item.label} clickEvent={()=>sort(item.value)}/>
           )}
           <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
         </Table.Row>
@@ -126,7 +183,7 @@ export default function UsersPage(){
       <Table.Body>
         {users.map((item) => (
           <Table.Row key={item.id}  color={iconTextColor}>
-            <Table.Cell py={2}>{item.full_name} </Table.Cell>
+            <Table.Cell py={2} pl={1}>{item.full_name} </Table.Cell>
             <Table.Cell>{item.username}</Table.Cell>
             <Table.Cell>{item.email}</Table.Cell>
             <Table.Cell>{item.role}</Table.Cell>
