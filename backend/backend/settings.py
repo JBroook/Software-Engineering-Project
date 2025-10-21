@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "corsheaders",
     'api',
     'rest_framework',
-    'assets'
+    'assets',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -133,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kuala Lumpur'
 
 USE_I18N = True
 
