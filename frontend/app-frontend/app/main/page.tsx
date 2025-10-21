@@ -182,7 +182,9 @@ export default function Main() {
     url2.searchParams.set('name', SFS.searchKeyword);
     url2.searchParams.set('media_type', SFS.mediaType.join("_"));
     url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
-    url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    if(SFS.sortMethod!==""){
+      url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    }
     const fileRes = await fetch(url2.toString(), {
       credentials: 'include',
     });
@@ -244,7 +246,7 @@ export default function Main() {
         </HStack>
 
         <HStack mr={10}>
-            <IconButton borderRadius={"xl"} bg="useColorModeValue("#F6F6F6", '#0D1835') cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>

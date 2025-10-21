@@ -50,20 +50,36 @@ export default function GalleryView(props : ViewProps){
         { label : "Filename", value : "name"},
         { label : "Last modified", value : "date_modified"}]}/>
     </ HStack>
-    <SimpleGrid 
-    w="100%" 
-    minChildWidth={80} 
-    gap="6" 
-    px={8} 
-    pb={10} 
-    bg={useColorModeValue("#9AB3F2", '#335098')} 
-    >
-      <ContentLoader 
-        loading={props.loading}
-        color="white"
-        content={folderComponents}
-      />
-    </SimpleGrid>
+    {folderComponents.length>=3 ?
+      <SimpleGrid 
+      w="100%" 
+      minChildWidth={80} 
+      gap="6px" 
+      px={8} 
+      pb={10} 
+      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      >
+        <ContentLoader 
+          loading={props.loading}
+          color="white"
+          content={folderComponents}
+        />
+      </SimpleGrid>
+      :
+      <Flex 
+      w="100%" 
+      gap="6px" 
+      px={8} 
+      pb={10} 
+      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      >
+        <ContentLoader 
+          loading={props.loading}
+          color="white"
+          content={folderComponents}
+        />
+      </Flex>
+    }
 
     <Separator size={"md"} />
 
@@ -94,12 +110,35 @@ export default function GalleryView(props : ViewProps){
         { label : "Last modified", value : "date_modified"}]}/>
     </Flex>
 
-    <SimpleGrid w="100%" minChildWidth={80} gap="6" px={8} pb={20} bg={useColorModeValue("white", '#0D1835')}>
-      <ContentLoader 
-        loading={props.loading}
-        color="black"
-        content={fileComponents}
-      />
-    </SimpleGrid>
+    {fileComponents.length>=3 ?
+      <SimpleGrid 
+      w="100%" 
+      minChildWidth={80} 
+      gap="6" 
+      px={8} 
+      pb={20} 
+      bg={useColorModeValue("white", '#0D1835')}
+      >
+        <ContentLoader 
+          loading={props.loading}
+          color="black"
+          content={fileComponents}
+        />
+      </SimpleGrid>
+     :
+      <Flex 
+      w="100%" 
+      gap="6" 
+      px={8} 
+      pb={20} 
+      bg={useColorModeValue("white", '#0D1835')}
+      >
+        <ContentLoader 
+          loading={props.loading}
+          color="black"
+          content={fileComponents}
+        />
+      </Flex>
+    }
     </>);
 }
