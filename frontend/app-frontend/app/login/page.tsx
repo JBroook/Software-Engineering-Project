@@ -63,7 +63,12 @@ export default function LoginPage(){
 
     if (res.ok){
       router.push('/main');
-    }else console.log('Login failed');
+    }else {
+      console.log('Login failed');
+      setTimeout(() => {
+          setLoginClicked(false)
+      }, 1000);
+    }
   }
 
   const loginButtonContent = loginClicked ? <Spinner /> : <Text>LOGIN</Text>;
