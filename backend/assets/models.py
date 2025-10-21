@@ -1,0 +1,36 @@
+from django.db import models
+
+# Create your models here.
+class Folder(models.Model):
+    name = models.CharField(max_length=100)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class File(models.Model):
+    name = models.CharField(max_length=100)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    size = models.PositiveBigIntegerField(editable=False, default=0)
+    filetype = models.CharField(max_length=5)
+    parent_folder = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True, blank=True)
+    data = models.FileField(upload_to='uploads')
+
+    def __str__(self):
+        return self.name
+
+class TagType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Tag(models.Model):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    type = models.ForeignKey(TagType, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.type.name

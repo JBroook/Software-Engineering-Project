@@ -9,6 +9,7 @@ import { useColorModeValue } from '../color-mode'
 interface ListFolderProps {
   foldername: string;
   date: string;
+  clickEvent: () => void ;
 }
 
 export default function ListFolder(props : ListFolderProps) {
@@ -24,6 +25,7 @@ export default function ListFolder(props : ListFolderProps) {
         px={4}
         cursor="pointer"
         _hover={{ bg: useColorModeValue("gray.200", '#2a2a2aff') }}
+        onClick={props.clickEvent}
         >
           <Flex justify="space-between" align="center">
             <HStack>
