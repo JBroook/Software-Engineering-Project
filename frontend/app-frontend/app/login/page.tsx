@@ -40,12 +40,6 @@ export default function LoginPage(){
     fetchCsrf()
   }, []);
 
-  const test = () =>{
-    fetch('http://localhost:8000/api/user', { credentials: 'include' })
-    .then(res => res.json())
-    .then(data => console.log(data));
-  }
-
   const handleLogin = async () => {
     setLoginClicked(true);
     const res = await fetch('http://localhost:8000/api/login/',{
@@ -200,7 +194,6 @@ export default function LoginPage(){
         >
           {loginButtonContent}
         </Button>
-        <Button onClick={test}>test</Button>
       </Stack>
     </Box>
   </AbsoluteCenter>
