@@ -21,4 +21,6 @@ export interface ViewProps {
   files : File[];
   clickEvent : (folderId : number, folderName : string) => void;
   loading : boolean;
+  sortFileEvent : (sortOption : string, sortOrder : string) => void;
+  sortFolderEvent : (sortOption : string, sortOrder : string) => void;
 }

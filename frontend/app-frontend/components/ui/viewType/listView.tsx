@@ -25,24 +25,28 @@ export default function ListView(props : ViewProps){
   const fileComponents = props.files.map(file => (
     <ListItem key={file.id} filename={file.name} date={file.date_modified} size={file.size}/>
   ))
-  
-  const centeredSpinner = (<Flex justify="center" w="100%"><Spinner/></Flex>);
-  const darkCenteredSpinner = (<Flex justify="center" w="100%"><Spinner color="black"/></Flex>);
 
   return (<>
     {/* Folders */}
     <HStack
     bg={useColorModeValue("#9AB3F2", '#335098')}
     pl={8}
-    pb={3}>
-      <FaFolder 
-        color={useColorModeValue("black", 'white')}
-        size={25}/>
+    pb={3}
+    justify="space-between">
+      <HStack>
+        <FaFolder 
+          color={useColorModeValue("black", 'white')}
+          size={25}/>
         <Heading
         fontFamily="var(--font-roboto-condensed)"
         color={useColorModeValue("black", 'white')}
         size={"2xl"}
         >Folders</Heading>
+      </HStack>
+
+      <SortBar onChange={props.sortFolderEvent} sortOptions={[
+        { label : "Filename", value : "name"},
+        { label : "Last modified", value : "date_modified"}]}/>
     </ HStack>
     
     <Stack
@@ -79,11 +83,12 @@ export default function ListView(props : ViewProps){
           >Files</Heading>
       </ HStack>
 
-      <SortBar />
+      <SortBar onChange={props.sortFileEvent} sortOptions={[
+        { label : "Filename", value : "name"},
+        { label : "Size", value : "size"},
+        { label : "Last modified", value : "date_modified"}]}/>
     </Flex>
     
-
-
     <Stack
     pl={8}
     pb={10}

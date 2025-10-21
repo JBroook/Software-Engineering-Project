@@ -16,6 +16,7 @@ class File(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     size = models.PositiveBigIntegerField(editable=False, default=0)
     filetype = models.CharField(max_length=5)
+    media_type = models.CharField(max_length=10)
     parent_folder = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True, blank=True)
     data = models.FileField(upload_to='uploads')
 

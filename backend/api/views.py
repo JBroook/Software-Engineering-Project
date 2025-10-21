@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from assets.models import Folder, File
 from . import serializers
+from django.db.models import Q
 
 class LoginView(APIView):
     #user logging in
@@ -33,22 +34,63 @@ class FolderViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FolderSerializer
 
     def get_queryset(self):
+        queryset = Folder.objects.all()
         parent_id = self.request.query_params.get('parent_folder')
+
         if parent_id is not None:
-            if parent_id!="-1":
-                return Folder.objects.filter(parent_folder=parent_id)
+            if parent_id != "-1":
+                queryset = queryset.filter(parent_folder=parent_id)
             else:
-                return Folder.objects.filter(parent_folder__isnull=True)
-        return Folder.objects.none()
+                queryset = queryset.filter(parent_folder__isnull=True)
+        else:
+            queryset = queryset.none() 
+
+        name = self.request.query_params.get('name')
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        sort_method = self.request.query_params.get('sort_method')
+        if sort_method:
+            sort_method, sort_order = sort_method.split('__')
+            sort_order = "-" if sort_order=="asc" else ""
+            queryset = queryset.order_by(sort_order+sort_method)
+
+        return queryset
 
 class FileViewSet(ReadOnlyModelViewSet):
     serializer_class = serializers.FileSerializer
 
     def get_queryset(self):
+        queryset = File.objects.all()
         parent_id = self.request.query_params.get('parent_folder')
-        if parent_id is not None:
-            if parent_id!="-1":
-                return File.objects.filter(parent_folder=parent_id)
+
+        if parent_id:
+            if parent_id != "-1":
+                queryset = queryset.filter(parent_folder=parent_id)
             else:
-                return File.objects.filter(parent_folder__isnull=True)
-        return File.objects.none()
+                queryset = queryset.filter(parent_folder__isnull=True)
+        else:
+            queryset = queryset.none() 
+
+        name = self.request.query_params.get('name')
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+    
+        media_type = self.request.query_params.get('media_type')
+        if media_type:
+            media_type = media_type.split('_')
+            queryset = queryset.filter(media_type__in=media_type)
+
+        file_type = self.request.query_params.get('file_type')
+        if file_type:
+            file_type = file_type.split('_')
+            queryset = queryset.filter(filetype__in=file_type)
+
+        sort_method = self.request.query_params.get('sort_method')
+        if sort_method:
+            sort_method, sort_order = sort_method.split('__')
+            sort_order = "-" if sort_order=="asc" else ""
+            queryset = queryset.order_by(sort_order+sort_method)
+
+
+        return queryset

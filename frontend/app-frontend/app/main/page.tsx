@@ -9,13 +9,13 @@ import {
 } from "@chakra-ui/react"
 import { IoIosArrowBack } from "react-icons/io";
 import { IoSearchCircleOutline } from "react-icons/io5";
-import { IoFilter } from "react-icons/io5";
 import { RiGalleryView2 } from "react-icons/ri";
 import { IoIosList } from "react-icons/io";
 import { useEffect, useState } from "react";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
+import FilterOptions from "@/components/ui/searchbar/filterOptions";
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -33,14 +33,33 @@ const getFiles = async (currentParent: number) => {
   return data;
 };
 
+type SFSParams = {
+  searchKeyword : string;
+  mediaType : string[];
+  fileExtension : string[];
+  sortMethod : string;
+  sortOrder : string;
+}
+
+const defaultSFSParams : SFSParams = {
+    searchKeyword : "",
+    mediaType : [],
+    fileExtension : [],
+    sortMethod : "",
+    sortOrder : "asc"
+  }
 
 export default function Main() {
   const [loading, setLoading] = useState<boolean>(true);
+  //folders and files are the actual array of items
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
+  // SFS=Search Filter Sort, controls the search filter sort params
+  const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
 
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
@@ -93,6 +112,16 @@ export default function Main() {
     fetchAssets()
   }, []);
 
+  // sort function
+  const sortFiles = (sortMethod : string, sortOrder : string) => {
+    const newSFS = {...SFS};
+    newSFS.sortMethod = sortMethod;
+    newSFS.sortOrder = sortOrder;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
   // handles gallery vs list view
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
@@ -102,6 +131,8 @@ export default function Main() {
         files={files} 
         clickEvent={openFolder}
         loading={loading}
+        sortFileEvent={sortFiles}
+        sortFolderEvent={sortFiles}
       />
   ) : (
       <ListView 
@@ -109,6 +140,8 @@ export default function Main() {
         files={files} 
         clickEvent={openFolder}
         loading={loading}
+        sortFileEvent={sortFiles}
+        sortFolderEvent={sortFiles}
       />
   );
 
@@ -117,7 +150,59 @@ export default function Main() {
   }
 
   //controls text and arrow color
-  const arrowTextColor = useColorModeValue("black", 'white');
+  const iconTextColor = useColorModeValue("black", 'white');
+
+  //search-filter-sort function
+  const fetchSFS = async (SFS : SFSParams) => {
+    const url1 = new URL('http://localhost:8000/api/folders/');
+    url1.searchParams.set('parent_folder', currentParent.toString());
+    url1.searchParams.set('name', SFS.searchKeyword);
+    if(SFS.sortMethod==='name' || SFS.sortMethod==='date_modified'){
+      url1.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    }
+    const folderRes = await fetch(url1, {
+      credentials: 'include',
+    });
+    const folderData = await folderRes.json();
+    setFolders(folderData)
+
+    const url2 = new URL('http://localhost:8000/api/files/');
+    url2.searchParams.set('parent_folder', currentParent.toString());
+    url2.searchParams.set('name', SFS.searchKeyword);
+    url2.searchParams.set('media_type', SFS.mediaType.join("_"));
+    url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    const fileRes = await fetch(url2.toString(), {
+      credentials: 'include',
+    });
+    const fileData = await fileRes.json();
+    console.log(fileData)
+    setFiles(fileData)
+  }
+
+  const searchKeyword = (keyword : string) => {
+    const newSFS = {...SFS};
+    newSFS.searchKeyword = keyword;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterMediaType = (mediaTypes : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.mediaType = mediaTypes;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterFileExtension = (fileExtensions : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.fileExtension = fileExtensions;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
 
   return (
     <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
@@ -136,13 +221,13 @@ export default function Main() {
             cursor="pointer"
             _hover={{ bg: 'gray.100' }}
             onClick={ascendFolderChain}>
-              <IoIosArrowBack color={arrowTextColor} size={"md"}/>
+              <IoIosArrowBack color={iconTextColor} size={"md"}/>
             </IconButton>
           }
           {/* file path title */}
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color={arrowTextColor}
+          color={iconTextColor}
           size={"3xl"}
           >{nameChain.join(" / ")}</Heading>
         </HStack>
@@ -154,54 +239,13 @@ export default function Main() {
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
             </IconButton>
             
-            {searchbar && <Searchbar placeholder="Search a file"/>}
+            {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
 
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-                  _hover={{ bg: '#e0e0e0ff' }}>
-                  <IoFilter color="#9AB3F2"/>
-                </IconButton>
-              </Popover.Trigger>
-              <Popover.Positioner>
-                <Popover.Content>
-                  <Popover.CloseTrigger />
-                  <Popover.Arrow>
-                    <Popover.ArrowTip />
-                  </Popover.Arrow>
-                  <Popover.Body p={3}>
-                    <Popover.Title color="black" fontWeight="medium">Filter options</Popover.Title>
-                    
-                    <Stack>
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>png</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>jpg</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>gif</Checkbox.Label>
-                      </Checkbox.Root>
-
-                      <Checkbox.Root>
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control />
-                        <Checkbox.Label color={arrowTextColor}>mp4</Checkbox.Label>
-                      </Checkbox.Root>
-                    </Stack>
-
-                  </Popover.Body>
-                </Popover.Content>
-              </Popover.Positioner>
-            </Popover.Root>
+            <FilterOptions 
+            iconTextColor={iconTextColor} 
+            mediaTypeEvent={filterMediaType}
+            fileExtensionEvent={filterFileExtension}
+            />
 
             <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
