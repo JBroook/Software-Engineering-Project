@@ -260,10 +260,10 @@ export default function Main() {
             fileExtensionEvent={filterFileExtension}
             />
 
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={changeViewType}>
-              {viewType=="gallery"?<RiGalleryView2 color="#9AB3F2"/>:<IoIosList color="#9AB3F2"/>}
+              {viewType=="gallery"?<IoIosList color="#9AB3F2"/>:<RiGalleryView2 color="#9AB3F2"/>}
             </IconButton>
 
           </HStack>

@@ -31,7 +31,7 @@ export default function FilterOptions(props : FilterOptionsProps){
     return (<>
         <Popover.Root>
             <Popover.Trigger asChild>
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
                 _hover={{ bg: '#e0e0e0ff' }}>
                 <IoFilter color="#9AB3F2"/>
             </IconButton>
