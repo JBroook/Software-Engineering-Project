@@ -56,10 +56,12 @@ class EmployeeViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = Employee.objects.all()
 
+        # search
         search_keyword = self.request.query_params.get('search')
         if search_keyword:
             queryset = queryset.filter(Q(user__first_name__icontains=search_keyword) | Q(user__last_name__icontains=search_keyword))
 
+        # sort
         sort_criteria = self.request.query_params.get('sort_criteria')
         sort_order = self.request.query_params.get('sort_order')
         if sort_criteria:
@@ -74,6 +76,12 @@ class EmployeeViewSet(ModelViewSet):
             else:
                 # name field has to be handled differently as it is two fields combined (first and last name)
                 queryset = queryset.order_by(sort_order+'user__first_name', sort_order+'user__last_name')
+
+        # filter
+        roles = self.request.query_params.get('roles')
+        if roles:
+            roles = roles.split('_')
+            queryset = queryset.filter(role__in=roles)
 
         return queryset
     

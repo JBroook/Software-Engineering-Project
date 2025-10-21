@@ -8,7 +8,7 @@ import {
   Stack, IconButton, Input, Popover,
   Text, Table
 } from "@chakra-ui/react"
-import FilterOptions from "@/components/ui/searchbar/filterOptions";
+import RoleFilter from "@/components/ui/searchbar/roleFilter";
 import { useState, useEffect } from "react"
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -29,14 +29,14 @@ type SFSParams = {
   searchKeyword : string;
   sortCriteria : string;
   sortOrder : string;
-  roleFilter : string;
+  roleFilter : string[];
 }
 
 const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   sortCriteria : "",
   sortOrder : "asc",
-  roleFilter : ""
+  roleFilter : []
 }
 
 
@@ -74,20 +74,6 @@ export default function UsersPage(){
     { label : "Last Active", value : "last_active"},
   ]
 
-  // const sortTable = async (sortCriteria : string) => {
-  //   setSortOrder(!sortOrder)
-  //   const url = new URL('http://localhost:8000/api/employees/');
-  //   url.searchParams.set('sort_criteria', sortCriteria);
-  //   url.searchParams.set('sort_order', sortOrder ? "desc" : "asc");
-  //   const res = await fetch(url, {
-  //     credentials : 'include',
-  //     method : 'GET',
-  //   });
-  //   const data = await res.json()
-
-  //   setUsers(data);
-  // }
-
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
     const url = new URL('http://localhost:8000/api/employees/');
@@ -97,6 +83,9 @@ export default function UsersPage(){
     if(SFS.sortCriteria!==""){
       url.searchParams.set('sort_criteria', SFS.sortCriteria);
       url.searchParams.set('sort_order', SFS.sortOrder);
+    }
+    if(SFS.roleFilter.length>0){
+      url.searchParams.set('roles', SFS.roleFilter.join('_'));
     }
     const res = await fetch(url.toString(), {
       credentials: 'include',
@@ -116,6 +105,13 @@ export default function UsersPage(){
   const searchKeyword = (keyword : string) => {
     const newSFS = {...SFS};
     newSFS.searchKeyword = keyword;
+    setSFS(newSFS);
+    fetchSFS(newSFS);
+  }
+
+  const filterRoles = (roles : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.roleFilter = roles;
     setSFS(newSFS);
     fetchSFS(newSFS);
   }
@@ -162,12 +158,17 @@ export default function UsersPage(){
           </HStack>
       </Flex>
 
-      <HStack ml={8} w="200px" mb={3} >
+      <HStack ml={8} w="250px" mb={3} >
         <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
           _hover={{ bg: '#e0e0e0ff' }}>
             <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
         </IconButton>
         <Searchbar color={iconTextColor} placeholder="Search users" inputEvent={searchKeyword}/>
+
+        <RoleFilter 
+          iconTextColor={iconTextColor} 
+          filterEvent={filterRoles}
+        />
       </HStack>
 
 
