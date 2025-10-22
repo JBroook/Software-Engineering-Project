@@ -66,7 +66,7 @@ export default function GalleryItem(props : GalleryItemProps) {
                 overflow={'hidden'}>
                   <Center>
                     {props.image ? (
-                      <Image w={'90%'} h={'80%'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                      <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
                     ) : (
                       <Box>No logo uploaded</Box>
                     )}

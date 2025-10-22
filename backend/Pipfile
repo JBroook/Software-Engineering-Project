@@ -13,6 +13,7 @@ django-cors-headers = "==4.9.0"
 python-decouple = "==3.8"
 python-dotenv = "*"
 django-filter = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
