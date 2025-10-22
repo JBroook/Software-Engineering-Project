@@ -43,7 +43,7 @@ export default function RoleFilter(props : RoleFilterProps){
                     <MiniPopover 
                         iconTextColor={props.iconTextColor}
                         clickEvent={clickEvent}
-                        label="Media Type"
+                        label="Roles"
                         options={[
                             {label : 'Admin', value : 'admin'},
                             {label : 'Editor', value : 'editor'},
