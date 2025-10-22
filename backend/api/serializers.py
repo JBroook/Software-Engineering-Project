@@ -24,11 +24,20 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+    
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+
+        instance.save()
+        return instance
 
 class EmployeeSerializer(serializers.ModelSerializer):
+    user = serializers.DictField(write_only=True)
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
-    user = UserSerializer()
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
 
@@ -47,11 +56,19 @@ class EmployeeSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        print(validated_data)
         user_data = validated_data.pop('user')
         user = UserSerializer().create(user_data)
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
+    
+    def update(self, instance, validated_data):
+        print("update triggered")
+        user_data = validated_data.pop('user')
+        UserSerializer().update(instance.user, user_data)
+        
+        instance.role = validated_data.get('role', instance.role)
+        instance.save()
+        return instance
     
     def get_email(self, obj):
         return obj.user.email

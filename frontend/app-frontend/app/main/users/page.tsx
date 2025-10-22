@@ -16,17 +16,7 @@ import SortableColumnHeader from "@/components/ui/user/sortableColumnHeader";
 import { IoSearchCircleOutline } from "react-icons/io5";
 import { IoPersonAdd } from "react-icons/io5";
 import UserForm from "@/components/ui/user/userForm";
-
-type user = {
-  id : number;
-  first_name : string;
-  last_name : string;
-  username : string;
-  email : string;
-  role : string;
-  join_date : string;
-  last_active : string;
-}
+import { User } from "@/components/ui/user/userForm";
 
 type SFSParams = {
   searchKeyword : string;
@@ -42,11 +32,17 @@ const defaultSFSParams : SFSParams = {
   roleFilter : []
 }
 
+function getCookie(name:string) {
+  const value = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return value ? decodeURIComponent(value.split('=')[1]) : "";
+}
 
 export default function UsersPage(){
   //controls text and arrow color
   const iconTextColor = useColorModeValue("black", 'white');
-  const [users, setUsers] = useState<user[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
 
   useEffect(()=>{
@@ -117,6 +113,70 @@ export default function UsersPage(){
     newSFS.roleFilter = roles;
     setSFS(newSFS);
     fetchSFS(newSFS);
+  }
+
+  // handle creating and updating users
+  const createUser = async (data : User) => {
+    const res = await fetch('http://localhost:8000/api/employees/', {
+      credentials : 'include',
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),//give csrf token
+      },
+      body : JSON.stringify({
+        "user" : {
+          "username" : data.username,
+          "email" : data.email,
+          "first_name" : data.first_name,
+          "last_name" : data.last_name,
+          "password" : data.password
+        },
+        "role" : data.role
+      })
+    });
+
+    if(res.ok){
+      const data = await res.json();
+      const newUsers = [...users];
+      newUsers.push(data)
+      setUsers(newUsers);
+    }else{
+      throw new Error('Failed to create employee');
+    }
+  }
+
+  // update existing user
+  const updateUser = async (data : User) => {
+    const res = await fetch(`http://localhost:8000/api/employees/${data.id}/`, {
+      credentials : 'include',
+      method : 'PATCH',
+      headers : {
+        'Content-Type' : 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+      },
+      body : JSON.stringify({
+        "user" : {
+          "username" : data.username,
+          "email" : data.email,
+          "first_name" : data.first_name,
+          "last_name" : data.last_name,
+        },
+        "role" : data.role
+      })
+    });
+
+    if(res.ok){
+      const data = await res.json();
+      const newUsers = [...users];
+      const oldIndex = newUsers.findIndex(obj => obj.id === data.id);
+      if(oldIndex!==-1){
+        newUsers[oldIndex] = data
+      }
+      setUsers(newUsers);
+    }else{
+      throw new Error('Failed to create employee');
+    }
   }
 
   return (<>
@@ -196,7 +256,11 @@ export default function UsersPage(){
             <Table.Cell>
               <HStack w="100%" justify="center">
 
-                <UserForm title="Edit User" user={item}>
+                <UserForm 
+                title="Edit User" 
+                user={item}
+                submitEvent={updateUser}
+                >
                   <IconButton>
                     <MdEdit />
                   </IconButton>
@@ -212,7 +276,7 @@ export default function UsersPage(){
       </Table.Body>
     </Table.Root>
 
-    <UserForm title="Create New User" user={null}>
+    <UserForm title="Create New User" user={null} submitEvent={createUser}> 
       <Button
         color={iconTextColor}
         variant="ghost" 
