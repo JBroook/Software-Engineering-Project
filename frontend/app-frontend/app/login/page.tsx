@@ -23,7 +23,6 @@ const getCsrfToken = async () => {
 };
 
 
-
 export default function LoginPage(){
   const router = useRouter();
   const [csrfToken, setCsrfToken] = useState("");

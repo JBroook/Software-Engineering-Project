@@ -14,6 +14,7 @@ import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import SortableColumnHeader from "@/components/ui/user/sortableColumnHeader";
 import { IoSearchCircleOutline } from "react-icons/io5";
+import CrudModal from "@/components/ui/user/crudModal";
 
 type user = {
   id : number;
@@ -76,7 +77,7 @@ export default function UsersPage(){
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
-    const url = new URL('http://localhost:8000/api/employees/');
+    const url = new URL('http://localhost:8000/api/employees');
     if(SFS.searchKeyword!==""){
       url.searchParams.set('search', SFS.searchKeyword);
     }
@@ -204,6 +205,8 @@ export default function UsersPage(){
         ))}
       </Table.Body>
     </Table.Root>
+
+    <CrudModal></CrudModal>
     </Box>
   </>);
 }
