@@ -40,8 +40,8 @@ function UserForm(props : UserFormChildfulProps) {
   const iconTextColor = useColorModeValue("black", "white");
 
   const onSubmit: SubmitHandler<User> = (data) =>{
-    const newUserData = {...props.user}
-    if(props.user!==null){// if exisitng user is given, populate data with user info
+    const newUserData = (props.user!==null) ? {...props.user} : data
+    if (props.user!==null){// if exisitng user is given, populate data with user info
       Object.assign(newUserData, data)
     }
 
