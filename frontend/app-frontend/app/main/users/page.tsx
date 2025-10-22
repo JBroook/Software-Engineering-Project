@@ -17,6 +17,7 @@ import { IoSearchCircleOutline } from "react-icons/io5";
 import { IoPersonAdd } from "react-icons/io5";
 import UserForm from "@/components/ui/user/userForm";
 import { User } from "@/components/ui/user/userForm";
+import DeleteConfirmation from "@/components/ui/user/deleteConfirmation";
 
 type SFSParams = {
   searchKeyword : string;
@@ -179,6 +180,27 @@ export default function UsersPage(){
     }
   }
 
+  // delete user
+  const deleteUser = async (userId : number) => {
+    const res = await fetch(`http://localhost:8000/api/employees/${userId}/`, {
+      credentials : 'include',
+      method : 'DELETE',
+      headers : {
+        'Content-Type' : 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+      }
+    });
+
+    if(res.ok){
+      const newUsers = [...users];
+      const removeId = newUsers.findIndex(user => user.id===userId)
+      newUsers.splice(removeId, 1);
+      setUsers(newUsers);
+    }else{
+      throw new Error('Failed to delete employee');
+    }
+  }
+
   return (<>
     <Box bg={useColorModeValue("white", '#0D1835')} minH="100vh">
       {/* Header box for title, search bar and others */}
@@ -266,9 +288,14 @@ export default function UsersPage(){
                   </IconButton>
                 </UserForm>
 
-                <IconButton>
-                  <MdDelete />
-                </IconButton>
+                <DeleteConfirmation
+                user={item}
+                deleteEvent={deleteUser}
+                >
+                  <IconButton>
+                    <MdDelete />
+                  </IconButton>
+                </DeleteConfirmation>
               </HStack>
             </Table.Cell>
           </Table.Row>
