@@ -3,10 +3,10 @@
 import Searchbar from "@/components/ui/searchbar/searchbar";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { 
-  Box, Heading, Image, Grid,
-  GridItem, HStack, Flex, SimpleGrid,
-  Stack, IconButton, Input, Popover,
-  Text, Table
+  Box, Heading, 
+  HStack, Flex, 
+  IconButton, 
+  Table, Button
 } from "@chakra-ui/react"
 import RoleFilter from "@/components/ui/searchbar/roleFilter";
 import { useState, useEffect } from "react"
@@ -14,11 +14,13 @@ import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import SortableColumnHeader from "@/components/ui/user/sortableColumnHeader";
 import { IoSearchCircleOutline } from "react-icons/io5";
-import CrudModal from "@/components/ui/user/crudModal";
+import { IoPersonAdd } from "react-icons/io5";
+import UserForm from "@/components/ui/user/userForm";
 
 type user = {
   id : number;
-  full_name : string;
+  first_name : string;
+  last_name : string;
   username : string;
   email : string;
   role : string;
@@ -185,7 +187,7 @@ export default function UsersPage(){
       <Table.Body>
         {users.map((item) => (
           <Table.Row key={item.id}  color={iconTextColor}>
-            <Table.Cell py={2} pl={1}>{item.full_name} </Table.Cell>
+            <Table.Cell py={2} pl={1}>{item.first_name+" "+item.last_name} </Table.Cell>
             <Table.Cell>{item.username}</Table.Cell>
             <Table.Cell>{item.email}</Table.Cell>
             <Table.Cell>{item.role}</Table.Cell>
@@ -193,9 +195,13 @@ export default function UsersPage(){
             <Table.Cell>{item.last_active}</Table.Cell>
             <Table.Cell>
               <HStack w="100%" justify="center">
-                <IconButton>
-                  <MdEdit />
-                </IconButton>
+
+                <UserForm title="Edit User" user={item}>
+                  <IconButton>
+                    <MdEdit />
+                  </IconButton>
+                </UserForm>
+
                 <IconButton>
                   <MdDelete />
                 </IconButton>
@@ -206,7 +212,22 @@ export default function UsersPage(){
       </Table.Body>
     </Table.Root>
 
-    <CrudModal></CrudModal>
+    <UserForm title="Create New User" user={null}>
+      <Button
+        color={iconTextColor}
+        variant="ghost" 
+        size="sm"
+        position="fixed"
+        bottom="30px"
+        right="30px"
+        p={2}
+        bg={useColorModeValue("#9AB3F1", "#335098")}
+        _hover={{bg : "#8fa5ddff"}}
+        >
+          <IoPersonAdd />
+          Create User
+      </Button>
+    </UserForm>
     </Box>
   </>);
 }

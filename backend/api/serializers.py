@@ -26,14 +26,25 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
     user = UserSerializer()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Employee
-        fields = ['id','role','full_name', 'email', 'username', 'last_active', 'join_date', 'user']
+        fields = [
+            'id',
+            'role',
+            'first_name', 
+            'last_name',
+            'email', 
+            'username', 
+            'last_active', 
+            'join_date', 
+            'user'
+        ]
 
     def create(self, validated_data):
         print(validated_data)
@@ -41,9 +52,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user = UserSerializer().create(user_data)
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
-
-    def get_full_name(self, obj):
-        return obj.user.first_name+" "+obj.user.last_name
     
     def get_email(self, obj):
         return obj.user.email
@@ -51,3 +59,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def get_username(self, obj):
         return obj.user.username
     
+    def get_first_name(self, obj):
+        return obj.user.first_name
+
+    def get_last_name(self, obj):
+        return obj.user.last_name

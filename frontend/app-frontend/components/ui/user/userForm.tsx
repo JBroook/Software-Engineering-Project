@@ -6,10 +6,10 @@ import {
   NativeSelect
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { IoPersonAdd } from "react-icons/io5";
 import { useColorModeValue } from "../color-mode";
 import { FaUser } from "react-icons/fa";
 import { useForm, SubmitHandler } from "react-hook-form";
+import React from "react";
 
 type FormInput = {
   first_name : string;
@@ -27,8 +27,27 @@ function getCookie(name:string) {
   return value ? decodeURIComponent(value.split('=')[1]) : "";
 }
 
-function CrudModal() {
+type User = {
+  id : number;
+  first_name : string;
+  last_name : string;
+  username : string;
+  email : string;
+  role : string;
+  join_date : string;
+  last_active : string;
+}
+
+interface UserFormProps {
+  title : string;
+  user : User | null;
+}
+
+type UserFormChildfulProps = React.PropsWithChildren<UserFormProps>;
+
+function UserForm(props : UserFormChildfulProps) {
   // const [formData, setFormData] = useState({ name: "", email: "" });
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const {register, handleSubmit, formState: {errors}} = useForm<FormInput>();
 
@@ -56,7 +75,9 @@ function CrudModal() {
     });
 
     if(res.ok){
-      return res.json();
+      setIsOpen(false);
+      const data = await res.json();
+
     }else{
       throw new Error('Failed to create employee');
     }
@@ -81,7 +102,10 @@ function CrudModal() {
         {field.label}
         <Field.RequiredIndicator />
       </Field.Label>
-      <Input {...register(field.value, {required : field.requiredText})}/>
+      <Input 
+        {...register(field.value, {required : field.requiredText})}
+        // defaultValue={}
+      />
       {/* <Field.HelperText /> */}
       {/* <Field.ErrorText> 
         {errors.firstName && <Text>This field is required</Text>}
@@ -91,22 +115,9 @@ function CrudModal() {
 
   return (
     <>
-      <Dialog.Root >
+      <Dialog.Root open={isOpen} onOpenChange={(details)=>setIsOpen(details.open)}>
       <Dialog.Trigger asChild>
-        <Button
-        color={iconTextColor}
-        variant="ghost" 
-        size="sm"
-        position="fixed"
-        bottom="30px"
-        right="30px"
-        p={2}
-        bg={useColorModeValue("#9AB3F1", "#335098")}
-        _hover={{bg : "#8fa5ddff"}}
-        >
-          <IoPersonAdd />
-          Create User
-        </Button>
+        {props.children}
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />
@@ -119,7 +130,7 @@ function CrudModal() {
                 color={iconTextColor}>
                 <HStack w="100%" justify="center" mb={3}>
                   <FaUser />
-                  <Heading fontFamily="var(--font-roboto-condensed)">Create New User</Heading>
+                  <Heading fontFamily="var(--font-roboto-condensed)">{props.title}</Heading>
                 </HStack>
               </Dialog.Title>
             </Dialog.Header>
@@ -130,17 +141,19 @@ function CrudModal() {
               <form onSubmit={handleSubmit(onSubmit)}>
               {FieldComponents}
 
-              <Field.Root mb={4}>
-                <Field.Label>
-                  Password
-                  <Field.RequiredIndicator />
-                </Field.Label>
-                <Input type="password" {...register('password', {required : 'Password is required'})}/>
-                {/* <Field.HelperText /> */}
-                {/* <Field.ErrorText> 
-                  {errors.firstName && <Text>This field is required</Text>}
-                </Field.ErrorText> */}
-              </Field.Root>
+              {!props.user &&
+                <Field.Root mb={4}>
+                  <Field.Label>
+                    Password
+                    <Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input type="password" {...register('password', {required : 'Password is required'})}/>
+                  {/* <Field.HelperText /> */}
+                  {/* <Field.ErrorText> 
+                    {errors.firstName && <Text>This field is required</Text>}
+                  </Field.ErrorText> */}
+                </Field.Root>
+              }
 
               <Field.Root mb={4}>
                 <Field.Label>
@@ -148,10 +161,11 @@ function CrudModal() {
                   <Field.RequiredIndicator />
                 </Field.Label>
                 <NativeSelect.Root >
-                  <NativeSelect.Field {...register('role', {required : 'Role is required'})}>
+                  <NativeSelect.Field {...register('role', {required : 'Role is required'})} 
+                    defaultValue={props.user ? props.user.role : undefined}>
                     <option value="viewer">Viewer</option>
                     <option value="editor">Editor</option>
-                    <option value="admin ">Admin</option>
+                    <option value="admin">Admin</option>
                   </NativeSelect.Field>
                   <NativeSelect.Indicator />
                 </NativeSelect.Root>
@@ -180,4 +194,4 @@ function CrudModal() {
   );
 }
 
-export default CrudModal;
+export default UserForm;
