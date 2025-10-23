@@ -63,7 +63,10 @@ export default function SimpleSidebar() {
         left={0}
         h="100vh">
         <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-          <Text fontSize="2xl" fontFamily={"var(--font-roboto-condensed)"} color={useColorModeValue('blue.700', 'blue.400') }>
+          <Text 
+          fontSize="2xl"
+          fontFamily="var(--font-roboto-condensed)"
+          color={useColorModeValue('blue.700', 'blue.400')}>
             DAM-N
           </Text>
         </Flex>
