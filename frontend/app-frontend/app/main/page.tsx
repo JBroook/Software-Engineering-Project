@@ -43,12 +43,12 @@ type SFSParams = {
 }
 
 const defaultSFSParams : SFSParams = {
-    searchKeyword : "",
-    mediaType : [],
-    fileExtension : [],
-    sortMethod : "",
-    sortOrder : "asc"
-  }
+  searchKeyword : "",
+  mediaType : [],
+  fileExtension : [],
+  sortMethod : "",
+  sortOrder : "asc"
+}
 
 export default function Main() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -101,6 +101,7 @@ export default function Main() {
   // check if user is logged in, else return to login page
   const router = useRouter();
   useEffect(()=>{
+    // extra layer of protection in case the middleware doesn't catch unauthenticated users
     fetch('http://localhost:8000/api/user', { credentials: 'include' })
     .then(res => {
       if (!res.ok) {
@@ -179,8 +180,12 @@ export default function Main() {
 
     const url2 = new URL('http://localhost:8000/api/files/');
     url2.searchParams.set('parent_folder', currentParent.toString());
-    url2.searchParams.set('name', SFS.searchKeyword);
-    url2.searchParams.set('media_type', SFS.mediaType.join("_"));
+    if (SFS.searchKeyword.length>0){
+      url2.searchParams.set('name', SFS.searchKeyword);
+    }
+    if (SFS.mediaType.length>0){
+      url2.searchParams.set('media_type', SFS.mediaType.join("_"));
+    }
     url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
     if(SFS.sortMethod!==""){
       url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
@@ -252,7 +257,7 @@ export default function Main() {
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
             </IconButton>
             
-            {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
+            {searchbar && <Searchbar color={iconTextColor} placeholder="Search a file" inputEvent={searchKeyword}/>}
 
             <FilterOptions 
             iconTextColor={iconTextColor} 

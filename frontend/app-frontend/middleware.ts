@@ -9,11 +9,10 @@ export async function middleware(request: NextRequest) {
     if (!sessionId) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
-
     // otherwise allow the request to continue
     return NextResponse.next();
 }
  
 export const config = {
-  matcher: '/main/:path*',
+  matcher: ['/main/:path*',]
 }

@@ -5,22 +5,34 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from assets.models import Folder, File
+from users.models import Employee
 from . import serializers
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdmin, IsEditor
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
+        employee = Employee.objects.get(user=user)
         return Response({
             "email": user.email,
             "username": user.username,
-            "id": user.id
+            "id": user.id,
+            "role": employee.role
         }, status=status.HTTP_200_OK)
+
+class StorageView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    # returns info on storage size and file number
+    def get(self, request):
+        storage_size = File.objects.aggregate(total_size=Sum('size'))['total_size']
+        file_number = len(File.objects.all())
+        return Response({'storageSize':storage_size, 'fileNumber': file_number}, status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     #user logging in
@@ -48,7 +60,49 @@ class LogoutView(APIView):
         print("Logged out")
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
     
-class FolderViewSet(ReadOnlyModelViewSet):
+class EmployeeViewSet(ModelViewSet):
+    # permission_classes = [IsAuthenticated, IsAdmin]
+    serializer_class = serializers.EmployeeSerializer
+
+    def get_queryset(self):
+        queryset = Employee.objects.all()
+
+        # search
+        search_keyword = self.request.query_params.get('search')
+        if search_keyword:
+            queryset = queryset.filter(Q(user__first_name__icontains=search_keyword) | Q(user__last_name__icontains=search_keyword))
+
+        # sort
+        sort_criteria = self.request.query_params.get('sort_criteria')
+        sort_order = self.request.query_params.get('sort_order')
+        if sort_criteria:
+            sort_order = "-" if sort_order=="desc" else ""
+            if sort_criteria!='name':
+                user_fields = ['email','username']
+                # extra handling for fields from user model
+                if sort_criteria in user_fields:
+                    sort_criteria = "user__" + sort_criteria
+
+                queryset = queryset.order_by(sort_order+sort_criteria)
+            else:
+                # name field has to be handled differently as it is two fields combined (first and last name)
+                queryset = queryset.order_by(sort_order+'user__first_name', sort_order+'user__last_name')
+
+        # filter
+        roles = self.request.query_params.get('roles')
+        if roles:
+            roles = roles.split('_')
+            queryset = queryset.filter(role__in=roles)
+
+        return queryset
+    
+    def perform_destroy(self, instance):
+        user = instance.user
+        instance.delete()
+        user.delete()
+        return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
+    
+class FolderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
 
@@ -76,7 +130,7 @@ class FolderViewSet(ReadOnlyModelViewSet):
 
         return queryset
 
-class FileViewSet(ReadOnlyModelViewSet):
+class FileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.FileSerializer
 
