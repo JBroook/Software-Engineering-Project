@@ -84,7 +84,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         instance.role = validated_data.get('role', instance.role)
         instance.save()
         return instance
-    
+
     def get_email(self, obj):
         return obj.user.email
     

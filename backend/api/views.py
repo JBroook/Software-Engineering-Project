@@ -96,6 +96,12 @@ class EmployeeViewSet(ModelViewSet):
 
         return queryset
     
+    def perform_destroy(self, instance):
+        user = instance.user
+        instance.delete()
+        user.delete()
+        return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
+    
 class FolderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
