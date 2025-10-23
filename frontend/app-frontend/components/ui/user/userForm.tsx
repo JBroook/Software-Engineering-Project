@@ -137,13 +137,21 @@ function UserForm(props : UserFormChildfulProps) {
                   <NativeSelect.Indicator />
                 </NativeSelect.Root>
               </Field.Root>
-              <HStack w="100%" justify="center" mt={2} gap={10}>
-                <Button type="submit">
+              <HStack w="100%" justify="center" mt={2} gap={5}>
+                <Button type="submit" 
+                bg={useColorModeValue("#9AB3F2", '#335098')} 
+                _hover={{bg : "#8aa0d7ff"}}
+                px={3}
+                >
                   Confirm
                 </Button>
 
                 <Dialog.ActionTrigger asChild>
-                  <Button>Cancel</Button>
+                  <Button 
+                  bg={useColorModeValue("#9AB3F2", '#335098')} 
+                  _hover={{bg : "#8aa0d7ff"}}
+                  px={3}
+                  >Cancel</Button>
                 </Dialog.ActionTrigger>
               </HStack>
               </form>

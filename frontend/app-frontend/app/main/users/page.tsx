@@ -3,10 +3,10 @@
 import Searchbar from "@/components/ui/searchbar/searchbar";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { 
-  Box, Heading, 
-  HStack, Flex, 
-  IconButton, 
-  Table, Button
+  Box, Heading, Spinner,
+  HStack, Flex, Text,
+  IconButton, Stack, Icon,
+  Table, Button, SimpleGrid
 } from "@chakra-ui/react"
 import RoleFilter from "@/components/ui/searchbar/roleFilter";
 import { useState, useEffect } from "react"
@@ -18,6 +18,12 @@ import { IoPersonAdd } from "react-icons/io5";
 import UserForm from "@/components/ui/user/userForm";
 import { User } from "@/components/ui/user/userForm";
 import DeleteConfirmation from "@/components/ui/user/deleteConfirmation";
+import { HiUsers } from "react-icons/hi2";
+import { HiMiniWrenchScrewdriver } from "react-icons/hi2";
+import { IoEye } from "react-icons/io5";
+import { FaFile } from "react-icons/fa6";
+import { GrStorage } from "react-icons/gr";
+import { useRouter } from "next/navigation";
 
 type SFSParams = {
   searchKeyword : string;
@@ -40,24 +46,106 @@ function getCookie(name:string) {
   return value ? decodeURIComponent(value.split('=')[1]) : "";
 }
 
+type OverviewInfo = {
+  totalUsers : number;
+  admins : number;
+  editors : number;
+  viewers : number;
+  files : number;
+  storage : number;
+}
+
+function convertISOTime(data : User[]){
+  if(data.length>0){
+    data.forEach((user : User)=>{
+      const joinDate = new Date(user.join_date);
+      const lastActive = new Date(user.last_active);
+      user.join_date = joinDate.toLocaleDateString();
+      user.last_active = lastActive.toLocaleString();
+    })
+  }
+}
+
 export default function UsersPage(){
   //controls text and arrow color
   const iconTextColor = useColorModeValue("black", 'white');
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
+  const [overviewInfo, setOverviewInfo] = useState<OverviewInfo>({
+    totalUsers : 0,
+    admins : 0,
+    editors : 0,
+    viewers : 0,
+    files : 0,
+    storage : 0
+  });
 
+  // calculate users function for overview
+  const getOverviewData = async (users : User[]) => {
+    if(users.length>0){
+
+      // user related info
+      const admins = users.filter((user)=>user.role==="admin").length
+      const editors = users.filter((user)=>user.role==="editor").length
+      const viewers = users.filter((user)=>user.role==="viewer").length
+
+      const newOverviewInfo = {...overviewInfo};
+      newOverviewInfo.admins = admins;
+      newOverviewInfo.editors = editors;
+      newOverviewInfo.viewers = viewers;
+      newOverviewInfo.totalUsers = admins+editors+viewers;
+
+      // storage related info
+      const storageInfo = await fetch("http://localhost:8000/api/storage",{
+        credentials : 'include',
+        method : 'GET',
+      });
+
+      if(storageInfo.ok){
+        const data = await storageInfo.json();
+        newOverviewInfo.files = data.fileNumber;
+        newOverviewInfo.storage = data.storageSize;
+      }
+
+      setOverviewInfo(newOverviewInfo);
+    }
+  }
+
+  const router = useRouter();
   useEffect(()=>{
+    const onPageLoad = async () => {
+      // extra layer of protection in case the middleware doesn't catch unauthenticated users
+      const res = await fetch('http://localhost:8000/api/user', { credentials: 'include' });
+      if (!res.ok){
+        router.push('/login')
+      }else{
+        const user = await res.json();
+        if (user.role!=='admin'){
+          router.push('/main')
+        }else{
+          setIsAdmin(true);
+        }
+      }
+    }
+
+    onPageLoad()
+
     const fetchUsers = async () =>{
       const res = await fetch("http://localhost:8000/api/employees", {
         credentials : 'include',
         method : 'GET',
       });
-      const data = await res.json()
+      const data = await res.json();
+
+      convertISOTime(data);
 
       setUsers(data);
+      getOverviewData(data);
     }
 
     fetchUsers()
+    
   }, []);
 
   type columnHeader = {
@@ -91,6 +179,9 @@ export default function UsersPage(){
       credentials: 'include',
     });
     const data = await res.json();
+
+    convertISOTime(data);
+
     setUsers(data)
   }
 
@@ -201,107 +292,140 @@ export default function UsersPage(){
     }
   }
 
-  return (<>
-    <Box bg={useColorModeValue("white", '#0D1835')} minH="100vh">
-      {/* Header box for title, search bar and others */}
-      <Flex 
-      w="100%"
-      h="12vh"
-      justify="space-between"
-      >
-      
-        <HStack
-        ml={8}>
-          <Heading
-          fontFamily="var(--font-roboto-condensed)"
-          color={iconTextColor}
-          size={"3xl"}
-          >Users</Heading>
+  // overview information
+  const overviewBoxes = [
+    { label: 'Total Users', value : overviewInfo.admins+overviewInfo.editors+overviewInfo.viewers, icon : HiUsers},
+    { label: 'Admins', value : overviewInfo.admins, icon : HiMiniWrenchScrewdriver},
+    { label: 'Files', value : overviewInfo.files, icon : FaFile},
+    { label: 'Editors', value : overviewInfo.editors, icon : MdEdit},
+    { label: 'Viewers', value : overviewInfo.viewers, icon : IoEye},
+    { label: 'Storage', value : overviewInfo.storage, icon : GrStorage},
+  ]
+  const overviewBoxComponents = overviewBoxes.map((box, index)=>{
+    return (
+    <Stack 
+    key={index} 
+    borderRadius={10} 
+    bg={useColorModeValue("white", '#383838')} 
+    aspectRatio="4/3" 
+    width="100%" align="center" 
+    justify="center">
+      <Icon size={"2xl"} as={box.icon} color={useColorModeValue("#9AB3F2", '#335098')}/>
+      <Heading color={iconTextColor} size="3xl">{box.value}</Heading>
+      <Text color={iconTextColor} fontSize="sm">{box.label}</Text>
+    </Stack>);
+  });
+
+  if(isAdmin){
+    return (<>
+      <Box bg={useColorModeValue("#9AB3F2", '#335098')} w="100%">
+        {/* Header box for title, search bar and others */}
+        <Flex 
+        w="100%"
+        h="12vh"
+        justify="space-between"
+        >
+        
+          <HStack
+          ml={8}>
+            <Heading
+            fontFamily="var(--font-roboto-condensed)"
+            color={iconTextColor}
+            size={"3xl"}
+            >Users</Heading>
+          </HStack>
+
+          <HStack mr={10}>
+              {/* <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+              _hover={{ bg: '#e0e0e0ff' }}
+              onClick={() => setSearchbar(!searchbar)}>
+                <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
+              </IconButton>
+              
+              {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
+
+              <FilterOptions 
+              iconTextColor={iconTextColor} 
+              mediaTypeEvent={filterMediaType}
+              fileExtensionEvent={filterFileExtension}
+              />
+
+              <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+              _hover={{ bg: '#e0e0e0ff' }}
+              onClick={changeViewType}>
+                {viewType=="gallery"?<RiGalleryView2 color="#9AB3F2"/>:<IoIosList color="#9AB3F2"/>}
+              </IconButton> */}
+
+            </HStack>
+        </Flex>
+              
+        <HStack justifySelf="center" w="60%" pb={10}>
+          <SimpleGrid columns={3} w="100%" gapY={3} gapX={4} color={iconTextColor}>
+            {overviewBoxComponents}
+          </SimpleGrid>
+        </HStack>
+      </Box>
+
+      <Box minH="100vh" pt={5} bg={useColorModeValue("white", '#0D1835')}>
+        <HStack mr={8} w="250px" mb={3}  justifySelf="flex-end">
+          <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            _hover={{ bg: '#e0e0e0ff' }}>
+              <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
+          </IconButton>
+          <Searchbar color={iconTextColor} placeholder="Search users" inputEvent={searchKeyword}/>
+
+          <RoleFilter 
+            iconTextColor={iconTextColor} 
+            filterEvent={filterRoles}
+          />
         </HStack>
 
-        <HStack mr={10}>
-            {/* <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-            _hover={{ bg: '#e0e0e0ff' }}
-            onClick={() => setSearchbar(!searchbar)}>
-              <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
-            </IconButton>
-            
-            {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
-
-            <FilterOptions 
-            iconTextColor={iconTextColor} 
-            mediaTypeEvent={filterMediaType}
-            fileExtensionEvent={filterFileExtension}
-            />
-
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-            _hover={{ bg: '#e0e0e0ff' }}
-            onClick={changeViewType}>
-              {viewType=="gallery"?<RiGalleryView2 color="#9AB3F2"/>:<IoIosList color="#9AB3F2"/>}
-            </IconButton> */}
-
-          </HStack>
-      </Flex>
-
-      <HStack ml={8} w="250px" mb={3} >
-        <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-          _hover={{ bg: '#e0e0e0ff' }}>
-            <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
-        </IconButton>
-        <Searchbar color={iconTextColor} placeholder="Search users" inputEvent={searchKeyword}/>
-
-        <RoleFilter 
-          iconTextColor={iconTextColor} 
-          filterEvent={filterRoles}
-        />
-      </HStack>
-
-
-      <Table.Root ml={8} w="95%">
-      <Table.Header>
-        <Table.Row bg={useColorModeValue("#9AB3F2", '#335098')}>
-          {columnHeaders.map((item, index)=>
-            <SortableColumnHeader key={index} label={item.label} clickEvent={()=>sort(item.value)}/>
-          )}
-          <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {users.map((item) => (
-          <Table.Row key={item.id}  color={iconTextColor}>
-            <Table.Cell py={2} pl={1}>{item.first_name+" "+item.last_name} </Table.Cell>
-            <Table.Cell>{item.username}</Table.Cell>
-            <Table.Cell>{item.email}</Table.Cell>
-            <Table.Cell>{item.role}</Table.Cell>
-            <Table.Cell>{item.join_date}</Table.Cell>
-            <Table.Cell>{item.last_active}</Table.Cell>
-            <Table.Cell>
-              <HStack w="100%" justify="center">
-
-                <UserForm 
-                title="Edit User" 
-                user={item}
-                submitEvent={updateUser}
-                >
-                  <IconButton>
-                    <MdEdit />
-                  </IconButton>
-                </UserForm>
-
-                <DeleteConfirmation
-                user={item}
-                deleteEvent={deleteUser}
-                >
-                  <IconButton>
-                    <MdDelete />
-                  </IconButton>
-                </DeleteConfirmation>
-              </HStack>
-            </Table.Cell>
+        <Table.Root ml={8} w="95%" borderTopRadius={10} overflow="hidden">
+        <Table.Header>
+          <Table.Row bg={useColorModeValue("#9AB3F2", '#335098')}>
+            {columnHeaders.map((item, index)=>
+              <SortableColumnHeader key={index} label={item.label} clickEvent={()=>sort(item.value)}/>
+            )}
+            <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table.Root>
+        </Table.Header>
+        <Table.Body>
+          {users.map((item) => (
+            <Table.Row key={item.id}  color={iconTextColor} bg="transparent">
+              <Table.Cell py={2} pl={1}>{item.first_name+" "+item.last_name} </Table.Cell>
+              <Table.Cell>{item.username}</Table.Cell>
+              <Table.Cell>{item.email}</Table.Cell>
+              <Table.Cell>{item.role}</Table.Cell>
+              <Table.Cell>{item.join_date}</Table.Cell>
+              <Table.Cell>{item.last_active}</Table.Cell>
+              <Table.Cell>
+                <HStack w="100%" justify="center">
+
+                  <UserForm 
+                  title="Edit User" 
+                  user={item}
+                  submitEvent={updateUser}
+                  >
+                    <IconButton _hover={{color : "#4ceb34"}}>
+                      <MdEdit />
+                    </IconButton>
+                  </UserForm>
+
+                  <DeleteConfirmation
+                  user={item}
+                  deleteEvent={deleteUser}
+                  >
+                    <IconButton _hover={{color : "red"}}>
+                      <MdDelete />
+                    </IconButton>
+                  </DeleteConfirmation>
+                </HStack>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </Box>
 
     <UserForm title="Create New User" user={null} submitEvent={createUser}> 
       <Button
@@ -314,11 +438,14 @@ export default function UsersPage(){
         p={2}
         bg={useColorModeValue("#9AB3F1", "#335098")}
         _hover={{bg : "#8fa5ddff"}}
+        boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
         >
           <IoPersonAdd />
           Create User
       </Button>
     </UserForm>
-    </Box>
-  </>);
+    </>);
+  }else{
+    return <Spinner></Spinner>
+  }
 }

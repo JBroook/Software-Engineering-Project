@@ -9,19 +9,30 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from assets.models import Folder, File
 from users.models import Employee
 from . import serializers
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdmin, IsEditor
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
+        employee = Employee.objects.get(user=user)
         return Response({
             "email": user.email,
             "username": user.username,
-            "id": user.id
+            "id": user.id,
+            "role": employee.role
         }, status=status.HTTP_200_OK)
+
+class StorageView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    # returns info on storage size and file number
+    def get(self, request):
+        storage_size = File.objects.aggregate(total_size=Sum('size'))['total_size']
+        file_number = len(File.objects.all())
+        return Response({'storageSize':storage_size, 'fileNumber': file_number}, status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     #user logging in
@@ -50,7 +61,7 @@ class LogoutView(APIView):
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
     
 class EmployeeViewSet(ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = serializers.EmployeeSerializer
 
     def get_queryset(self):
