@@ -70,7 +70,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user')
         user = UserSerializer(data=user_data)
         user.is_valid(raise_exception=True)
-        user.save()
+        user = user.save()
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
     
