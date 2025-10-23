@@ -135,7 +135,7 @@ function UserForm(props : UserFormChildfulProps) {
                     <Field.RequiredIndicator />
                   </Field.Label>
                   <Input p={2} type="password" {...register('password', {required : 'Password is required'})}/>
-                  {/* <Field.HelperText>Hello</Field.HelperText> */}
+                  <Field.HelperText>This password will be sent to the user's email</Field.HelperText>
                   <Field.ErrorText> 
                     {errors.password?.message}
                   </Field.ErrorText>

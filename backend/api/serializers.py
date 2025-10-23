@@ -77,7 +77,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         print("update triggered")
         user_data = validated_data.pop('user')
-        UserSerializer().update(instance.user, user_data)
+        user_serializer = UserSerializer(instance.user, data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user_serializer.save()
         
         instance.role = validated_data.get('role', instance.role)
         instance.save()

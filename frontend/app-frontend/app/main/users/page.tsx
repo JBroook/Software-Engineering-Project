@@ -253,34 +253,44 @@ export default function UsersPage(){
 
   // update existing user
   const updateUser = async (data : User) => {
-    const res = await fetch(`http://localhost:8000/api/employees/${data.id}/`, {
-      credentials : 'include',
-      method : 'PATCH',
-      headers : {
-        'Content-Type' : 'application/json',
-        'X-CSRFToken': getCookie('csrftoken'),// give csrf token
-      },
-      body : JSON.stringify({
-        "user" : {
-          "username" : data.username,
-          "email" : data.email,
-          "first_name" : data.first_name,
-          "last_name" : data.last_name,
+    try{
+      const res = await fetch(`http://localhost:8000/api/employees/${data.id}/`, {
+        credentials : 'include',
+        method : 'PATCH',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
         },
-        "role" : data.role
-      })
-    });
+        body : JSON.stringify({
+          "user" : {
+            "username" : data.username,
+            "email" : data.email,
+            "first_name" : data.first_name,
+            "last_name" : data.last_name,
+          },
+          "role" : data.role
+        })
+      });
 
-    if(res.ok){
-      const data = await res.json();
-      const newUsers = [...users];
-      const oldIndex = newUsers.findIndex(obj => obj.id === data.id);
-      if(oldIndex!==-1){
-        newUsers[oldIndex] = data
+      if(res.ok){
+        const userData = await res.json();
+        const newUsers = [...users];
+        newUsers.push(userData)
+        setUsers(newUsers);
+      }else{
+        const errorData = await res.json();
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
       }
-      setUsers(newUsers);
-    }else{
-      throw new Error('Failed to create employee');
+    }catch (err:any){
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
     }
   }
 
