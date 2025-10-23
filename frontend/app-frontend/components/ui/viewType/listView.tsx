@@ -1,10 +1,9 @@
 import { 
-  Heading, HStack, SimpleGrid,
+  Heading, HStack, 
   Separator, Flex, Stack, Spinner
 } from "@chakra-ui/react"
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
-import GalleryFolder from "@/components/ui/item/galleryFolder";
 import ListItem from "../item/listItem";
 import ListFolder from "../item/listFolder";
 import { useColorModeValue } from '../color-mode'
@@ -23,7 +22,7 @@ export default function ListView(props : ViewProps){
     ))
   
   const fileComponents = props.files.map(file => (
-    <ListItem key={file.id} filename={file.name} date={file.date_modified} size={file.size}/>
+    <ListItem key={file.id} filename={file.name} image={file.data} date={file.date_modified} size={file.size}/>
   ))
 
   return (<>

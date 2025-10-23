@@ -1,6 +1,6 @@
-import React, { ReactNode, useState } from 'react'
-import { Stack, Flex, Heading,
-    Box, Text, HStack, IconButton,
+import React, { useState } from 'react'
+import { Flex, Heading,
+    Box, Text, IconButton,
     CloseButton,
     Dialog,
     Spacer, Image,
@@ -21,8 +21,6 @@ interface GalleryItemProps {
 export default function GalleryItem(props : GalleryItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("v1");
-  console.log(selectedVersion)
-  // const currentImage = GalleryItemProps[selectedVersion] ?? null;
   
   return (
     <>
@@ -144,7 +142,7 @@ export default function GalleryItem(props : GalleryItemProps) {
                       defaultValue={"v1"}
                       value={selectedVersion}
                       onValueChange={(v) => setSelectedVersion(v.value)}>
-                        <Tabs.List>
+                        <Tabs.List bg={useColorModeValue('#D9D9D9','#383838')}>
                           <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v1">Version 1</Tabs.Trigger>
                           <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v2">Version 2</Tabs.Trigger>
                           <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v3">Version 3</Tabs.Trigger>
@@ -157,11 +155,13 @@ export default function GalleryItem(props : GalleryItemProps) {
                     w={'90%'} 
                     h={'100%'} 
                     m={8}
+                    mb={6}
                     direction={'column'} 
-                    justify={'space-between'}>
+                    justify={'space-between'}
+                    color={useColorModeValue("black", 'white')}>
 
                       <Flex w={'100%'} justify={'space-between'}>
-                        <Grid templateColumns="repeat(2, 1fr)" gap="6">
+                        <Grid templateColumns="repeat(2, 1fr)" gap="4">
                           { props.filename ? (
                             <>
                               <Text>File Name:</Text>
@@ -192,7 +192,7 @@ export default function GalleryItem(props : GalleryItemProps) {
 
                       {/* File Created / Modified */}
                       <Flex w={'100%'}>
-                        <Grid templateColumns="repeat(2, 1fr)" gap="6">
+                        <Grid templateColumns="repeat(2, 1fr)" gap="4">
                           { props.filename ? (
                             <>
                               <Text>Created On:</Text>
@@ -222,7 +222,12 @@ export default function GalleryItem(props : GalleryItemProps) {
                       {/* Shared Tags */}
                       <Flex w={'100%'} h={'30%'} direction={'column'}>
                         <Text>Tags:</Text>
-                        <Box bg={useColorModeValue('#D9D9D9','#383838')}>
+                        <Box 
+                        w={'100%'} 
+                        h={'100%'} 
+                        mt={4}
+                        p={4}
+                        bg={useColorModeValue('#D9D9D9','#383838')}>
                           This Holds all tags that are able to view / edit 
                         </Box>
                       </Flex>
