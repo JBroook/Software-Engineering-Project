@@ -275,7 +275,10 @@ export default function UsersPage(){
       if(res.ok){
         const userData = await res.json();
         const newUsers = [...users];
-        newUsers.push(userData)
+        const oldIndex = newUsers.findIndex(obj => obj.id === userData.id);
+        if(oldIndex!==-1){
+          newUsers[oldIndex] = userData
+        }
         setUsers(newUsers);
       }else{
         const errorData = await res.json();
@@ -339,9 +342,12 @@ export default function UsersPage(){
     </Stack>);
   });
 
+  const upperPortionColor = useColorModeValue("#9AB3F2", '#335098');
+  const lowerPortionColor = useColorModeValue("white", '#0D1835');
+
   if(isAdmin){
     return (<>
-      <Box bg={useColorModeValue("#9AB3F2", '#335098')} w="100%">
+      <Box bg={upperPortionColor} w="100%">
         {/* Header box for title, search bar and others */}
         <Flex 
         w="100%"
@@ -389,7 +395,7 @@ export default function UsersPage(){
         </HStack>
       </Box>
 
-      <Box minH="100vh" pt={5} bg={useColorModeValue("white", '#0D1835')}>
+      <Box minH="100vh" pt={5} bg={lowerPortionColor}>
         <HStack mr={8} w="250px" mb={3}  justifySelf="flex-end">
           <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}>
@@ -405,7 +411,7 @@ export default function UsersPage(){
 
         <Table.Root ml={8} w="95%" borderTopRadius={10} overflow="hidden">
         <Table.Header>
-          <Table.Row bg={useColorModeValue("#9AB3F2", '#335098')}>
+          <Table.Row bg={upperPortionColor}>
             {columnHeaders.map((item, index)=>
               <SortableColumnHeader key={index} label={item.label} clickEvent={()=>sort(item.value)}/>
             )}
@@ -459,7 +465,7 @@ export default function UsersPage(){
         bottom="30px"
         right="30px"
         p={2}
-        bg={useColorModeValue("#9AB3F1", "#335098")}
+        bg={upperPortionColor}
         _hover={{bg : "#8fa5ddff"}}
         boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
         >
