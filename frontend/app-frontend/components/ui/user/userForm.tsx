@@ -35,19 +35,35 @@ function UserForm(props : UserFormChildfulProps) {
   // const [formData, setFormData] = useState({ name: "", email: "" });
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  const {register, handleSubmit, formState: {errors}} = useForm<User>();
+  const {register, handleSubmit, setError, formState: {errors}} = useForm<User>();
 
   const iconTextColor = useColorModeValue("black", "white");
 
-  const onSubmit: SubmitHandler<User> = (data) =>{
+  const onSubmit: SubmitHandler<User> = async (data) =>{
     const newUserData = (props.user!==null) ? {...props.user} : data
-    if (props.user!==null){// if exisitng user is given, populate data with user info
+    if (props.user!==null){// if existing user is given, populate data with user info
       Object.assign(newUserData, data)
     }
 
-    console.log(newUserData);
-    props.submitEvent(newUserData);
-    setIsOpen(false);
+    try{
+      await props.submitEvent(newUserData);
+      setIsOpen(false);
+    } catch (err: any){
+      if (err.response && err.response.data) {
+        const backendErrors = err.response.data;
+
+        Object.keys(backendErrors).forEach((field) => {
+          const message = backendErrors[field][0]; // DRF returns list of messages
+          setError(field as keyof User, {
+            type: "server",
+            message,
+          });
+        });
+      } else {
+        // fallback error handling
+        setError("root", { type: "server", message: "An unexpected error occurred." });
+      }
+    }
   }
 
   type UserCrudField = {
@@ -63,7 +79,7 @@ function UserForm(props : UserFormChildfulProps) {
 ];
 
   const FieldComponents : React.JSX.Element[] = userCrudFields.map((field, index)=>{
-    return (<Field.Root key={index} mb={4}>
+    return (<Field.Root key={index} mb={4} invalid={!!errors[field.value]}>
       <Field.Label>
         {field.label}
         <Field.RequiredIndicator />
@@ -74,15 +90,19 @@ function UserForm(props : UserFormChildfulProps) {
         defaultValue={props.user!==null? props.user[field.value] : undefined}
       />
       {/* <Field.HelperText /> */}
-      {/* <Field.ErrorText> 
-        {errors.firstName && <Text>This field is required</Text>}
-      </Field.ErrorText> */}
+      <Field.ErrorText> 
+        {errors[field.value]?.message}
+      </Field.ErrorText>
     </Field.Root>);
   })
 
+  const handleOpen = (details: { open: boolean | ((prevState: boolean) => boolean); }) => {
+    setIsOpen(details.open)
+  }
+
   return (
     <>
-      <Dialog.Root open={isOpen} onOpenChange={(details)=>setIsOpen(details.open)}>
+      <Dialog.Root open={isOpen} onOpenChange={handleOpen}>
       <Dialog.Trigger asChild>
         {props.children}
       </Dialog.Trigger>
@@ -109,23 +129,26 @@ function UserForm(props : UserFormChildfulProps) {
               {FieldComponents}
 
               {!props.user &&
-                <Field.Root mb={4}>
+                <Field.Root mb={4} invalid={!!errors.password}>
                   <Field.Label>
                     Password
                     <Field.RequiredIndicator />
                   </Field.Label>
                   <Input p={2} type="password" {...register('password', {required : 'Password is required'})}/>
-                  {/* <Field.HelperText /> */}
-                  {/* <Field.ErrorText> 
-                    {errors.firstName && <Text>This field is required</Text>}
-                  </Field.ErrorText> */}
+                  {/* <Field.HelperText>Hello</Field.HelperText> */}
+                  <Field.ErrorText> 
+                    {errors.password?.message}
+                  </Field.ErrorText>
                 </Field.Root>
               }
 
-              <Field.Root mb={4}>
+              <Field.Root mb={4} invalid={!!errors.role}>
                 <Field.Label>
                   Role
                   <Field.RequiredIndicator />
+                  <Field.ErrorText> 
+                    {errors.role?.message}
+                  </Field.ErrorText>
                 </Field.Label>
                 <NativeSelect.Root >
                   <NativeSelect.Field p={2} {...register('role', {required : 'Role is required'})} 

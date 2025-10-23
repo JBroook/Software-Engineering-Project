@@ -209,32 +209,45 @@ export default function UsersPage(){
 
   // handle creating and updating users
   const createUser = async (data : User) => {
-    const res = await fetch('http://localhost:8000/api/employees/', {
-      credentials : 'include',
-      method : 'POST',
-      headers : {
-        'Content-Type' : 'application/json',
-        'X-CSRFToken': getCookie('csrftoken'),//give csrf token
-      },
-      body : JSON.stringify({
-        "user" : {
-          "username" : data.username,
-          "email" : data.email,
-          "first_name" : data.first_name,
-          "last_name" : data.last_name,
-          "password" : data.password
+    try{
+      const res = await fetch('http://localhost:8000/api/employees/', {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),//give csrf token
         },
-        "role" : data.role
-      })
-    });
+        body : JSON.stringify({
+          "user" : {
+            "username" : data.username,
+            "email" : data.email,
+            "first_name" : data.first_name,
+            "last_name" : data.last_name,
+            "password" : data.password
+          },
+          "role" : data.role
+        })
+      });
 
-    if(res.ok){
-      const data = await res.json();
-      const newUsers = [...users];
-      newUsers.push(data)
-      setUsers(newUsers);
-    }else{
-      throw new Error('Failed to create employee');
+      if(res.ok){
+        const userData = await res.json();
+        const newUsers = [...users];
+        newUsers.push(userData)
+        setUsers(newUsers);
+      }else{
+        const errorData = await res.json();
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+    }catch (err:any){
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
     }
   }
 
@@ -427,7 +440,7 @@ export default function UsersPage(){
       </Table.Root>
     </Box>
 
-    <UserForm title="Create New User" user={null} submitEvent={createUser}> 
+    <UserForm title="Create New User" user={null} submitEvent={createUser} key={1 }> 
       <Button
         color={iconTextColor}
         variant="ghost" 

@@ -61,7 +61,7 @@ class LogoutView(APIView):
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
     
 class EmployeeViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdmin]
+    # permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = serializers.EmployeeSerializer
 
     def get_queryset(self):

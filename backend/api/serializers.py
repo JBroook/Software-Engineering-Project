@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from assets.models import File, Folder
 from users.models import Employee
 from django.contrib.auth.models import User
@@ -14,6 +15,16 @@ class FolderSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'parent_folder', 'date_created', 'date_modified']
 
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
     class Meta:
         model = User
         fields = ['id','first_name','last_name','email','username','password']
@@ -57,7 +68,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user = UserSerializer().create(user_data)
+        user = UserSerializer(data=user_data)
+        user.is_valid(raise_exception=True)
+        user.save()
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
     
