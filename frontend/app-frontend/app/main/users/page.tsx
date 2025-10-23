@@ -469,6 +469,9 @@ export default function UsersPage(){
     </UserForm>
     </>);
   }else{
-    return <Spinner></Spinner>
+    return (
+    <Flex w="100%" h="100vh" justify="center" align="center">
+    <Spinner color={iconTextColor}></Spinner>
+    </Flex>);
   }
 }
