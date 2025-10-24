@@ -1,6 +1,7 @@
 import { 
   Heading, HStack, SimpleGrid,
-  Separator, Spinner, Flex
+  Separator, Spinner, Flex,
+  Spacer,
 } from "@chakra-ui/react"
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
@@ -24,11 +25,11 @@ export default function GalleryView(props : ViewProps){
   ))
 
   const fileComponents = props.files.map(file => (
-    <GalleryItem key={file.id} filename={file.name} date={file.date_modified}/>
+    <GalleryItem key={file.id} filename={file.name} image={file.data} date={file.date_modified}/>
   ))
 
   return (<>
-  {/* Gallery view */}
+    {/* Gallery view */}
     {/* Folders */}
     <HStack
     bg={useColorModeValue("#9AB3F2", '#335098')}
@@ -50,6 +51,7 @@ export default function GalleryView(props : ViewProps){
         { label : "Filename", value : "name"},
         { label : "Last modified", value : "date_modified"}]}/>
     </ HStack>
+    
     {folderComponents.length>=3 ?
       <SimpleGrid 
       w="100%" 
@@ -113,6 +115,7 @@ export default function GalleryView(props : ViewProps){
     {fileComponents.length>=3 ?
       <SimpleGrid 
       w="100%" 
+      h='auto'
       minChildWidth={80} 
       gap="6" 
       px={8} 
@@ -124,10 +127,12 @@ export default function GalleryView(props : ViewProps){
           color="black"
           content={fileComponents}
         />
+        <Spacer></Spacer>
       </SimpleGrid>
-     :
+    :
       <Flex 
       w="100%" 
+      h='auto'
       gap="6" 
       px={8} 
       pb={20} 
