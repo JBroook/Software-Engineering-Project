@@ -6,7 +6,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from assets.models import Folder, File
+from assets.models import Folder, File, TagType
 from users.models import Employee
 from . import serializers
 from django.db.models import Q, Sum, Count
@@ -59,6 +59,10 @@ class LogoutView(APIView):
         logout(request)
         print("Logged out")
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
+    
+class TagTypeViewSet(ModelViewSet):
+    queryset = TagType.objects.all()
+    serializer_class = serializers.TagTypeSerializer
     
 class EmployeeViewSet(ModelViewSet):
     # permission_classes = [IsAuthenticated, IsAdmin]
