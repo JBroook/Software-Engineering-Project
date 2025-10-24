@@ -6,7 +6,9 @@ import { Flex, Heading,
     Dialog,
     Grid,
     Spacer,
-    Tabs
+    Tabs,
+    Portal,
+    Tooltip
 } from '@chakra-ui/react'
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
@@ -33,58 +35,80 @@ export default function ListItem(props : ListItemProps) {
       onOpenChange={(details) => setIsOpen(details.open)}
       trapFocus={true}
       >
-        <Dialog.Trigger asChild>
-          <Box 
-          w="95%"
-          h="fit-content"
-          bg={useColorModeValue("white", '#383838')}
-          color={useColorModeValue("black", 'white')}
-          // h={"2xs"}
-          borderRadius={"xl"}
-          py={2}
-          px={4}
-          cursor="pointer"
-          _hover={{ bg: useColorModeValue("gray.200", '#2a2a2aff') }}
-          boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
-          >
-            <Flex justify="space-between" align="center">
-              <HStack>
-                <FaFile
-                    color={useColorModeValue("black", 'white')}
-                    size={25}/>
-                <Box h="fit-content">
-                  <Heading fontFamily="var(--font-reddit-mono)">
-                    {props.filename}
-                  </Heading>
-                  <Text fontFamily="var(--font-roboto)">
-                    file type
-                  </Text>
-                </Box>
-              </HStack>
+        <Tooltip.Root positioning={{ placement: "top" }}>
+          <Tooltip.Trigger> {/* To show image preview content in tooltip */}
+            <Dialog.Trigger w='full'> {/* To show Item content in dialog */}
+              <Box 
+              w="95%"
+              h="fit-content"
+              bg={useColorModeValue("white", '#383838')}
+              color={useColorModeValue("black", 'white')}
+              borderRadius={"xl"}
+              py={2}
+              px={4}
+              cursor="pointer"
+              _hover={{ bg: useColorModeValue("gray.200", '#2a2a2a') }}
+              boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
+              >
+                <Flex justify="space-between" align="center">
+                  <HStack>
+                    <FaFile
+                        color={useColorModeValue("black", 'white')}
+                        size={25}/>
+                    <Box h="fit-content">
+                      <Heading fontFamily="var(--font-reddit-mono)">
+                        {props.filename}
+                      </Heading>
+                      <Text fontFamily="var(--font-roboto)">
+                        file type
+                      </Text>
+                    </Box>
+                  </HStack>
 
-              <HStack fontFamily="var(--font-roboto)" fontSize={14}>
-                <Flex mx={2} w="100px" justify="center">
-                  <Text>Only you</Text>
-                </Flex>
+                  <HStack fontFamily="var(--font-roboto)" fontSize={14}>
+                    <Flex mx={2} w="100px" justify="center">
+                      <Text>Only you</Text>
+                    </Flex>
 
-                <Flex mx={2} w="200px" justify="center">
-                  <Text>{props.date}</Text>
-                </Flex>
+                    <Flex mx={2} w="200px" justify="center">
+                      <Text>{props.date}</Text>
+                    </Flex>
 
-                <Flex mx={2} w="60px" justify="center">
-                  <Text>{props.size}</Text>
-                </Flex>
+                    <Flex mx={2} w="60px" justify="center">
+                      <Text>{props.size}</Text>
+                    </Flex>
 
-                <IconButton
-                    variant="ghost"
-                    _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
-                    borderRadius="100%">
                     <SlOptionsVertical/>
-                </IconButton>
-              </HStack>
-            </Flex>
-          </Box>
-        </Dialog.Trigger>
+                  </HStack>
+                </Flex>
+              </Box>
+          
+            </Dialog.Trigger>
+          </Tooltip.Trigger>
+
+          <Tooltip.Positioner>
+            <Tooltip.Content>
+              <Tooltip.Arrow>
+                <Tooltip.ArrowTip />
+              </Tooltip.Arrow>
+              <Flex
+              w='10vw'
+              h='10vw'
+              align={'center'}
+              justify={'center'}
+              overflow='hidden'
+              >
+                <Center>
+                  {props.image ? (
+                    <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                  ) : (
+                    <Box>No logo uploaded</Box>
+                  )}
+                </Center>
+              </Flex>
+            </Tooltip.Content>
+          </Tooltip.Positioner>
+        </Tooltip.Root>
 
         <Dialog.Backdrop
           bg="blackAlpha.700" // Darken background with semi-transparent black

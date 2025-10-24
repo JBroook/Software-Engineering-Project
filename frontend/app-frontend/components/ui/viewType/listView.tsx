@@ -1,6 +1,8 @@
 import { 
   Heading, HStack, 
-  Separator, Flex, Stack, Spinner
+  Separator, Flex, Stack, Spinner,
+  Tooltip, Text,
+  Portal
 } from "@chakra-ui/react"
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
@@ -12,6 +14,7 @@ import {ViewProps} from "./interfaces"
 import ContentLoader from "./contentLoader";
 
 export default function ListView(props : ViewProps){
+  console.log(props)
   const folderComponents = props.folders.map(folder => (
       <ListFolder 
         key={folder.id} 
