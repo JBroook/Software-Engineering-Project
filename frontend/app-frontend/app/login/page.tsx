@@ -23,7 +23,6 @@ const getCsrfToken = async () => {
 };
 
 
-
 export default function LoginPage(){
   const router = useRouter();
   const [csrfToken, setCsrfToken] = useState("");
@@ -39,12 +38,6 @@ export default function LoginPage(){
 
     fetchCsrf()
   }, []);
-
-  const test = () =>{
-    fetch('http://localhost:8000/api/user', { credentials: 'include' })
-    .then(res => res.json())
-    .then(data => console.log(data));
-  }
 
   const handleLogin = async () => {
     setLoginClicked(true);
@@ -205,7 +198,6 @@ export default function LoginPage(){
         >
           {loginButtonContent}
         </Button>
-        <Button onClick={test}>test</Button>
       </Stack>
     </Box>
   </AbsoluteCenter>

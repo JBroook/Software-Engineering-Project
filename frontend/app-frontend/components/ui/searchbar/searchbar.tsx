@@ -2,9 +2,10 @@ import React, { ReactNode } from 'react'
 import { Input
 } from "@chakra-ui/react"
 
-interface SearchbarProps {
+type SearchbarProps = {
   placeholder: string;
   inputEvent: (keyword : string) => void;
+  color : string;
 }
 
 export default function Searchbar(props: SearchbarProps){
@@ -13,8 +14,8 @@ export default function Searchbar(props: SearchbarProps){
         placeholder={props.placeholder}
         variant="flushed" 
         pl={2}
-        color="white"
-        _placeholder={{ color: "white"}}
+        color={props.color}
+        _placeholder={{ color: props.placeholder}}
         data-state="open"
         onChange={(event) => props.inputEvent(event.target.value)}
         _open={{

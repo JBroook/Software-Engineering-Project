@@ -11,6 +11,7 @@ import { useColorModeValue } from '../color-mode'
 import ToggleTheme from '../toggleTheme'
 import NavItem from './NavLinks'
 import { useRouter } from 'next/navigation';
+import { FaRegUser } from "react-icons/fa";
 
 interface LinkItemProps {
   name: string;
@@ -21,7 +22,7 @@ interface LinkItemProps {
 // List of navigation items
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome, href: '/main' },
-  { name: 'Trending', icon: FiTrendingUp, href: '/main' },
+  { name: 'Users', icon: FaRegUser, href: '/main/users' },
   { name: 'Explore', icon: FiCompass, href: '/main' },
   { name: 'Favourites', icon: FiStar, href: '/main' },
   { name: 'Settings', icon: FiSettings, href: '/main' },
