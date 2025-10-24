@@ -17,6 +17,7 @@ import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
 import { useRouter } from "next/navigation";
+import { TagType } from "@/components/ui/tags/tagForm";
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -34,12 +35,22 @@ const getFiles = async (currentParent: number) => {
   return data;
 };
 
+const getTags = async () => {
+  const res = await fetch(`http://localhost:8000/api/tagtypes`, {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  const filteredTagTypes = data.map((item : TagType)=>item.name)
+  return filteredTagTypes;
+};
+
 type SFSParams = {
   searchKeyword : string;
   mediaType : string[];
   fileExtension : string[];
   sortMethod : string;
   sortOrder : string;
+  tagType : string[];
 }
 
 const defaultSFSParams : SFSParams = {
@@ -47,7 +58,8 @@ const defaultSFSParams : SFSParams = {
   mediaType : [],
   fileExtension : [],
   sortMethod : "",
-  sortOrder : "asc"
+  sortOrder : "asc",
+  tagType : []
 }
 
 export default function Main() {
@@ -55,6 +67,7 @@ export default function Main() {
   //folders and files are the actual array of items
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [tagTypes, setTagTypes] = useState<string[]>([]);
 
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
@@ -118,6 +131,10 @@ export default function Main() {
       f = await getFiles(currentParent);
       setFiles(f);
 
+      // fetch all tag types
+      f = await getTags();
+      setTagTypes(f)
+
       setLoading(false);
     }
 
@@ -166,6 +183,7 @@ export default function Main() {
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
+    // folders
     const url1 = new URL('http://localhost:8000/api/folders/');
     url1.searchParams.set('parent_folder', currentParent.toString());
     url1.searchParams.set('name', SFS.searchKeyword);
@@ -178,15 +196,27 @@ export default function Main() {
     const folderData = await folderRes.json();
     setFolders(folderData)
 
+    // files
     const url2 = new URL('http://localhost:8000/api/files/');
     url2.searchParams.set('parent_folder', currentParent.toString());
+
+    // search
     if (SFS.searchKeyword.length>0){
       url2.searchParams.set('name', SFS.searchKeyword);
     }
+
+    // filtering
     if (SFS.mediaType.length>0){
       url2.searchParams.set('media_type', SFS.mediaType.join("_"));
     }
-    url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    if (SFS.fileExtension.length>0){
+      url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    }
+    if (SFS.tagType.length>0){
+      url2.searchParams.set('tag_type', SFS.tagType.join("_"));
+    }
+
+    // sort
     if(SFS.sortMethod!==""){
       url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
     }
@@ -217,6 +247,14 @@ export default function Main() {
   const filterFileExtension = (fileExtensions : string[]) => {
     const newSFS = {...SFS};
     newSFS.fileExtension = fileExtensions;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterTags = (tags : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.tagType = tags;
     setSFS(newSFS)
 
     fetchSFS(newSFS)
@@ -263,6 +301,8 @@ export default function Main() {
             iconTextColor={iconTextColor} 
             mediaTypeEvent={filterMediaType}
             fileExtensionEvent={filterFileExtension}
+            tags={tagTypes}
+            tagEvent={filterTags}
             />
 
             <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"

@@ -11,8 +11,9 @@ import { User } from "./userForm";
 import { useState } from "react";
 
 interface DeleteConfirmationProps {
-   user : User;
-   deleteEvent : (userId : number) => void;
+  objectId : number;
+  objectName : string;
+  deleteEvent : (userId : number) => void;
 }
 
 type DeleteConfirmationChildfulProps = React.PropsWithChildren<DeleteConfirmationProps>;
@@ -22,9 +23,9 @@ function DeleteConfirmation(props : DeleteConfirmationChildfulProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false)
 
     const [clickedDelete, setClickedDelete] = useState<boolean>(false);
-    const deleteUser = () => {
+    const deleteObject = () => {
         setClickedDelete(true);
-        props.deleteEvent(props.user.id)
+        props.deleteEvent(props.objectId)
         setIsOpen(false);
     }
 
@@ -54,7 +55,7 @@ function DeleteConfirmation(props : DeleteConfirmationChildfulProps) {
             color={iconTextColor} w="100%">
                 <Stack w="100%" align="center" px={2}>
                     <Text textAlign="center">
-                        Are you sure you want to delete {props.user.first_name+"'s"} account? This will permanently delete this user.
+                        Are you sure you want to delete {props.objectName}? This action is permanent.
                     </Text>
                     { !clickedDelete ?
                         <Button
@@ -63,7 +64,7 @@ function DeleteConfirmation(props : DeleteConfirmationChildfulProps) {
                         _hover={{bg : "gray.200"}}
                         p={3}
                         borderRadius={10}
-                        onClick={deleteUser}
+                        onClick={deleteObject}
                         >Delete</Button>
                         :
                         <Spinner m={3}></Spinner>

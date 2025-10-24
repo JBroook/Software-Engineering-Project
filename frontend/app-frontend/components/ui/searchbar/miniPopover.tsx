@@ -4,7 +4,7 @@ import {
   Text, Code
 } from "@chakra-ui/react"
 import { useColorModeValue } from "../color-mode";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MdSelectAll } from "react-icons/md";
 import { MdDeselect } from "react-icons/md";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
@@ -40,24 +40,31 @@ export default function MiniPopover(props : miniPopoverProps){
 
     const { control, handleSubmit, setValue, watch } = form
     const values = watch("checkboxes")
+    const prevOptionsLength = useRef(props.options.length);
 
     useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-        if (name?.startsWith("checkboxes")) {
-        const checkboxes = form.getValues("checkboxes")
-
-        const selectedValues = props.options
-            .filter((_, i) => checkboxes[i])
-            .map((opt) => opt.value)
-
-        props.clickEvent?.(selectedValues)
+        if (props.options.length !== prevOptionsLength.current) {
+            form.reset({
+            checkboxes: Array(props.options.length).fill(false),
+            });
+            prevOptionsLength.current = props.options.length;
         }
-    })
+        const subscription = form.watch((value, { name }) => {
+            if (name?.startsWith("checkboxes")) {
+            const checkboxes = form.getValues("checkboxes")
 
-    return () => subscription.unsubscribe()
+            const selectedValues = props.options
+                .filter((_, i) => checkboxes[i])
+                .map((opt) => opt.value)
+
+            props.clickEvent?.(selectedValues)
+            }
+        },)
+
+        return () => subscription.unsubscribe()
     }, [form, props.options, props.clickEvent])
 
-    // Toggle all checkboxes: if all are checked, uncheck all; else check all
+    // toggle all checkboxes: if all are checked, uncheck all; else check all
     const toggleAll = () => {
         const allChecked = values.every((v) => v === true)
         setValue("checkboxes", values.map(() => !allChecked), {
@@ -90,7 +97,7 @@ export default function MiniPopover(props : miniPopoverProps){
                     <Button w="100%" variant="outline" onClick={toggleAll}>
                          {!allChecked ? (<><MdSelectAll /> Select All</>) : (<><MdDeselect />Deselect All</>)}
                     </Button>
-                    {/* List of checkboxes */}
+                    {/* list of checkboxes */}
                     {values.map((value, index) => (
                     <Controller
                         key={index}
