@@ -37,19 +37,20 @@ export default function ListItem(props : ListItemProps) {
       >
         <Tooltip.Root positioning={{ placement: "top" }}>
           <Tooltip.Trigger> {/* To show image preview content in tooltip */}
-            <Dialog.Trigger w='full'> {/* To show Item content in dialog */}
-              <Box 
+            <Box
               w="95%"
               h="fit-content"
-              bg={useColorModeValue("white", '#383838')}
-              color={useColorModeValue("black", 'white')}
-              borderRadius={"xl"}
+              bg={useColorModeValue("white", "#383838")}
+              color={useColorModeValue("black", "white")}
+              borderRadius="xl"
               py={2}
               px={4}
               cursor="pointer"
-              _hover={{ bg: useColorModeValue("gray.200", '#2a2a2a') }}
+              _hover={{ bg: useColorModeValue("gray.200", "#2a2a2a") }}
               boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
-              >
+              onClick={() => setIsOpen(true)} // Manually open dialog
+              role="button"
+            >
                 <Flex justify="space-between" align="center">
                   <HStack>
                     <FaFile
@@ -82,8 +83,6 @@ export default function ListItem(props : ListItemProps) {
                   </HStack>
                 </Flex>
               </Box>
-          
-            </Dialog.Trigger>
           </Tooltip.Trigger>
 
           <Tooltip.Positioner>
