@@ -49,7 +49,7 @@ type OverviewInfo = {
 export default function TagsPage(){
   //controls text and arrow color
   const iconTextColor = useColorModeValue("black", 'white');
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [hasRoles, setHasRoles] = useState<boolean>(false);
   const [tagTypes, setTagTypes] = useState<TagType[]>([]);
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
   const [overviewInfo, setOverviewInfo] = useState<OverviewInfo>({
@@ -85,10 +85,10 @@ export default function TagsPage(){
         router.push('/login')
       }else{
         const user = await res.json();
-        if (user.role!=='admin'){
+        if (user.role==='viewer'){
           router.push('/main')
         }else{
-          setIsAdmin(true);
+          setHasRoles(true);
         }
       }
     }
@@ -278,7 +278,7 @@ export default function TagsPage(){
   const upperPortionColor = useColorModeValue("#9AB3F2", '#335098');
   const lowerPortionColor = useColorModeValue("white", '#0D1835');
 
-  if(isAdmin){
+  if(hasRoles){
     return (<>
       <Box bg={upperPortionColor} w="100%">
         {/* Header box for title, search bar and others */}
