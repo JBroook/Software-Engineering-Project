@@ -16,11 +16,8 @@ import { IoSearchCircleOutline } from "react-icons/io5";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { User } from "@/components/ui/user/userForm";
 import DeleteConfirmation from "@/components/ui/user/deleteConfirmation";
-import { HiUsers } from "react-icons/hi2";
-import { HiMiniWrenchScrewdriver } from "react-icons/hi2";
-import { IoEye } from "react-icons/io5";
-import { FaFile } from "react-icons/fa6";
-import { GrStorage } from "react-icons/gr";
+import { FaHashtag } from "react-icons/fa";
+import { IoMdPricetags } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import TagForm, { TagType } from "@/components/ui/tags/tagForm";
 
@@ -44,25 +41,9 @@ function getCookie(name:string) {
 }
 
 type OverviewInfo = {
-  totalUsers : number;
-  admins : number;
-  editors : number;
-  viewers : number;
-  files : number;
-  storage : number;
+  tags : number;
+  types : number;
 }
-
-function convertISOTime(data : User[]){
-  if(data.length>0){
-    data.forEach((user : User)=>{
-      const joinDate = new Date(user.join_date);
-      const lastActive = new Date(user.last_active);
-      user.join_date = joinDate.toLocaleDateString();
-      user.last_active = lastActive.toLocaleString();
-    })
-  }
-}
-
 
 
 export default function TagsPage(){
@@ -72,43 +53,27 @@ export default function TagsPage(){
   const [tagTypes, setTagTypes] = useState<TagType[]>([]);
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
   const [overviewInfo, setOverviewInfo] = useState<OverviewInfo>({
-    totalUsers : 0,
-    admins : 0,
-    editors : 0,
-    viewers : 0,
-    files : 0,
-    storage : 0
+    tags : 0,
+    types : 0,
   });
 
   // calculate users function for overview
-  const getOverviewData = async (users : User[]) => {
-    if(users.length>0){
+  const getOverviewData = async () => {
+    const newOverviewInfo = {...overviewInfo};
+    // storage related info
+    const storageInfo = await fetch("http://localhost:8000/api/storage",{
+      credentials : 'include',
+      method : 'GET',
+    });
 
-      // user related info
-      const admins = users.filter((user)=>user.role==="admin").length
-      const editors = users.filter((user)=>user.role==="editor").length
-      const viewers = users.filter((user)=>user.role==="viewer").length
-
-      const newOverviewInfo = {...overviewInfo};
-      newOverviewInfo.admins = admins;
-      newOverviewInfo.editors = editors;
-      newOverviewInfo.viewers = viewers;
-      newOverviewInfo.totalUsers = admins+editors+viewers;
-
-      // storage related info
-      const storageInfo = await fetch("http://localhost:8000/api/storage",{
-        credentials : 'include',
-        method : 'GET',
-      });
-
-      if(storageInfo.ok){
-        const data = await storageInfo.json();
-        newOverviewInfo.files = data.fileNumber;
-        newOverviewInfo.storage = data.storageSize;
-      }
-
-      setOverviewInfo(newOverviewInfo);
+    if(storageInfo.ok){
+      const data = await storageInfo.json();
+      newOverviewInfo.tags = data.tagCount;
+      newOverviewInfo.types = data.tagTypes;
     }
+
+    setOverviewInfo(newOverviewInfo);
+    console.log(newOverviewInfo)
   }
 
   const router = useRouter();
@@ -129,6 +94,7 @@ export default function TagsPage(){
     }
 
     onPageLoad()
+    getOverviewData()
 
     const fetchTagTypes = async () =>{
       const res = await fetch("http://localhost:8000/api/tagtypes", {
@@ -291,20 +257,16 @@ export default function TagsPage(){
 
   // overview information
   const overviewBoxes = [
-    { label: 'Total Users', value : overviewInfo.admins+overviewInfo.editors+overviewInfo.viewers, icon : HiUsers},
-    { label: 'Admins', value : overviewInfo.admins, icon : HiMiniWrenchScrewdriver},
-    { label: 'Files', value : overviewInfo.files, icon : FaFile},
-    { label: 'Editors', value : overviewInfo.editors, icon : MdEdit},
-    { label: 'Viewers', value : overviewInfo.viewers, icon : IoEye},
-    { label: 'Storage', value : overviewInfo.storage, icon : GrStorage},
+    { label: 'Types', value : overviewInfo.types, icon : IoMdPricetags},
+    { label: 'Total Tags', value : overviewInfo.tags, icon : FaHashtag},
   ]
   const overviewBoxComponents = overviewBoxes.map((box, index)=>{
     return (
     <Stack 
     key={index} 
-    borderRadius={10} 
+    borderRadius="100%" 
     bg={useColorModeValue("white", '#383838')} 
-    aspectRatio="4/3" 
+    aspectRatio="1/1" 
     width="100%" align="center" 
     justify="center">
       <Icon size={"2xl"} as={box.icon} color={useColorModeValue("#9AB3F2", '#335098')}/>
@@ -336,8 +298,8 @@ export default function TagsPage(){
           </HStack>
         </Flex>
               
-        <HStack justifySelf="center" w="60%" pb={10}>
-          <SimpleGrid columns={3} w="100%" gapY={3} gapX={4} color={iconTextColor}>
+        <HStack justifySelf="center" w="40%" pb={10}>
+          <SimpleGrid columns={2} w="100%" gapY={3} gapX={4} color={iconTextColor}>
             {overviewBoxComponents}
           </SimpleGrid>
         </HStack>

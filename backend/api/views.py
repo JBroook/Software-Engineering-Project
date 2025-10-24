@@ -32,7 +32,14 @@ class StorageView(APIView):
     def get(self, request):
         storage_size = File.objects.aggregate(total_size=Sum('size'))['total_size']
         file_number = len(File.objects.all())
-        return Response({'storageSize':storage_size, 'fileNumber': file_number}, status=status.HTTP_200_OK)
+        tag_count = len(Tag.objects.all())
+        tag_types = len(TagType.objects.all())
+        return Response({
+            'storageSize':storage_size, 
+            'fileNumber': file_number,
+            'tagCount' : tag_count,
+            'tagTypes' : tag_types
+        }, status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     #user logging in
