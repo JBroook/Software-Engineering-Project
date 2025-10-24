@@ -33,7 +33,7 @@ type SFSParams = {
 const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   sortCriteria : "",
-  sortOrder : "asc",
+  sortOrder : "desc",
 }
 
 function getCookie(name:string) {
@@ -158,7 +158,7 @@ export default function TagsPage(){
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
-    const url = new URL('http://localhost:8000/api/employees');
+    const url = new URL('http://localhost:8000/api/tagtypes');
     if(SFS.searchKeyword!==""){
       url.searchParams.set('search', SFS.searchKeyword);
     }
@@ -171,14 +171,12 @@ export default function TagsPage(){
     });
     const data = await res.json();
 
-    convertISOTime(data);
-
     setTagTypes(data)
   }
 
   const sort = (sortCriteria : string) => {
     const newSFS = {...SFS};
-    newSFS.sortCriteria = sortCriteria;
+    newSFS.sortCriteria = sortCriteria; 
     newSFS.sortOrder = (newSFS.sortOrder==="asc") ? "desc" : "asc";
     setSFS(newSFS);
     fetchSFS(newSFS);

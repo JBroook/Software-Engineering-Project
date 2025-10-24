@@ -32,7 +32,7 @@ class TagType(models.Model):
 
 class Tag(models.Model):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    type = models.ForeignKey(TagType, on_delete=models.CASCADE)
+    type = models.ForeignKey(TagType, on_delete=models.CASCADE, related_name='tag')
 
     def __str__(self):
         return self.type.name

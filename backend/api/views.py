@@ -6,7 +6,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from assets.models import Folder, File, TagType
+from assets.models import Folder, File, TagType, Tag
 from users.models import Employee
 from . import serializers
 from django.db.models import Q, Sum, Count
@@ -61,8 +61,29 @@ class LogoutView(APIView):
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
     
 class TagTypeViewSet(ModelViewSet):
-    queryset = TagType.objects.all()
     serializer_class = serializers.TagTypeSerializer
+
+    def get_queryset(self):
+        queryset = TagType.objects.all()
+
+        # search
+        search_keyword = self.request.query_params.get('search')
+        if search_keyword:
+            queryset = queryset.filter(name__icontains=search_keyword)
+
+        # sort
+        sort_criteria = self.request.query_params.get('sort_criteria')
+        sort_order = self.request.query_params.get('sort_order')
+        if sort_criteria:
+            sort_order = "-" if sort_order=="desc" else ""
+            if sort_criteria!="tag_count":
+                queryset = queryset.order_by(sort_order+sort_criteria)
+            else:
+                queryset = queryset.annotate(
+                    tag_count=Count('tag')
+                ).order_by(sort_order+sort_criteria)
+
+        return queryset
     
 class EmployeeViewSet(ModelViewSet):
     # permission_classes = [IsAuthenticated, IsAdmin]

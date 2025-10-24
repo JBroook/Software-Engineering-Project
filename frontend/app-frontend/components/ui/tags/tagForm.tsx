@@ -102,7 +102,7 @@ function TagForm(props : TagFormChildfulProps) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
-          <Dialog.Content w="25vw" minW="300px" p={4} maxH="70vh" overflowY="scroll">
+          <Dialog.Content w="25vw" minW="300px" p={4} maxH="70vh">
 
             <Dialog.Header mt={5}>
               <Dialog.Title 
