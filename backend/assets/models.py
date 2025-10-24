@@ -31,7 +31,7 @@ class TagType(models.Model):
         return self.name
 
 class Tag(models.Model):
-    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    file = models.ForeignKey(File, on_delete=models.CASCADE, related_name='tag')
     type = models.ForeignKey(TagType, on_delete=models.CASCADE, related_name='tag')
 
     def __str__(self):

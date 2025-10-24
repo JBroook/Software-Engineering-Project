@@ -171,10 +171,12 @@ class FileViewSet(ModelViewSet):
         else:
             queryset = queryset.none() 
 
+        # search
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
     
+        # filter
         media_type = self.request.query_params.get('media_type')
         if media_type:
             media_type = media_type.split('_')
@@ -185,6 +187,12 @@ class FileViewSet(ModelViewSet):
             file_type = file_type.split('_')
             queryset = queryset.filter(filetype__in=file_type)
 
+        tag_type = self.request.query_params.get('tag_type')
+        if tag_type:
+            tag_type = tag_type.split('_')
+            queryset = queryset.filter(tag__type__name__in=tag_type)
+
+        # sort
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
