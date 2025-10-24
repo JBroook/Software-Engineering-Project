@@ -6,7 +6,7 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from assets.models import Folder, File
+from assets.models import Folder, File, TagType, Tag
 from users.models import Employee
 from . import serializers
 from django.db.models import Q, Sum, Count
@@ -32,7 +32,14 @@ class StorageView(APIView):
     def get(self, request):
         storage_size = File.objects.aggregate(total_size=Sum('size'))['total_size']
         file_number = len(File.objects.all())
-        return Response({'storageSize':storage_size, 'fileNumber': file_number}, status=status.HTTP_200_OK)
+        tag_count = len(Tag.objects.all())
+        tag_types = len(TagType.objects.all())
+        return Response({
+            'storageSize':storage_size, 
+            'fileNumber': file_number,
+            'tagCount' : tag_count,
+            'tagTypes' : tag_types
+        }, status=status.HTTP_200_OK)
 
 class LoginView(APIView):
     #user logging in
@@ -59,6 +66,31 @@ class LogoutView(APIView):
         logout(request)
         print("Logged out")
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
+    
+class TagTypeViewSet(ModelViewSet):
+    serializer_class = serializers.TagTypeSerializer
+
+    def get_queryset(self):
+        queryset = TagType.objects.all()
+
+        # search
+        search_keyword = self.request.query_params.get('search')
+        if search_keyword:
+            queryset = queryset.filter(name__icontains=search_keyword)
+
+        # sort
+        sort_criteria = self.request.query_params.get('sort_criteria')
+        sort_order = self.request.query_params.get('sort_order')
+        if sort_criteria:
+            sort_order = "-" if sort_order=="desc" else ""
+            if sort_criteria!="tag_count":
+                queryset = queryset.order_by(sort_order+sort_criteria)
+            else:
+                queryset = queryset.annotate(
+                    tag_count=Count('tag')
+                ).order_by(sort_order+sort_criteria)
+
+        return queryset
     
 class EmployeeViewSet(ModelViewSet):
     # permission_classes = [IsAuthenticated, IsAdmin]
@@ -146,10 +178,12 @@ class FileViewSet(ModelViewSet):
         else:
             queryset = queryset.none() 
 
+        # search
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
     
+        # filter
         media_type = self.request.query_params.get('media_type')
         if media_type:
             media_type = media_type.split('_')
@@ -160,6 +194,12 @@ class FileViewSet(ModelViewSet):
             file_type = file_type.split('_')
             queryset = queryset.filter(filetype__in=file_type)
 
+        tag_type = self.request.query_params.get('tag_type')
+        if tag_type:
+            tag_type = tag_type.split('_')
+            queryset = queryset.filter(tag__type__name__in=tag_type)
+
+        # sort
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')

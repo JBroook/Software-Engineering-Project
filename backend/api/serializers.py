@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from assets.models import File, Folder
+from assets.models import File, Folder, TagType, Tag
 from users.models import Employee
 from django.contrib.auth.models import User
 
@@ -13,6 +13,16 @@ class FolderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Folder
         fields = ['id', 'name', 'parent_folder', 'date_created', 'date_modified']
+
+class TagTypeSerializer(serializers.ModelSerializer):
+    tag_count = serializers.SerializerMethodField()
+    class Meta:
+        model = TagType
+        fields = ['id', 'name', 'tag_count', 'description']
+
+    def get_tag_count(self, obj):
+        return len(Tag.objects.filter(type=obj))
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(

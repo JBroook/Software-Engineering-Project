@@ -12,6 +12,8 @@ import ToggleTheme from '../toggleTheme'
 import NavItem from './NavLinks'
 import { useRouter } from 'next/navigation';
 import { FaRegUser } from "react-icons/fa";
+import { TiTags } from "react-icons/ti";
+
 
 interface LinkItemProps {
   name: string;
@@ -23,7 +25,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome, href: '/main' },
   { name: 'Users', icon: FaRegUser, href: '/main/users' },
-  { name: 'Explore', icon: FiCompass, href: '/main' },
+  { name: 'Tags', icon: TiTags, href: '/main/tags' },
   { name: 'Favourites', icon: FiStar, href: '/main' },
   { name: 'Settings', icon: FiSettings, href: '/main' },
 ]
