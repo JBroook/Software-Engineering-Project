@@ -96,7 +96,7 @@ class EmployeeAPITestCase(APITestCase):
         self.assertEqual(new_user.first_name, "John")
         self.assertEqual(new_user.last_name, "Smith")
 
-    def test_create_existing_employee(self):
+    def test_create_nonunique_employee(self):
         url = reverse('employee-list')
         response = self.client.post(
             url,
@@ -119,7 +119,7 @@ class EmployeeAPITestCase(APITestCase):
         self.assertIn('email',response.json())
         self.assertIn("This field must be unique.",response.json()['email'])
 
-    def test_update_existing_employee(self):
+    def test_update_nonunique_employee(self):
         url = reverse('employee-detail', kwargs={'pk':self.employee.id})
         response = self.client.patch(
             url,

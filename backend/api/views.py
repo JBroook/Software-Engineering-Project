@@ -148,7 +148,7 @@ class FolderViewSet(ModelViewSet):
             else:
                 queryset = queryset.filter(parent_folder__isnull=True)
         else:
-            queryset = queryset.none() 
+            queryset = queryset.all() 
 
         name = self.request.query_params.get('name')
         if name:
@@ -163,7 +163,7 @@ class FolderViewSet(ModelViewSet):
         return queryset
 
 class FileViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = serializers.FileSerializer
 
     def get_queryset(self):
@@ -176,7 +176,7 @@ class FileViewSet(ModelViewSet):
             else:
                 queryset = queryset.filter(parent_folder__isnull=True)
         else:
-            queryset = queryset.none() 
+            queryset = queryset.all() 
 
         # search
         name = self.request.query_params.get('name')
