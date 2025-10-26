@@ -44,6 +44,20 @@ class FolderAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Folder.objects.count(), 3)
         self.assertEqual(Folder.objects.last().name, "New Folder")
+    
+    def test_create_folder_as_viewer(self):
+        data = {"name": "New Folder", "parent_folder": self.root_folder.id}
+        viewer_client = APIClient()
+        viewer_user = User.objects.create_user(
+            username='viewer', 
+            email='viewer@gmail.com',
+            password='lettuce123'
+            )
+        Employee.objects.create(user=viewer_user, role='viewer')
+        viewer_client.force_authenticate(user=viewer_user)
+        
+        response = viewer_client.post(self.folder_list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 @override_settings(MEDIA_ROOT=temp_dir)
 class FileAPITests(APITestCase):
@@ -101,6 +115,27 @@ class FileAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(File.objects.filter(id=self.file_instance.id).exists())
 
+    def test_create_file_as_viewer(self):
+        new_file = SimpleUploadedFile("new.txt", b"Another file", content_type="text/plain")
+        data = {
+            "name": "New File",
+            "filetype": "txt",
+            "media_type": "text",
+            "data": new_file,
+            "parent_folder": self.folder.id
+        }
+        viewer_client = APIClient()
+        viewer_user = User.objects.create_user(
+            username='viewer', 
+            email='viewer@gmail.com',
+            password='lettuce123'
+            )
+        Employee.objects.create(user=viewer_user, role='viewer')
+        viewer_client.force_authenticate(user=viewer_user)
+        
+        response = viewer_client.post(self.file_list_url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 @override_settings(MEDIA_ROOT=temp_dir)
 class TagTypeAPITests(APITestCase):
     def setUp(self):
@@ -116,6 +151,15 @@ class TagTypeAPITests(APITestCase):
         Tag.objects.create(file=self.file, type=self.tag_type)
         self.tagtype_list_url = reverse('tagtype-list')
         self.tagtype_detail_url = reverse('tagtype-detail', args=[self.tag_type.id])
+
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='admin', 
+            email='admin@gmail.com',
+            password='lettuce123'
+            )
+        self.employee = Employee.objects.create(user=self.user, role='admin')
+        self.client.force_authenticate(user=self.user)
 
     def test_list_tagtypes(self):
         response = self.client.get(self.tagtype_list_url)
