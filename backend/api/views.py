@@ -210,8 +210,6 @@ class FileViewSet(ModelViewSet):
         # Focused File
         activated_file = self.request.query_params.get('file')
         if activated_file:
-            print(f"accessed: {activated_file}")
             queryset = FileVersion.objects.filter(original_file=activated_file).order_by('-version')
-            print(queryset.values())
 
         return queryset

@@ -38,16 +38,21 @@ interface Version {
   date_created: string;
   created_by: string;
   data: string;
+  employee:string;
 }
 interface ListItemProps {
   id: number;
   filename: string;
-  size: number;
+  filetype: string;
+  created_by: any;
   image: string;
   date: string;
 }
 
 export default function ListItem(props : ListItemProps) {
+  const textColor = useColorModeValue('black', 'white');
+  const contentbg = useColorModeValue('#D9D9D9', '#383838');
+  
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("0");
   const [versions, setVersions] = useState<Version[] | null>(); // Store fetched data
@@ -105,8 +110,8 @@ export default function ListItem(props : ListItemProps) {
                       <Heading fontFamily="var(--font-reddit-mono)">
                         {props.filename}
                       </Heading>
-                      <Text fontFamily="var(--font-roboto)">
-                        file type
+                      <Text fontFamily="var(--font-roboto)" justifySelf={'left'} pl={4}>
+                        {props.filetype}
                       </Text>
                     </Box>
                   </HStack>
@@ -121,7 +126,7 @@ export default function ListItem(props : ListItemProps) {
                     </Flex>
 
                     <Flex mx={2} w="60px" justify="center">
-                      <Text>{props.size}</Text> {/* change to created by */}
+                      <Text>{props.created_by.username}</Text>
                     </Flex>
 
                     <SlOptionsVertical/>
@@ -173,11 +178,11 @@ export default function ListItem(props : ListItemProps) {
             <>
             <Dialog.Header>
               <Dialog.Title
-                color={useColorModeValue('black', 'white')}
+                color={textColor}
                 fontSize="xl"
                 fontWeight="bold"
                 mb={4}>
-                {props.filename}
+                {versions.find((v) => v.version.toString() === selectedVersion.toString())?.name}
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body spaceY={4}>
@@ -190,7 +195,7 @@ export default function ListItem(props : ListItemProps) {
                   align={'center'}
                   justify={'center'}
                   rounded={'md'}
-                  bg={useColorModeValue('#D9D9D9', '#383838')}
+                  bg={contentbg}
                   overflow={'hidden'}>
                   <Center>
                     {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
@@ -214,7 +219,7 @@ export default function ListItem(props : ListItemProps) {
                     w={"100%"}
                     variant="enclosed"
                     fitted
-                    defaultValue={"v1"}
+                    defaultValue={versions[0].version.toString()}
                     value={selectedVersion}
                     onValueChange={(v) => setSelectedVersion(v.value)}>
                     <Tabs.List bg={useColorModeValue('#D9D9D9', '#383838')}>
@@ -222,14 +227,14 @@ export default function ListItem(props : ListItemProps) {
                         <Tabs.Trigger 
                         key={versions.version}
                         color={useColorModeValue('#383838', '#D9D9D')} 
-                        value={versions.version}>
-                          Version {versions.version}
+                        value={versions.version.toString()}>
+                          Version {versions.version.toString()}
                         </Tabs.Trigger>
                       ))}
                     </Tabs.List>
 
                     {versions.map((version: any) => (
-                      <Tabs.Content value={version.version}>
+                      <Tabs.Content key={version.version.toString()} value={version.version.toString()}>
                         {/* File Details */}
                         <Flex
                           w={'90%'}
@@ -267,7 +272,7 @@ export default function ListItem(props : ListItemProps) {
                                 </GridItem>
                                 <GridItem colSpan={3}>
                                   <Text h={'50%'}>{version.date_created}</Text>
-                                  <Text h={'50%'}>{version.created_by}</Text>
+                                  <Text h={'50%'}>{version.employee.username}</Text>
                                 </GridItem>
                                 </>
                               ) : (
@@ -278,7 +283,7 @@ export default function ListItem(props : ListItemProps) {
                                 </GridItem>
                                 <GridItem colSpan={3}>
                                   <Text h={'50%'}>{version.date_created}</Text>
-                                  <Text h={'50%'}>{version.created_by}</Text>
+                                  <Text h={'50%'}>{version.employee.username}</Text>
                                 </GridItem>
                                 </>
                               )}

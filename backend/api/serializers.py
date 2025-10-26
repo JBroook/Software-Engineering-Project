@@ -4,22 +4,6 @@ from assets.models import File, FileVersion, Folder, TagType, Tag
 from users.models import Employee
 from django.contrib.auth.models import User
 
-class FileVersionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FileVersion
-        fields = ['id', 'original_file', 'name', 'size', 'filetype', 'data', 'version', 'date_created', 'created_by']
-
-class FileSerializer(serializers.ModelSerializer):
-    file = FileVersionSerializer(source='original_file')
-    class Meta:
-        model = File
-        fields = ['id', 'parent_folder','file']
-
-class FolderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Folder
-        fields = ['id', 'name', 'parent_folder', 'date_created', 'date_modified']
-
 class TagTypeSerializer(serializers.ModelSerializer):
     tag_count = serializers.SerializerMethodField()
     class Meta:
@@ -112,3 +96,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     def get_last_name(self, obj):
         return obj.user.last_name
+    
+class FileVersionSerializer(serializers.ModelSerializer):
+    employee = EmployeeSerializer(source='created_by')
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    class Meta:
+        model = FileVersion
+        fields = ['id', 'original_file', 'name', 'size', 'filetype', 'data', 'version', 'date_created', 'created_by','employee']
+
+class FileSerializer(serializers.ModelSerializer):
+    file = FileVersionSerializer(source='original_file')
+    class Meta:
+        model = File
+        fields = ['id', 'parent_folder','file']
+
+class FolderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Folder
+        fields = ['id', 'name', 'parent_folder', 'date_created', 'date_modified']

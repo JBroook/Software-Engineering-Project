@@ -1,3 +1,7 @@
+export interface Employee{
+  username: string;
+}
+
 export interface Folder {
   id: number;
   name: string;
@@ -10,12 +14,12 @@ export interface Folder {
 export interface File {
   id: number;
   name: string;
+  filetype: string;
   parent_folder: number | null;
   original_file: number;
   data: string;
   date_created: string;
-  date_modified: string;
-  size: number;
+  employee: any;
 }
 
 export interface ViewProps {
