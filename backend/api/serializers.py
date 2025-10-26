@@ -1,13 +1,19 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from assets.models import File, Folder, TagType, Tag
+from assets.models import File, FileVersion, Folder, TagType, Tag
 from users.models import Employee
 from django.contrib.auth.models import User
 
+class FileVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileVersion
+        fields = ['id', 'original_file', 'name', 'size', 'filetype', 'data', 'version', 'date_created', 'created_by']
+
 class FileSerializer(serializers.ModelSerializer):
+    file = FileVersionSerializer(source='original_file')
     class Meta:
         model = File
-        fields = ['id', 'name', 'size', 'filetype', 'data', 'date_created', 'date_modified', 'parent_folder']
+        fields = ['id', 'parent_folder','file']
 
 class FolderSerializer(serializers.ModelSerializer):
     class Meta:

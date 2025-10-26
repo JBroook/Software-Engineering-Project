@@ -6,10 +6,10 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from assets.models import Folder, File, TagType, Tag
+from assets.models import Folder, File, FileVersion, TagType, Tag
 from users.models import Employee
 from . import serializers
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, OuterRef, Subquery
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdmin, IsEditor
 
@@ -164,17 +164,18 @@ class FolderViewSet(ModelViewSet):
 
 class FileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.FileSerializer
+    serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = File.objects.all()
+        queryset = FileVersion.objects.all().order_by('original_file', '-date_created').distinct('original_file')
+        
         parent_id = self.request.query_params.get('parent_folder')
 
         if parent_id:
             if parent_id != "-1":
-                queryset = queryset.filter(parent_folder=parent_id)
+                queryset = queryset.filter(original_file_id__parent_folder=parent_id)
             else:
-                queryset = queryset.filter(parent_folder__isnull=True)
+                queryset = queryset.filter(original_file_id__parent_folder__isnull=True)
         else:
             queryset = queryset.none() 
 
@@ -206,5 +207,11 @@ class FileViewSet(ModelViewSet):
             sort_order = "-" if sort_order=="asc" else ""
             queryset = queryset.order_by(sort_order+sort_method)
 
+        # Focused File
+        activated_file = self.request.query_params.get('file')
+        if activated_file:
+            print(f"accessed: {activated_file}")
+            queryset = FileVersion.objects.filter(original_file=activated_file).order_by('-version')
+            print(queryset.values())
 
         return queryset

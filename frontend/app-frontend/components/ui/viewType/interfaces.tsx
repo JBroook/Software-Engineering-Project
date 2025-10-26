@@ -11,6 +11,7 @@ export interface File {
   id: number;
   name: string;
   parent_folder: number | null;
+  original_file: number;
   data: string;
   date_created: string;
   date_modified: string;

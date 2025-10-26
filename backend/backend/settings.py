@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 import os
 
 # Load environment variables from .env file
@@ -109,7 +109,7 @@ DATABASES = {
         'USER': os.getenv("DB_USER"),
         'PASSWORD': os.getenv("DB_PASSWORD"),
         'HOST': 'localhost',
-        'PORT': os.getenv("5432")
+        'PORT': os.getenv("DB_PORT")
     }
 }
 

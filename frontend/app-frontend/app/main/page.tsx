@@ -1,22 +1,24 @@
 'use client'
-import Searchbar from "@/components/ui/searchbar/searchbar";
-import { useColorModeValue } from "@/components/ui/color-mode";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { 
-  Box, Heading, Image, Grid,
-  GridItem, HStack, Flex, SimpleGrid,
-  Stack, IconButton, Input, Popover,
-  Text, Checkbox
+  Box, Heading,
+  HStack, Flex, IconButton
 } from "@chakra-ui/react"
+
+// Icons
 import { IoIosArrowBack } from "react-icons/io";
 import { IoSearchCircleOutline } from "react-icons/io5";
 import { RiGalleryView2 } from "react-icons/ri";
 import { IoIosList } from "react-icons/io";
-import { useEffect, useState } from "react";
+
+// UI Components
+import Searchbar from "@/components/ui/searchbar/searchbar";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
-import { useRouter } from "next/navigation";
 import { TagType } from "@/components/ui/tags/tagForm";
 
 const getFolders = async (parentFolder : number) => {

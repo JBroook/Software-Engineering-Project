@@ -12,6 +12,15 @@ import { SlOptionsVertical } from "react-icons/sl";
 
 import { useColorModeValue } from '../color-mode'
 
+const getFileDetails = async (currentID: number) => {
+  const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  console.log(res.json)
+  return data;
+}
+
 interface GalleryItemProps {
   filename: string;
   image: string;

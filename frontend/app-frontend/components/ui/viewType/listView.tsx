@@ -14,7 +14,6 @@ import {ViewProps} from "./interfaces"
 import ContentLoader from "./contentLoader";
 
 export default function ListView(props : ViewProps){
-  console.log(props)
   const folderComponents = props.folders.map(folder => (
       <ListFolder 
         key={folder.id} 
@@ -25,7 +24,7 @@ export default function ListView(props : ViewProps){
     ))
   
   const fileComponents = props.files.map(file => (
-    <ListItem key={file.id} filename={file.name} image={file.data} date={file.date_modified} size={file.size}/>
+    <ListItem key={file.id} id={file.original_file} filename={file.name} image={file.data} date={file.date_modified} size={file.size}/>
   ))
 
   return (<>
