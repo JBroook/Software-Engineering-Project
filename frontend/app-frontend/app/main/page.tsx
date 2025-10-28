@@ -170,8 +170,8 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
-        folders={folders} 
-        files={files} 
+        folders={folders}
+        files={files}
         clickEvent={openFolder}
         loading={loading}
         sortFileEvent={sortFiles}

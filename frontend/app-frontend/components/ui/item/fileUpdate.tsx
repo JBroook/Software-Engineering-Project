@@ -202,11 +202,11 @@ export default function FileForm(props: FileFormChildfulProps) {
                     value={fileUpload}
                     {...register('data',)}
                     >
+                      <FileUploadList />
                       <FileUpload.HiddenInput />
                       <FileUpload.Dropzone asChild>
                         <FileUpload.Label>Drag & drop an image here, or click to select</FileUpload.Label>
                       </FileUpload.Dropzone>
-                        <FileUploadList />
                     </FileUpload.RootProvider>
                     <Field.ErrorText>{errors.data?.message}</Field.ErrorText>
                   </Field.Root>

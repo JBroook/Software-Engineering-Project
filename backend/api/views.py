@@ -208,16 +208,14 @@ class FileViewSet(ModelViewSet):
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
             sort_order = "-" if sort_order=="asc" else ""
-            queryset = queryset.order_by(sort_order+sort_method)
-
+            queryset = FileVersion.objects.filter(id__in=queryset).order_by(sort_order+sort_method)
+            
         # Focused File
         activated_file = self.request.query_params.get('file')
         if activated_file:
             queryset = FileVersion.objects.filter(original_file=activated_file).order_by('-version')
 
-        print("QuerySet1: \n",queryset)
         queryset = queryset.order_by('original_file', '-version').distinct('original_file')
-        print("\nQuerySet2: \n",queryset)
         return queryset
     
     def perform_destroy(self, instance):

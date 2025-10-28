@@ -8,6 +8,7 @@ import { Flex, Heading,
     Tabs,
     Grid,
     GridItem,
+    Button,
 } from '@chakra-ui/react'
 import { SlOptionsVertical } from "react-icons/sl";
 
@@ -60,6 +61,9 @@ export default function GalleryItem(props : GalleryItemProps) {
   const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#D9D9D9', '#383838');
   const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const buttonbg = useColorModeValue("#79EB99", '#5BB975');
+  const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
+  const buttonbg3 = useColorModeValue("#F29D9A", '#C04E4A');
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("0");
@@ -287,7 +291,7 @@ export default function GalleryItem(props : GalleryItemProps) {
                                 <Spacer />
 
                                 {/* Shared Tags */}
-                                <Flex w={'100%'} h={'30%'} direction={'column'}>
+                                <Flex w={'100%'} h={'25%'} direction={'column'}>
                                   <Text>Tags:</Text>
                                   <Box
                                     w={'100%'}
@@ -297,6 +301,22 @@ export default function GalleryItem(props : GalleryItemProps) {
                                     bg={contentbg}>
                                     This Holds all tags that are able to view / edit
                                   </Box>
+                                </Flex>
+
+                                <Spacer />
+                                
+                                <Flex w={'full'} justify={'space-between'}>
+                                  <Button bg={buttonbg} w={'48%'}>
+                                    Download
+                                  </Button>
+                                  <Flex w={'45%'} justify={'space-between'}>
+                                    <Button bg={buttonbg2} w={'48%'}>
+                                      Edit
+                                    </Button>
+                                    <Button bg={buttonbg3} w={'48%'}>
+                                      Delete
+                                    </Button>
+                                  </Flex>
                                 </Flex>
                               </Flex>
                             </Tabs.Content>
