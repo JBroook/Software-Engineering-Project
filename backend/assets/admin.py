@@ -18,7 +18,7 @@ class FileAdmin(admin.ModelAdmin):
 
 @admin.register(FileVersion)
 class FileVersionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'original_file', 'name', 'filetype', 'size', 'date_created', 'data')
+    list_display = ('id', 'original_file', 'name', 'filetype', 'media_type', 'size', 'date_created', 'data')
     list_filter = ('filetype', 'date_created')
     search_fields = ('name','original_file')
     ordering = ('original_file','-date_created',)

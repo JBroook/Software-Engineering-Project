@@ -46,6 +46,15 @@ interface GalleryItemProps {
   date: string;
 }
 
+function formatBytes (bytes: number,decimals: number) {
+  if(bytes == 0) return '0 Bytes';
+  var k = 1024,
+      dm = decimals || 2,
+      sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+      i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 export default function GalleryItem(props : GalleryItemProps) {
   const textColor = useColorModeValue('black', 'white');
   const basicbg = useColorModeValue('white', 'black');
@@ -239,7 +248,7 @@ export default function GalleryItem(props : GalleryItemProps) {
                                     <GridItem colSpan={3}>
                                       <Text h={'30%'}>{version.name}</Text>
                                       <Text h={'30%'}>{version.filetype}</Text>
-                                      <Text h={'30%'}>{version.size}</Text>
+                                      <Text h={'30%'}>{formatBytes(version.size,2)}</Text>
                                     </GridItem>
                                   </Grid>
                                 </Flex>

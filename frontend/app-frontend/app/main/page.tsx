@@ -3,7 +3,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { 
   Box, Heading,
-  HStack, Flex, IconButton
+  HStack, Flex, IconButton,
+  Button
 } from "@chakra-ui/react"
 
 // Icons
@@ -20,6 +21,16 @@ import ListView from "@/components/ui/viewType/listView";
 import { Folder, File } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
 import { TagType } from "@/components/ui/tags/tagForm";
+import UserForm from "@/components/ui/user/userForm";
+import FileForm, { FileProp } from "@/components/ui/item/fileForm";
+import { AiFillFileAdd } from "react-icons/ai";
+
+function getCookie(name:string) {
+  const value = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return value ? decodeURIComponent(value.split('=')[1]) : "";
+}
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -59,7 +70,7 @@ const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   mediaType : [],
   fileExtension : [],
-  sortMethod : "",
+  sortMethod : "name",
   sortOrder : "asc",
   tagType : []
 }
@@ -148,6 +159,7 @@ export default function Main() {
     const newSFS = {...SFS};
     newSFS.sortMethod = sortMethod;
     newSFS.sortOrder = sortOrder;
+    console.log(sortMethod)
     setSFS(newSFS)
 
     fetchSFS(newSFS)
@@ -226,7 +238,6 @@ export default function Main() {
       credentials: 'include',
     });
     const fileData = await fileRes.json();
-    console.log(fileData)
     setFiles(fileData)
   }
 
@@ -260,6 +271,63 @@ export default function Main() {
     setSFS(newSFS)
 
     fetchSFS(newSFS)
+  }
+
+  // handle uploading files
+  const createFile = async (data : FileProp) => {
+
+    const fileProp: FileProp = {
+      parent_folder: data.parent_folder || '',
+      filename: data.filename,
+      description: data.description,
+      data: data.data,
+      version: data.version,
+    }
+
+    const formData = new FormData();
+    formData.append('data', fileProp.data);
+    formData.append('name', fileProp.filename);
+    formData.append('description', fileProp.description);
+    formData.append('parent_folder', fileProp.parent_folder || "");
+    formData.append('version', fileProp.version.toString());
+    console.log("Form Data: ", formData)
+
+    try{
+      const res = await fetch('http://localhost:8000/api/files/', {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : formData,
+      });
+
+      if(res.ok){
+        const fileData = await res.json();
+        const newFile = [...files];
+        newFile.push(fileData)
+        setFiles(newFile);
+        console.log(fileData);
+      
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+
   }
 
   return (
@@ -318,6 +386,17 @@ export default function Main() {
 
       {view}
 
+      <Flex 
+      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      position={'fixed'} 
+      zIndex={2} right={'2vw'} bottom={'4vh'}
+      >
+        <FileForm title="Upload File" current_folder={null} file={null} submitEvent={createFile} folders={folders}>
+          <Button bg={useColorModeValue("#335098", '#9AB3F2')}>
+              <AiFillFileAdd />
+              Create File</Button>
+        </FileForm>
+      </Flex>
     </Box>
   );
 }

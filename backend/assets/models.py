@@ -17,9 +17,10 @@ class File(models.Model):
 class FileVersion(models.Model):
     original_file = models.ForeignKey(File, on_delete=models.CASCADE,null=True)
     name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255, null=True)
     size = models.PositiveBigIntegerField(editable=False, default=0)
-    filetype = models.CharField(max_length=5)
-    media_type = models.CharField(max_length=10)
+    filetype = models.CharField(max_length=30)
+    media_type = models.CharField(max_length=30)
     data = models.FileField(upload_to='uploads')
     version = models.PositiveSmallIntegerField()
     date_created = models.DateTimeField(auto_now_add=True)

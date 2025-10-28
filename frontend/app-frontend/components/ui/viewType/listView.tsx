@@ -23,7 +23,6 @@ export default function ListView(props : ViewProps){
       />
     ))
   
-  console.log(props.files)
   const fileComponents = props.files.map(file => (
     <ListItem key={file.id} id={file.original_file} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created} created_by={file.employee}/>
   ))
@@ -88,7 +87,7 @@ export default function ListView(props : ViewProps){
       <SortBar onChange={props.sortFileEvent} sortOptions={[
         { label : "Filename", value : "name"},
         { label : "Size", value : "size"},
-        { label : "Last modified", value : "date_modified"}]}/>
+        { label : "Last modified", value : "date_created"}]}/>
     </Flex>
     
     <Stack

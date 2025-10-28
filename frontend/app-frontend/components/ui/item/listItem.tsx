@@ -49,10 +49,21 @@ interface ListItemProps {
   date: string;
 }
 
+function formatBytes (bytes: number,decimals: number) {
+  if(bytes == 0) return '0 Bytes';
+  var k = 1024,
+      dm = decimals || 2,
+      sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+      i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 export default function ListItem(props : ListItemProps) {
   const textColor = useColorModeValue('black', 'white');
+  const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#D9D9D9', '#383838');
-  
+  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("0");
   const [versions, setVersions] = useState<Version[] | null>(); // Store fetched data
@@ -212,7 +223,7 @@ export default function ListItem(props : ListItemProps) {
                   w={"35vw"}
                   h={"80vh"}
                   direction={'column'}
-                  bg={useColorModeValue('white', 'black')}>
+                  bg={basicbg}>
 
                   {/* File Version */}
                   <Tabs.Root
@@ -222,11 +233,11 @@ export default function ListItem(props : ListItemProps) {
                     defaultValue={versions[0].version.toString()}
                     value={selectedVersion}
                     onValueChange={(v) => setSelectedVersion(v.value)}>
-                    <Tabs.List bg={useColorModeValue('#D9D9D9', '#383838')}>
+                    <Tabs.List bg={contentbg}>
                       {versions.map((versions: any) => (
                         <Tabs.Trigger 
                         key={versions.version}
-                        color={useColorModeValue('#383838', '#D9D9D')} 
+                        color={contentbg2} 
                         value={versions.version.toString()}>
                           Version {versions.version.toString()}
                         </Tabs.Trigger>
@@ -242,7 +253,7 @@ export default function ListItem(props : ListItemProps) {
                           m={8}
                           mb={6}
                           direction={'column'}
-                          color={useColorModeValue("black", 'white')}>
+                          color={textColor}>
 
                           <Flex h={'30%'}>
                             <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
@@ -254,7 +265,7 @@ export default function ListItem(props : ListItemProps) {
                               <GridItem colSpan={3}>
                                 <Text h={'30%'}>{version.name}</Text>
                                 <Text h={'30%'}>{version.filetype}</Text>
-                                <Text h={'30%'}>{version.size}</Text>
+                                <Text h={'30%'}>{formatBytes(version.size,2)}</Text>
                               </GridItem>
                             </Grid>
                           </Flex>
@@ -300,7 +311,7 @@ export default function ListItem(props : ListItemProps) {
                               h={'100%'}
                               mt={4}
                               p={4}
-                              bg={useColorModeValue('#D9D9D9', '#383838')}>
+                              bg={contentbg}>
                               This Holds all tags that are able to view / edit
                             </Box>
                           </Flex>
@@ -314,8 +325,8 @@ export default function ListItem(props : ListItemProps) {
             </Dialog.Body>
             <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
               <CloseButton
-                bg={useColorModeValue("white", '#383838')}
-                color={useColorModeValue("black", 'white')}
+                bg={contentbg}
+                color={textColor}
                 size="sm" />
             </Dialog.CloseTrigger>
             </>
