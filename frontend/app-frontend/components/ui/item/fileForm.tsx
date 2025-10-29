@@ -13,10 +13,12 @@ import { LuX } from "react-icons/lu";
 import { Folder } from "../viewType/interfaces";
 
 export type FileProp = {
+  usage: string;
+  id: number | null;
   filename: string;
   description: string;
   parent_folder: string | null;
-  data: File;
+  data: File | null;
   version: number;
 }
 
@@ -25,7 +27,7 @@ interface FileFormProps {
   current_folder: string | null;
   file: FileProp | null;
   folders: Folder[];
-  submitEvent: (data : FileProp) => void;
+  submitEvent: (data: FileProp) => void;
 }
 
 type FileFormChildfulProps = React.PropsWithChildren<FileFormProps>;
@@ -47,7 +49,6 @@ export default function FileForm(props: FileFormChildfulProps) {
     const fileUpload = useFileUploadContext()
     const files = fileUpload.acceptedFiles
     if (files.length === 0) return null
-    console.log("Uploaded File11: ",fileUpload.acceptedFiles[0])
     return (
       <FileUpload.ItemGroup>
         {files.map((file) => (
@@ -71,9 +72,10 @@ export default function FileForm(props: FileFormChildfulProps) {
   }
 
   const onSubmit: SubmitHandler<FileProp> = async (fetched) =>{
-    console.log("passing thru")
     const file = fileUpload.acceptedFiles[0]
     const newFileData: FileProp = {
+      usage: "create",
+      id: null,
       filename: fetched.filename,
       description: fetched.description,
       parent_folder: props.current_folder || fetched.parent_folder || null,

@@ -115,12 +115,14 @@ class FileVersionSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(source='created_by', read_only=True)
     date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
     data = serializers.FileField()
+    file_id = serializers.IntegerField(write_only=True, required=False, default=0)
 
     class Meta:
         model = FileVersion
         fields = [
             'id', 
             'original_file', 
+            'file_id',
             'name', 
             'description',
             'size', 
@@ -148,8 +150,9 @@ class FileVersionSerializer(serializers.ModelSerializer):
                 "Authenticated user has no Employee profile."
             )
         
-        # Get parent_folder from request.POST
+        # Get parent_folder from request.POST        
         parent_folder = self.context['request'].POST.get('parent_folder')
+        file_id = validated_data.get('file_id')
         if parent_folder in ('', 'null', 'undefined'):
             parent_folder = None
         else:
@@ -158,15 +161,18 @@ class FileVersionSerializer(serializers.ModelSerializer):
             except (TypeError, ValueError):
                 raise serializers.ValidationError({"parent_folder": "Invalid folder ID."})
         # Create File Instance
-        if parent_folder is None:
-            file_instance = File.objects.create(
-                parent_folder=None
-            )
+        if file_id != 0:
+            file_instance = File.objects.get(id=file_id)
         else:
-            folder = Folder.objects.get(id=parent_folder)
-            file_instance = File.objects.create(
-                parent_folder=folder
-            )
+            if parent_folder is None:
+                file_instance = File.objects.create(
+                    parent_folder=None
+                )
+            else:
+                folder = Folder.objects.get(id=parent_folder)
+                file_instance = File.objects.create(
+                    parent_folder=folder
+                )
 
         # Auto-calculate metadata
         uploaded_file = validated_data.pop('data')

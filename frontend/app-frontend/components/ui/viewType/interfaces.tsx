@@ -1,5 +1,29 @@
+import { FileProp } from "../item/fileForm";
+
 export interface Employee{
   username: string;
+}
+
+export interface Version {
+  version: number;
+  name: string;
+  description: string;
+  filetype: string;
+  size: number;
+  date_created: string;
+  created_by: string;
+  data: File;
+  employee: any;
+}
+
+export interface ViewItemProps {
+  id: number;
+  filename: string;
+  filetype: string;
+  created_by: any;
+  image: string;
+  date: string;
+  submitEvent: (data : FileProp) => void;
 }
 
 export interface Folder {
@@ -12,7 +36,7 @@ export interface Folder {
 }
 
 export interface File {
-  id: number;
+  id: string;
   name: string;
   filetype: string;
   parent_folder: number | null;
@@ -26,6 +50,7 @@ export interface ViewProps {
   folders : Folder[];
   files : File[];
   clickEvent : (folderId : number, folderName : string) => void;
+  submitEvent: (data : FileProp) => void;
   loading : boolean;
   sortFileEvent : (sortOption : string, sortOrder : string) => void;
   sortFolderEvent : (sortOption : string, sortOrder : string) => void;

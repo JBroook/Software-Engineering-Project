@@ -172,7 +172,7 @@ class FileViewSet(ModelViewSet):
     
 
     def get_queryset(self):
-        queryset = FileVersion.objects.all()
+        queryset = FileVersion.objects.all().order_by('original_file', '-version').distinct('original_file')
         
         parent_id = self.request.query_params.get('parent_folder')
 
@@ -215,14 +215,18 @@ class FileViewSet(ModelViewSet):
         if activated_file:
             queryset = FileVersion.objects.filter(original_file=activated_file).order_by('-version')
 
-        queryset = queryset.order_by('original_file', '-version').distinct('original_file')
         return queryset
     
     def perform_destroy(self, instance):
-        file = instance.file
         instance.delete()
-        file.delete()
-        return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, pk, *args, **kwargs):
+        instance = File.objects.get(id=pk)
+        self.perform_destroy(instance)
+        return Response(
+            {"message": "Delete successful"},
+            status=status.HTTP_200_OK
+        )
     
     def get(self, request):
         csrf_token = get_token(request)

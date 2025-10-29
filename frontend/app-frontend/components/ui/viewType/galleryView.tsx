@@ -25,7 +25,7 @@ export default function GalleryView(props : ViewProps){
   ))
 
   const fileComponents = props.files.map(file => (
-    <GalleryItem key={file.id} id={file.original_file} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created}/>
+    <GalleryItem key={file.id} id={file.original_file} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created} created_by={file.employee} submitEvent={props.submitEvent}/>
   ))
 
   return (<>

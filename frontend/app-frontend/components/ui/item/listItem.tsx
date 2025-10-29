@@ -9,12 +9,16 @@ import { Flex, Heading,
     Tabs,
     Portal,
     Tooltip,
-    GridItem
+    GridItem,
+    Button
 } from '@chakra-ui/react'
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
+import { Version, ViewItemProps } from '../viewType/interfaces';
+import DeleteFile from './fileDelete';
+import UpdateFile from './fileUpdate';
 
 const getFileDetails = async (currentID: number):Promise<Version[]> => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -30,24 +34,6 @@ const getFileDetails = async (currentID: number):Promise<Version[]> => {
   // If API returns a single object, wrap it in an array
   return Array.isArray(data) ? data : [data];
 }
-interface Version {
-  version: number;
-  name: string;
-  filetype: string;
-  size: string;
-  date_created: string;
-  created_by: string;
-  data: string;
-  employee:string;
-}
-interface ListItemProps {
-  id: number;
-  filename: string;
-  filetype: string;
-  created_by: any;
-  image: string;
-  date: string;
-}
 
 function formatBytes (bytes: number,decimals: number) {
   if(bytes == 0) return '0 Bytes';
@@ -58,18 +44,21 @@ function formatBytes (bytes: number,decimals: number) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export default function ListItem(props : ListItemProps) {
+export default function ListItem(props : ViewItemProps) {
   const textColor = useColorModeValue('black', 'white');
   const basicbg = useColorModeValue('white', 'black');
-  const contentbg = useColorModeValue('#D9D9D9', '#383838');
+  const contentbg = useColorModeValue('#F5F5F5', '#383838');
   const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const buttonbg = useColorModeValue("#79EB99", '#5BB975');
+  const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState("0");
   const [versions, setVersions] = useState<Version[] | null>(); // Store fetched data
   const [loading, setLoading] = useState(false);
 
-  const handleOpenDialog = async () => {setLoading(true);
+  const handleOpenDialog = async () => {
+    setLoading(true);
     try {
       const data = await getFileDetails(props.id);
       setVersions(data);
@@ -81,11 +70,6 @@ export default function ListItem(props : ListItemProps) {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-  console.log('Versions State:', versions);
-  console.log("Current Version: ",selectedVersion)
-  }, [versions,selectedVersion]);
   
   return (
     <>
@@ -210,7 +194,7 @@ export default function ListItem(props : ListItemProps) {
                   overflow={'hidden'}>
                   <Center>
                     {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
-                      <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data} alt="Image" objectFit="contain" borderRadius="md" />
+                      <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
                     ) : (
                       <Box>No logo uploaded</Box>
                     )}
@@ -255,17 +239,32 @@ export default function ListItem(props : ListItemProps) {
                           direction={'column'}
                           color={textColor}>
 
-                          <Flex h={'30%'}>
-                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
+                          <Flex h={'35%'} direction={'column'}>
+                            <Grid w={'100%'} h={'25%'} templateColumns="repeat(5, 1fr)" gap={4}>
                               <GridItem colSpan={2}>
                                 <Text h={'30%'}>File Name:</Text>
-                                <Text h={'30%'}>File Type:</Text>
-                                <Text h={'30%'}>File Size:</Text>
                               </GridItem>
                               <GridItem colSpan={3}>
                                 <Text h={'30%'}>{version.name}</Text>
-                                <Text h={'30%'}>{version.filetype}</Text>
-                                <Text h={'30%'}>{formatBytes(version.size,2)}</Text>
+                              </GridItem>
+                            </Grid>
+                            <Flex direction={'column'} h={'100%'}>
+                                <Text h={'20%'}>Description:</Text>
+                                <Text h={'70%'} bg={contentbg} rounded={6} p={4}>{version.description}</Text>
+                            </Flex>
+                          </Flex>
+
+                          <Spacer />
+
+                          <Flex h={'15%'}>
+                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
+                              <GridItem colSpan={2}>
+                                <Text h={'50%'}>File Type:</Text>
+                                <Text h={'50%'}>File Size:</Text>
+                              </GridItem>
+                              <GridItem colSpan={3}>
+                                <Text h={'50%'}>{version.filetype}</Text>
+                                <Text h={'50%'}>{formatBytes(version.size,2)}</Text>
                               </GridItem>
                             </Grid>
                           </Flex>
@@ -273,8 +272,8 @@ export default function ListItem(props : ListItemProps) {
                           <Spacer />
 
                           {/* File Created / Modified */}
-                          <Flex h={'25%'}>
-                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap="4">
+                          <Flex h={'15%'}>
+                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
                               {version.version == 1 ? (
                                 <>
                                 <GridItem colSpan={2}>
@@ -304,16 +303,32 @@ export default function ListItem(props : ListItemProps) {
                           <Spacer />
 
                           {/* Shared Tags */}
-                          <Flex w={'100%'} h={'30%'} direction={'column'}>
-                            <Text>Tags:</Text>
+                          <Flex w={'100%'} h={'25%'} direction={'column'}>
+                            <Text h={'20%'}>Tags:</Text>
                             <Box
                               w={'100%'}
-                              h={'100%'}
-                              mt={4}
+                              h={'70%'}
                               p={4}
+                              rounded={6}
                               bg={contentbg}>
                               This Holds all tags that are able to view / edit
                             </Box>
+                          </Flex>
+
+                          <Spacer />
+                          
+                          <Flex w={'full'} justify={'space-between'}>
+                            <Button bg={buttonbg} w={'48%'}>
+                              Download
+                            </Button>
+                            <Flex w={'45%'} justify={'space-between'}>
+                              <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
+                                <Button bg={buttonbg2} w={'48%'}>
+                                  Edit
+                                </Button>
+                              </UpdateFile>
+                              <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                            </Flex>
                           </Flex>
                         </Flex>
                       </Tabs.Content>
