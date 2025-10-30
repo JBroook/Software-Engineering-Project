@@ -17,7 +17,7 @@ import { FileProp } from './fileForm';
 import { Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 
-export const getFileDetails = async (currentID: number):Promise<Version[]> => {
+export const getFileDetails = async (currentID: number) => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
     credentials: 'include',
   });
@@ -30,7 +30,6 @@ export const getFileDetails = async (currentID: number):Promise<Version[]> => {
   // If API returns a single object, wrap it in an array
   return Array.isArray(data) ? data : [data];
 }
-
 
 function formatBytes (bytes: number,decimals: number) {
   if(bytes == 0) return '0 Bytes';

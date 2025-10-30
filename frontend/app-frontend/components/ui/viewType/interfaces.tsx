@@ -18,6 +18,7 @@ export interface Version {
 
 export interface ViewItemProps {
   id: number;
+  parent_folder: number | null;
   filename: string;
   filetype: string;
   created_by: any;

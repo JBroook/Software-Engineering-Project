@@ -114,7 +114,7 @@ class FileVersionSerializer(serializers.ModelSerializer):
     file = FileSerializer(source='original_file', read_only=True)
     employee = EmployeeSerializer(source='created_by', read_only=True)
     date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
-    data = serializers.FileField()
+    data = serializers.FileField(required=False)
     file_id = serializers.IntegerField(write_only=True, required=False, default=0)
 
     class Meta:
@@ -175,10 +175,20 @@ class FileVersionSerializer(serializers.ModelSerializer):
                 )
 
         # Auto-calculate metadata
-        uploaded_file = validated_data.pop('data')
-        size = uploaded_file.size
-        filetype = uploaded_file.content_type.split('/')[1]
-        media_type = uploaded_file.content_type.split('/')[0]
+        if 'data' not in validated_data:
+            fetched_old_file_data = FileVersion.objects.filter(original_file__id=file_id).order_by('original_file', '-version').distinct('original_file')
+            print("Getting old data: \n",fetched_old_file_data)
+            data = fetched_old_file_data[0].data
+            size = fetched_old_file_data[0].size
+            filetype = fetched_old_file_data[0].filetype
+            media_type = fetched_old_file_data[0].media_type
+        else:
+            uploaded_file = validated_data.pop('data')
+            data = uploaded_file
+            size = uploaded_file.size
+            filetype = uploaded_file.content_type.split('/')[1]
+            media_type = uploaded_file.content_type.split('/')[0]
+
         # Create FileVersion Instance
         file_vers = FileVersion.objects.create(
             original_file=file_instance,
@@ -186,7 +196,7 @@ class FileVersionSerializer(serializers.ModelSerializer):
             description=validated_data.get('description'),
             filetype=filetype,
             media_type=media_type,
-            data=uploaded_file,
+            data=data,
             version=validated_data.get('version'),
             size=size,
             created_by=employee

@@ -87,103 +87,6 @@ export default function Main() {
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
   // SFS=Search Filter Sort, controls the search filter sort params
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
-
-  const handleFileCRUD = async (data: FileProp) => {
-    if (data.usage == "create" || data.usage == "update") {
-      createFile(data)
-    } else if (data.usage == 'delete') {
-      deleteFile(data)
-    }
-  }
-
-  // handle uploading files
-  const createFile = async (data : FileProp) => {
-
-    const fileProp: FileProp = {
-      usage: "",
-      id: data.id ?? 0,
-      parent_folder: data.parent_folder || '',
-      filename: data.filename,
-      description: data.description,
-      data: data.data,
-      version: data.version,
-    }
-
-    const formData = new FormData();
-    if (fileProp.data){
-      formData.append('data', fileProp.data);
-    }
-    formData.append('name', fileProp.filename);
-    formData.append('file_id', fileProp.id != null ? String(fileProp.id) : '0');
-    formData.append('description', fileProp.description);
-    formData.append('parent_folder', fileProp.parent_folder || "");
-    formData.append('version', fileProp.version.toString());
-
-    try{
-      const res = await fetch('http://localhost:8000/api/files/', {
-        credentials : 'include',
-        method : 'POST',
-        headers : {
-          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
-        },
-        body : formData,
-      });
-
-      if(res.ok){
-        const fileData = await res.json();
-        const newFile = [...files];
-        newFile.push(fileData)
-        setFiles(newFile);
-      }else{
-        const errorData = await res.json();
-        console.log("error data:",errorData)
-        const error = new Error('Validation failed');
-        (error as any).response = {status: res.status, data:errorData}
-        throw error;
-      }
-
-    }catch (err:any){
-      console.error('Error creating file:', err);
-      // handle DRF validation errors (400)
-      if (err.response && err.response.status === 400) {
-        // throw so form's catch block can use setError()
-        throw err;
-      }
-
-      throw new Error('Unexpected server error');
-    };
-
-  }
-
-  const deleteFile = async (data : FileProp) => {
-    try{
-      const res = await fetch(`http://localhost:8000/api/files/${data.id}/`, {
-        credentials : 'include',
-        method : 'DELETE',
-        headers : {
-          'Content-Type' : 'application/json',
-          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
-        }
-      });
-
-      if(res.ok){
-        const newFile = [...files];
-        
-        const removeId = newFile.findIndex(file => file.id===data.id?.toString())
-        newFile.splice(removeId, 1);
-        setFiles(newFile);
-      }else{
-        throw new Error('Failed to delete file');
-      }
-    }catch (err:any){
-      console.error('Error creating file:', err);
-      // handle DRF validation errors (400)
-      if (err.response && err.response.status === 400) {
-        // throw so form's catch block can use setError()
-        throw err;
-      }
-    }
-  }
   
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
@@ -260,6 +163,101 @@ export default function Main() {
     setSFS(newSFS)
 
     fetchSFS(newSFS)
+  }
+  
+  const handleFileCRUD = async (data: FileProp) => {
+    if (data.usage == "create" || data.usage == "update") {
+      createFile(data)
+    } else if (data.usage == 'delete') {
+      deleteFile(data)
+    }
+  }
+
+  // handle uploading files
+  const createFile = async (data : FileProp) => {
+
+    const fileProp: FileProp = {
+      usage: "",
+      id: data.id ?? 0,
+      parent_folder: data.parent_folder || '',
+      filename: data.filename,
+      description: data.description,
+      data: data.data,
+      version: data.version,
+    }
+
+    const formData = new FormData();
+    if (fileProp.data){
+      formData.append('data', fileProp.data);
+    }
+    formData.append('name', fileProp.filename);
+    formData.append('file_id', fileProp.id != null ? String(fileProp.id) : '0');
+    formData.append('description', fileProp.description);
+    formData.append('parent_folder', fileProp.parent_folder || "");
+    formData.append('version', fileProp.version.toString());
+
+    try{
+      const res = await fetch('http://localhost:8000/api/files/', {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : formData,
+      });
+
+      if(res.ok){
+        const fileData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+
+  }
+
+  const deleteFile = async (data : FileProp) => {
+    try{
+      const res = await fetch(`http://localhost:8000/api/files/${data.id}/`, {
+        credentials : 'include',
+        method : 'DELETE',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+        }
+      });
+
+      if(res.ok){
+        const newFile = [...files];
+        
+        const removeId = newFile.findIndex(file => file.id===data.id?.toString())
+        newFile.splice(removeId, 1);
+        setFiles(newFile);
+      }else{
+        throw new Error('Failed to delete file');
+      }
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+    }
   }
 
   // handles gallery vs list view
@@ -433,11 +431,12 @@ export default function Main() {
       position={'fixed'} 
       zIndex={2} right={'2vw'} bottom={'4vh'}
       >
-        <FileForm title="Upload File" current_folder={null} file={null} submitEvent={createFile} folders={folders}>
-          <Button bg={useColorModeValue("#335098", '#9AB3F2')}>
-              <AiFillFileAdd />
-              Create File</Button>
-        </FileForm>
+        <FileForm 
+        title="Upload File" 
+        current_folder={null} 
+        file={null} 
+        folders={folders}
+        submitEvent={createFile} />
       </Flex>
     </Box>
   );

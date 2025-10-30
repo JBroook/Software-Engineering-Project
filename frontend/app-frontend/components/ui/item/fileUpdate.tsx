@@ -21,6 +21,7 @@ import { Folder } from "../viewType/interfaces";
 import { FileProp } from "./fileForm";
 import { getFileDetails } from "./galleryItem";
 import { ViewItemProps, Version } from '../viewType/interfaces';
+import { promises } from 'fs';
 
 export interface UpdateFileProps{
   filedata: ViewItemProps;
@@ -39,7 +40,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
   const buttonbg3 = useColorModeValue("#F29D9A", '#C04E4A');
 
-  const [selectedVersion, setSelectedVersion] = useState("1");
+  const [selectedFolder, setSelectedFolder] = useState<string>();
   const [versions, setVersions] = useState<Version>(); // Store fetched data
   const [loading, setLoading] = useState(false);
 
@@ -47,7 +48,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const {register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
     defaultValues: {
       parent_folder: null,
-      version: 1,
     }
   });
 
@@ -73,9 +73,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const FileUploadList = () => {
     const fileUpload = useFileUploadContext();
     const files = fileUpload.acceptedFiles;
-    if (files == null && versions){
-      const file = versions.data
-    }
+    
     console.log("Uploaded File11: ",fileUpload.acceptedFiles[0]);
     return (
       <FileUpload.ItemGroup>
@@ -102,45 +100,50 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   }
 
   const onSubmit: SubmitHandler<FileProp> = async (fetched) =>{
-    console.log("passing thru")
+    console.log("fetched: ", fetched)
     const files = fileUpload.acceptedFiles[0]
-    if (files == null && versions){
-      const files = versions.data
-    }
-    
-    const newFileData: FileProp = {
-      usage: "update",
-      id: props.filedata.id,
-      filename: fetched.filename,
-      description: fetched.description,
-      parent_folder: null,
-      data: files, // Single File object
-      version: fetched.version + 1, 
+    if (props.filedata.parent_folder) {
+      setSelectedFolder(props.filedata.parent_folder.toString())
     }
 
-    console.log("new File Data:", newFileData)
-    if (!newFileData.data) {
-      setError("data", { type: "manual", message: "Please upload a file" });
-      return;
-    }
+    console.log(selectedFolder);
     
-    try{
-      await props.submitEvent(newFileData);
-      setIsOpen(false);
-      props.closeModal();
-    } catch (err: any){
-      if (err.response && err.response.data) {
-        const backendErrors = err.response.data;
+    if (versions) {
 
-        Object.keys(backendErrors).forEach((field) => {
-          const message = Array.isArray(backendErrors[field])
-            ? backendErrors[field][0]
-            : backendErrors[field];
-          setError(field as keyof FileProp, { type: "server", message });
-        });
-      } else {
-        // fallback error handling
-        setError("root", { type: "server", message: "An unexpected error occurred." });
+      let newFileData: FileProp = {
+        usage: "update",
+        id: props.filedata.id,
+        filename: fetched.filename,
+        description: fetched.description,
+        parent_folder: selectedFolder || fetched.parent_folder || null,
+        data: files, // Single File object
+        version: versions.version + 1, 
+      }
+
+      console.log("new File Data:", newFileData)
+      // if (!newFileData.data) {
+      //   setError("data", { type: "manual", message: "Please upload a file" });
+      //   return;
+      // }
+      
+      try{
+        await props.submitEvent(newFileData);
+        setIsOpen(false);
+        props.closeModal();
+      } catch (err: any){
+        if (err.response && err.response.data) {
+          const backendErrors = err.response.data;
+
+          Object.keys(backendErrors).forEach((field) => {
+            const message = Array.isArray(backendErrors[field])
+              ? backendErrors[field][0]
+              : backendErrors[field];
+            setError(field as keyof FileProp, { type: "server", message });
+          });
+        } else {
+          // fallback error handling
+          setError("root", { type: "server", message: "An unexpected error occurred." });
+        }
       }
     }
   }

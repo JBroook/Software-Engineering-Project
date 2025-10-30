@@ -138,7 +138,7 @@ class EmployeeViewSet(ModelViewSet):
         return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
     
 class FolderViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
 
     def get_queryset(self):
@@ -160,9 +160,9 @@ class FolderViewSet(ModelViewSet):
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
-            sort_order = "-" if sort_order=="asc" else ""
+            sort_order = "-" if sort_order=="desc" else ""
             queryset = queryset.order_by(sort_order+sort_method)
-
+        
         return queryset
 
 class FileViewSet(ModelViewSet):
@@ -207,7 +207,7 @@ class FileViewSet(ModelViewSet):
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
-            sort_order = "-" if sort_order=="asc" else ""
+            sort_order = "-" if sort_order=="desc" else ""
             queryset = FileVersion.objects.filter(id__in=queryset).order_by(sort_order+sort_method)
             
         # Focused File
