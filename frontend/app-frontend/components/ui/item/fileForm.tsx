@@ -8,7 +8,7 @@ import {
   Input, Portal, 
   useFileUploadContext, Badge, 
   useFileUpload, 
-  Select,
+  Select, Text,
   createListCollection,
   Span,
   Stack,} from "@chakra-ui/react";
@@ -16,6 +16,7 @@ import { FaFile } from "react-icons/fa";
 import { LuX } from "react-icons/lu";
 import { Folder } from "../viewType/interfaces";
 import { AiFillFileAdd } from "react-icons/ai";
+import { color } from "framer-motion";
 
 export type FileProp = {
   usage: string;
@@ -63,6 +64,10 @@ export const getFolderDetails = async (currentID: number) => {
 type FileFormChildfulProps = React.PropsWithChildren<FileFormProps>;
 
 export default function FileForm(props: FileFormChildfulProps) {
+  const textColor = useColorModeValue('black', 'white');
+  const basicbg = useColorModeValue('white', 'black');
+  const contentbg = useColorModeValue('#F5F5F5', '#383838');
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [allFolder, setAllFolder] = useState<[{}]>([{}]);
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
@@ -255,22 +260,21 @@ export default function FileForm(props: FileFormChildfulProps) {
                             <Select.Indicator />
                           </Select.IndicatorGroup>
                         </Select.Control>
-                          <Select.Positioner>
-                              <Select.Content h={'auto'} >
-                                {folderframeworks.items.map((folder) => (
-                                  // <Text>{framework.label.toString()}</Text>
-                                  <Select.Item item={folder} key={folder.value} value={folder.value} bg={'white'}>
-                                    <Stack gap="0">
-                                      <Select.ItemText>{folder.label}</Select.ItemText>
-                                      <Span color="fg.muted" textStyle="xs">
-                                        {folder.description}
-                                      </Span>
-                                    </Stack>
-                                    <Select.ItemIndicator />
-                                  </Select.Item>
-                                ))}
-                              </Select.Content>
-                          </Select.Positioner>
+                        <Select.Positioner>
+                            <Select.Content h={'auto'}>
+                              {folderframeworks.items.map((folder,index) => (
+                                <Select.Item item={folder} key={index} value={folder.value} color={textColor}>
+                                  <Stack gap="0">
+                                    <Select.ItemText>{folder.label}</Select.ItemText>
+                                    <Span color="fg.muted" textStyle="xs">
+                                      {folder.description}
+                                    </Span>
+                                  </Stack>
+                                  <Select.ItemIndicator />
+                                </Select.Item>
+                              ))}
+                            </Select.Content>
+                        </Select.Positioner>
                       </Select.Root>
                     )}} />
 
@@ -350,8 +354,11 @@ export default function FileForm(props: FileFormChildfulProps) {
               </Flex>
             </Dialog.Body>
 
-            <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" color={useColorModeValue("#9AB3F2", '#335098')}/>
+            <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
+              <CloseButton 
+                bg={contentbg}
+                color={textColor} 
+                size="sm" />
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>

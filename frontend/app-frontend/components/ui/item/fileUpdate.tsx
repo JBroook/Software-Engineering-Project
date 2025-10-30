@@ -311,9 +311,8 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                   </Select.Control>
                                     <Select.Positioner>
                                         <Select.Content h={'auto'} >
-                                          {folderframeworks.items.map((folder) => (
-                                            // <Text>{framework.label.toString()}</Text>
-                                            <Select.Item item={folder} key={folder.value} value={folder.value} bg={'white'}>
+                                          {folderframeworks.items.map((folder,index) => (
+                                            <Select.Item item={folder} key={index} value={folder.value} color={textColor}>
                                               <Stack gap="0">
                                                 <Select.ItemText>{folder.label}</Select.ItemText>
                                                 <Span color="fg.muted" textStyle="xs">

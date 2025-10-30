@@ -226,7 +226,3 @@ class FileViewSet(ModelViewSet):
             {"message": "Delete successful"},
             status=status.HTTP_200_OK
         )
-    
-    def get(self, request):
-        csrf_token = get_token(request)
-        return Response({'csrfToken':csrf_token})

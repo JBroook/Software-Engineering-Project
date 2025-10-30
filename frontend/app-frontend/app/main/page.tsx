@@ -433,7 +433,7 @@ export default function Main() {
       >
         <FileForm 
         title="Upload File" 
-        current_folder={null} 
+        current_folder={currentParent.toString()}
         file={null} 
         folders={folders}
         submitEvent={createFile} />
