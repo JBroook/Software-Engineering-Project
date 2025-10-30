@@ -1,27 +1,25 @@
 import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useColorModeValue } from "../color-mode";
 import { 
   Button, CloseButton, 
   Dialog, Field, FileUpload, 
-  Flex, Float, Heading, 
-  Input, NativeSelect, Portal, 
+  Flex, Float, 
+  Input, Portal, 
   useFileUploadContext, Badge, 
   useFileUpload, Text,
   Box, Image,
   Center,
-  Grid,
-  GridItem,
   Spacer,
-  Tabs,
-  VisuallyHidden} from "@chakra-ui/react";
-import { FaFile } from "react-icons/fa";
+  VisuallyHidden,
+  createListCollection,
+  Select,
+  Span,
+  Stack} from "@chakra-ui/react";
 import { LuX } from "react-icons/lu";
-import { Folder } from "../viewType/interfaces";
-import { FileProp } from "./fileForm";
+import { FileProp, getFolderDetails, fetchFolders } from "./fileForm";
 import { getFileDetails } from "./galleryItem";
 import { ViewItemProps, Version } from '../viewType/interfaces';
-import { promises } from 'fs';
 
 export interface UpdateFileProps{
   filedata: ViewItemProps;
@@ -43,25 +41,64 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const [selectedFolder, setSelectedFolder] = useState<string>();
   const [versions, setVersions] = useState<Version>(); // Store fetched data
   const [loading, setLoading] = useState(false);
+    
+  const [allFolder, setAllFolder] = useState<[{}]>([{}]);
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const {register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
+  const {control, register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
     defaultValues: {
       parent_folder: null,
     }
   });
 
-  const fileUpload = useFileUpload({
-    maxFiles: 1,
-  })
+  let folderframeworks = createListCollection({items: allFolder});
+
+  const getChain = async (item: any, all_Items: any):Promise<string> => {
+    const chain: number[] = [];
+    let breadcrumb: string = "All files";
+    let current = item;
+    while (current?.parent_folder != null) {
+      chain.push(current.parent_folder);
+      current = all_Items.find((f: any) => f.id === current.parent_folder);
+    }
+
+    let i = chain.length;
+    let j = 0;
+    while (j < i) {
+      const folder_name = await getFolderDetails(chain[j])
+      breadcrumb = breadcrumb + '/' + folder_name[0].name;
+      j++;
+    };
+    return breadcrumb;
+  }
 
   const handleOpenDialog = async () => {setLoading(true);
     try {
+      // Get All Parent Folders
+      const all_folder = await fetchFolders();
+      const fetchedFolder:[{}] = [{}];
+      for (const items of all_folder) {
+        if (Object.keys(fetchedFolder[0]).length === 0){
+          console.log("accessing first element");
+          fetchedFolder[0] = {
+            label: items.name,
+            value: items.id,
+            description: getChain(items,all_folder), // Filepath address
+          }
+        }else{
+          fetchedFolder.push({
+            label: items.name,
+            value: items.id,
+            description: getChain(items,all_folder), // Filepath address
+          }
+          )
+        }
+      }
+      setAllFolder(fetchedFolder);
+
+      // Get All Versions of this File
       let data = await getFileDetails(props.filedata.id);
-      console.log("current id: ",props.filedata.id)
-      console.log("current data: ",data[0])
       setVersions(data[0]);
-      console.log("current version: ",versions?.version)
       setIsOpen(true);
     } catch (error) {
       console.error('Error fetching file details:', error);
@@ -69,6 +106,10 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       setLoading(false);
     }
   }
+
+  const fileUpload = useFileUpload({
+    maxFiles: 1,
+  })
   
   const FileUploadList = () => {
     const fileUpload = useFileUploadContext();
@@ -100,14 +141,11 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   }
 
   const onSubmit: SubmitHandler<FileProp> = async (fetched) =>{
-    console.log("fetched: ", fetched)
-    const files = fileUpload.acceptedFiles[0]
+    const files = fileUpload.acceptedFiles[0];
     if (props.filedata.parent_folder) {
-      setSelectedFolder(props.filedata.parent_folder.toString())
+      setSelectedFolder(props.filedata.parent_folder.toString());
     }
 
-    console.log(selectedFolder);
-    
     if (versions) {
 
       let newFileData: FileProp = {
@@ -120,11 +158,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
         version: versions.version + 1, 
       }
 
-      console.log("new File Data:", newFileData)
-      // if (!newFileData.data) {
-      //   setError("data", { type: "manual", message: "Please upload a file" });
-      //   return;
-      // }
+      console.log("new File Data:", newFileData);
       
       try{
         await props.submitEvent(newFileData);
@@ -243,6 +277,62 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                             mb={6}
                             direction={'column'}
                             color={textColor}>
+                              
+                            <Field.Root key={1} mb={4} invalid={!!errors['parent_folder']}>
+                              <Field.Label>
+                                Parent Folder
+                                <Field.RequiredIndicator
+                                  fallback={
+                                    <Badge size="xs" variant="surface">
+                                      Optional
+                                    </Badge>
+                                  }
+                                />
+                              </Field.Label> 
+                              <Controller
+                                control={control}
+                                name="parent_folder"
+                                render={({ field }) => {
+                                const selectValue = field.value ?? undefined;
+                                return(
+                                <Select.Root
+                                  multiple={false}
+                                  value={selectValue as string[] | undefined}
+                                  onValueChange={(e) => field.onChange(e.value)}
+                                  collection={folderframeworks}
+                                >
+                                  <Select.Control>
+                                    <Select.Trigger>
+                                      <Select.ValueText placeholder="Parent Folder" />
+                                    </Select.Trigger>
+                                    <Select.IndicatorGroup>
+                                      <Select.Indicator />
+                                    </Select.IndicatorGroup>
+                                  </Select.Control>
+                                    <Select.Positioner>
+                                        <Select.Content h={'auto'} >
+                                          {folderframeworks.items.map((folder) => (
+                                            // <Text>{framework.label.toString()}</Text>
+                                            <Select.Item item={folder} key={folder.value} value={folder.value} bg={'white'}>
+                                              <Stack gap="0">
+                                                <Select.ItemText>{folder.label}</Select.ItemText>
+                                                <Span color="fg.muted" textStyle="xs">
+                                                  {folder.description}
+                                                </Span>
+                                              </Stack>
+                                              <Select.ItemIndicator />
+                                            </Select.Item>
+                                          ))}
+                                        </Select.Content>
+                                    </Select.Positioner>
+                                </Select.Root>
+                              )}} />
+
+                              <Field.ErrorText> 
+                                {errors['parent_folder']?.message}
+                              </Field.ErrorText>
+                            </Field.Root>
+                    
 
                             <Field.Root key={0} mb={4} invalid={!!errors['filename']}>
                               <Field.Label>

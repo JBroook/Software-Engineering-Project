@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, SubmitHandler, Controller, } from "react-hook-form";
 import { useColorModeValue } from "../color-mode";
 import { 
   Button, CloseButton, 
   Dialog, Field, FileUpload, 
   Flex, Float, Heading, 
-  Input, NativeSelect, Portal, 
+  Input, Portal, 
   useFileUploadContext, Badge, 
-  useFileUpload, Text,
+  useFileUpload, 
   Select,
   createListCollection,
   Span,
-  Stack,
-  ListCollection,} from "@chakra-ui/react";
+  Stack,} from "@chakra-ui/react";
 import { FaFile } from "react-icons/fa";
 import { LuX } from "react-icons/lu";
 import { Folder } from "../viewType/interfaces";
-import { describe } from "node:test";
 import { AiFillFileAdd } from "react-icons/ai";
 
 export type FileProp = {
@@ -37,7 +35,7 @@ interface FileFormProps {
   submitEvent: (data: FileProp) => void;
 }
 
-const fetchFolders = async () => {
+export const fetchFolders = async () => {
   const res = await fetch(`http://localhost:8000/api/folders/`, {
   credentials: 'include',
   });
@@ -47,7 +45,6 @@ const fetchFolders = async () => {
   let folders = await res.json();
   return folders
 }
-
 
 export const getFolderDetails = async (currentID: number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentID}`, {
@@ -67,7 +64,6 @@ type FileFormChildfulProps = React.PropsWithChildren<FileFormProps>;
 
 export default function FileForm(props: FileFormChildfulProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [getFolder, setFolder] = useState<any>();
   const [allFolder, setAllFolder] = useState<[{}]>([{}]);
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
     defaultValues: {
@@ -75,12 +71,8 @@ export default function FileForm(props: FileFormChildfulProps) {
       version: 1,
     }
   });
-
-  let folderframeworks = createListCollection({items: allFolder})
-
-  const fileUpload = useFileUpload({
-    maxFiles: 1,
-  })
+  
+  let folderframeworks = createListCollection({items: allFolder});
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -89,7 +81,7 @@ export default function FileForm(props: FileFormChildfulProps) {
     while (current?.parent_folder != null) {
       chain.push(current.parent_folder);
       current = all_Items.find((f: any) => f.id === current.parent_folder);
-    }
+    };
 
     let i = chain.length;
     let j = 0;
@@ -97,14 +89,13 @@ export default function FileForm(props: FileFormChildfulProps) {
       const folder_name = await getFolderDetails(chain[j])
       breadcrumb = breadcrumb + '/' + folder_name[0].name;
       j++;
-    }
+    };
     return breadcrumb;
   }
 
   const handleOpenDialog = async () => {
     try{
       const all_folder = await fetchFolders();
-      setFolder(all_folder)
       const fetchedFolder:[{}] = [{}];
       for (const items of all_folder) {
         if (Object.keys(fetchedFolder[0]).length === 0){
@@ -121,15 +112,19 @@ export default function FileForm(props: FileFormChildfulProps) {
             description: getChain(items,all_folder), // Filepath address
           }
           )
-        }
-      }
-      setAllFolder(fetchedFolder)
+        };
+      };
+      setAllFolder(fetchedFolder);
 
       setIsOpen(true);
     } catch (error) {
       console.error('Error fetching file details:', error);
     } 
   }
+
+  const fileUpload = useFileUpload({
+    maxFiles: 1,
+  })
 
   const FileUploadList = () => {
     const fileUpload = useFileUploadContext();
@@ -170,6 +165,7 @@ export default function FileForm(props: FileFormChildfulProps) {
       version: 1, 
     };
 
+    console.log("new File Data:", newFileData);
     if (!newFileData.data) {
       setError("data", { type: "manual", message: "Please upload a file" });
       return;
@@ -244,7 +240,6 @@ export default function FileForm(props: FileFormChildfulProps) {
                       name="parent_folder"
                       render={({ field }) => {
                       const selectValue = field.value ?? undefined;
-                      console.log(selectValue);
                       return(
                       <Select.Root
                         multiple={false}

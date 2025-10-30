@@ -169,7 +169,6 @@ class FileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = serializers.FileVersionSerializer
-    
 
     def get_queryset(self):
         queryset = FileVersion.objects.all().order_by('original_file', '-version').distinct('original_file')
