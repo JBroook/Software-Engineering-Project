@@ -25,7 +25,7 @@ export default function GalleryView(props : ViewProps){
   ))
 
   const fileComponents = props.files.map(file => (
-    <GalleryItem key={file.id} filename={file.name} image={file.data} date={file.date_modified}/>
+    <GalleryItem key={file.id} id={file.original_file} parent_folder={file.parent_folder} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created} created_by={file.employee} submitEvent={props.submitEvent}/>
   ))
 
   return (<>
@@ -109,7 +109,7 @@ export default function GalleryView(props : ViewProps){
       <SortBar onChange={props.sortFileEvent} sortOptions={[
         { label : "Filename", value : "name"},
         { label : "Size", value : "size"},
-        { label : "Last modified", value : "date_modified"}]}/>
+        { label : "Last modified", value : "date_created"}]}/>
     </Flex>
 
     {fileComponents.length>=3 ?

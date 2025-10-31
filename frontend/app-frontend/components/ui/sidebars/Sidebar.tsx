@@ -26,8 +26,6 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome, href: '/main' },
   { name: 'Users', icon: FaRegUser, href: '/main/users' },
   { name: 'Tags', icon: TiTags, href: '/main/tags' },
-  { name: 'Favourites', icon: FiStar, href: '/main' },
-  { name: 'Settings', icon: FiSettings, href: '/main' },
 ]
 
 function getCookie(name:string) {

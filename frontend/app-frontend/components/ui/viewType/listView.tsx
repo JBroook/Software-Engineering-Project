@@ -14,7 +14,6 @@ import {ViewProps} from "./interfaces"
 import ContentLoader from "./contentLoader";
 
 export default function ListView(props : ViewProps){
-  console.log(props)
   const folderComponents = props.folders.map(folder => (
       <ListFolder 
         key={folder.id} 
@@ -25,7 +24,16 @@ export default function ListView(props : ViewProps){
     ))
   
   const fileComponents = props.files.map(file => (
-    <ListItem key={file.id} filename={file.name} image={file.data} date={file.date_modified} size={file.size}/>
+    <ListItem 
+    parent_folder={file.parent_folder}
+    key={file.id} 
+    id={file.original_file} 
+    filename={file.name} 
+    filetype={file.filetype} 
+    image={file.data} 
+    date={file.date_created} 
+    created_by={file.employee} 
+    submitEvent={props.submitEvent}/>
   ))
 
   return (<>
@@ -88,7 +96,7 @@ export default function ListView(props : ViewProps){
       <SortBar onChange={props.sortFileEvent} sortOptions={[
         { label : "Filename", value : "name"},
         { label : "Size", value : "size"},
-        { label : "Last modified", value : "date_modified"}]}/>
+        { label : "Last modified", value : "date_created"}]}/>
     </Flex>
     
     <Stack

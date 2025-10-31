@@ -1,17 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdmin, IsEditor
+
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from assets.models import Folder, File, TagType, Tag
+from assets.models import Folder, File, FileVersion, TagType, Tag
 from users.models import Employee
 from . import serializers
-from django.db.models import Q, Sum, Count
-from rest_framework.permissions import IsAuthenticated
-from .permissions import IsAdmin, IsEditor
+from django.db.models import Q, Sum, Count, OuterRef, Subquery
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,7 +33,7 @@ class StorageView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     # returns info on storage size and file number
     def get(self, request):
-        storage_size = File.objects.aggregate(total_size=Sum('size'))['total_size']
+        storage_size = FileVersion.objects.distinct('original_file').aggregate(total_size=Sum('size'))['total_size']
         file_number = len(File.objects.all())
         tag_count = len(Tag.objects.all())
         tag_types = len(TagType.objects.all())
@@ -66,7 +69,7 @@ class LogoutView(APIView):
         logout(request)
         print("Logged out")
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
-    
+
 class TagTypeViewSet(ModelViewSet):
     serializer_class = serializers.TagTypeSerializer
 
@@ -93,7 +96,7 @@ class TagTypeViewSet(ModelViewSet):
         return queryset
     
 class EmployeeViewSet(ModelViewSet):
-    # permission_classes = [IsAuthenticated, IsAdmin]
+    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = serializers.EmployeeSerializer
 
     def get_queryset(self):
@@ -135,7 +138,7 @@ class EmployeeViewSet(ModelViewSet):
         return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
     
 class FolderViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = serializers.FolderSerializer
 
     def get_queryset(self):
@@ -148,7 +151,7 @@ class FolderViewSet(ModelViewSet):
             else:
                 queryset = queryset.filter(parent_folder__isnull=True)
         else:
-            queryset = queryset.none() 
+            queryset = queryset.all() 
 
         name = self.request.query_params.get('name')
         if name:
@@ -157,26 +160,26 @@ class FolderViewSet(ModelViewSet):
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
-            sort_order = "-" if sort_order=="asc" else ""
+            sort_order = "-" if sort_order=="desc" else ""
             queryset = queryset.order_by(sort_order+sort_method)
-
+        
         return queryset
 
 class FileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.FileSerializer
+    parser_classes = [MultiPartParser, FormParser]
+    serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = File.objects.all()
+        queryset = FileVersion.objects.all().order_by('original_file', '-version').distinct('original_file')
+        
         parent_id = self.request.query_params.get('parent_folder')
 
         if parent_id:
             if parent_id != "-1":
-                queryset = queryset.filter(parent_folder=parent_id)
+                queryset = queryset.filter(original_file_id__parent_folder=parent_id)
             else:
-                queryset = queryset.filter(parent_folder__isnull=True)
-        else:
-            queryset = queryset.none() 
+                queryset = queryset.filter(original_file_id__parent_folder__isnull=True)
 
         # search
         name = self.request.query_params.get('name')
@@ -203,8 +206,23 @@ class FileViewSet(ModelViewSet):
         sort_method = self.request.query_params.get('sort_method')
         if sort_method:
             sort_method, sort_order = sort_method.split('__')
-            sort_order = "-" if sort_order=="asc" else ""
-            queryset = queryset.order_by(sort_order+sort_method)
-
+            sort_order = "-" if sort_order=="desc" else ""
+            queryset = FileVersion.objects.filter(id__in=queryset).order_by(sort_order+sort_method)
+            
+        # Focused File
+        activated_file = self.request.query_params.get('file')
+        if activated_file:
+            queryset = FileVersion.objects.filter(original_file=activated_file).order_by('-version')
 
         return queryset
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+    
+    def destroy(self, request, pk, *args, **kwargs):
+        instance = File.objects.get(id=pk)
+        self.perform_destroy(instance)
+        return Response(
+            {"message": "Delete successful"},
+            status=status.HTTP_200_OK
+        )

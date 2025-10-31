@@ -17,7 +17,7 @@ type SortBarProps = {
 }
 
 export default function SortBar(props: SortBarProps){
-    const [value, setValue] = useState<string>("filename")
+    const [value, setValue] = useState<string>("name")
     const [toggle, setToggle] = useState<boolean>(false);
     let icon;
     if(toggle){
