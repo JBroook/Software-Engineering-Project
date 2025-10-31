@@ -109,22 +109,6 @@ export default function FileForm(props: FileFormChildfulProps) {
       const all_folder = await fetchFolders();
       const fetchedFolder:FolderItem[] = [];
       for (const items of all_folder) {
-<<<<<<< Updated upstream
-        fetchedFolder.push({
-          label: items.name,
-          value: items.id,
-          description: getChain(items,all_folder), // Filepath address
-        });
-      };
-      if (Object.keys(fetchedFolder[0]).length === 0){
-          console.log("accessing first element");
-          fetchedFolder[0] = {
-            label: "",
-            value: 0,
-            description: "", // Filepath address
-          }
-        };
-=======
         // if (Object.keys(fetchedFolder[0]).length === 0){
         //   console.log("accessing first element");
         //   fetchedFolder[0] = {
@@ -141,7 +125,6 @@ export default function FileForm(props: FileFormChildfulProps) {
           )
         // };
       };
->>>>>>> Stashed changes
       setAllFolder(fetchedFolder);
 
       setIsOpen(true);
