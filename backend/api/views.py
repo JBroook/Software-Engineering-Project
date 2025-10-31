@@ -219,12 +219,10 @@ class FileViewSet(ModelViewSet):
         return queryset
     
     def perform_destroy(self, instance):
+        instance = File.objects.get(id=instance.original_file.id)
         instance.delete()
-    
-    def destroy(self, request, pk, *args, **kwargs):
-        instance = File.objects.get(id=pk)
-        self.perform_destroy(instance)
         return Response(
             {"message": "Delete successful"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_204_NO_CONTENT
         )
+    

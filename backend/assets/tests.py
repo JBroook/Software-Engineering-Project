@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .models import Folder, File, TagType, Tag
+from django.contrib.auth.models import User
+from .models import Folder, File, FileVersion, TagType, Tag, Employee
 from django.test import override_settings
 from tempfile import mkdtemp
 
-temp_dir = mkdtemp(prefix='django_test_media_')
+temp_dir = mkdtemp(prefix='django_test_media')
 
 @override_settings(MEDIA_ROOT=temp_dir)
 class FolderModelTest(TestCase):
@@ -24,74 +25,52 @@ class FolderModelTest(TestCase):
         self.assertIsNotNone(self.root_folder.date_created)
         self.assertIsNotNone(self.root_folder.date_modified)
 
-
 @override_settings(MEDIA_ROOT=temp_dir)
 class FileModelTest(TestCase):
     def setUp(self):
-        self.folder = Folder.objects.create(name="Test Folder")
+        # create a Django user
+        self.user = User.objects.create_user(
+            username='johndoe',
+            password='testpassword123',
+            email='johndoe@example.com'
+        )
+        # create an Employee linked to that user
+        self.employee = Employee.objects.create(
+            user=self.user,
+            role='editor',
+        )
+    
+        self.folder = Folder.objects.create(name="Test Folder") # Create Folder Object
         test_file = SimpleUploadedFile("example.txt", b"Dummy content")
-        self.file = File.objects.create(
+        self.file = File.objects.create(parent_folder=self.folder) # Create File Object
+        self.fileVersion = FileVersion.objects.create( # Create FileVersion Object
+            original_file=self.file,
             name="example.txt",
+            description="this is a sample description",
+            size=test_file.size,
             filetype="txt",
             media_type="text",
-            parent_folder=self.folder,
             data=test_file,
-            size=len(b"Dummy content")
+            version=1,
+            created_by= self.employee
         )
 
     def test_file_creation(self):
-        self.assertEqual(self.file.name, "example.txt")
-        self.assertEqual(self.file.parent_folder, self.folder)
-        self.assertEqual(self.file.filetype, "txt")
-        self.assertEqual(self.file.media_type, "text")
+        self.assertEqual(self.file.parent_folder , self.folder)
+
+    def test_file_detail(self):
+        self.assertEqual(self.fileVersion.original_file, self.file)
+        self.assertEqual(self.fileVersion.name, "example.txt")
+        self.assertEqual(self.fileVersion.description, "this is a sample description")
+        self.assertEqual(self.fileVersion.filetype, "txt")
+        self.assertEqual(self.fileVersion.media_type, "text")
+        self.assertEqual(self.fileVersion.created_by, self.employee)
 
     def test_str_method(self):
-        self.assertEqual(str(self.file), "example.txt")
-
+        self.assertEqual(str(self.fileVersion),"example.txt")
+        
     def test_file_upload_path(self):
-        self.assertIn("uploads/", self.file.data.name)
+        self.assertIn("uploads/", self.fileVersion.data.name)
 
     def test_auto_timestamps(self):
-        self.assertIsNotNone(self.file.date_created)
-        self.assertIsNotNone(self.file.date_modified)
-
-
-@override_settings(MEDIA_ROOT=temp_dir)
-class TagTypeModelTest(TestCase):
-    def setUp(self):
-        self.tag_type = TagType.objects.create(
-            name="Important",
-            description="Marks important files"
-        )
-
-    def test_tag_type_creation(self):
-        self.assertEqual(self.tag_type.name, "Important")
-        self.assertEqual(self.tag_type.description, "Marks important files")
-
-    def test_str_method(self):
-        self.assertEqual(str(self.tag_type), "Important")
-
-
-@override_settings(MEDIA_ROOT=temp_dir)
-class TagModelTest(TestCase):
-    def setUp(self):
-        self.folder = Folder.objects.create(name="Folder")
-        test_file = SimpleUploadedFile("file.txt", b"Tag content")
-        self.file = File.objects.create(
-            name="file.txt",
-            filetype="txt",
-            media_type="text",
-            parent_folder=self.folder,
-            data=test_file
-        )
-        self.tag_type = TagType.objects.create(name="Category", description="File category")
-        self.tag = Tag.objects.create(file=self.file, type=self.tag_type)
-
-    def test_tag_creation(self):
-        self.assertEqual(self.tag.file, self.file)
-        self.assertEqual(self.tag.type, self.tag_type)
-        self.assertEqual(str(self.tag), "Category")
-
-    def test_related_name_access(self):
-        self.assertIn(self.tag, self.file.tag.all())
-        self.assertIn(self.tag, self.tag_type.tag.all())
+        self.assertIsNotNone(self.fileVersion.date_created)

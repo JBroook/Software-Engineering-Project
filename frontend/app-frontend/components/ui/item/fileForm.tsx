@@ -111,7 +111,7 @@ export default function FileForm(props: FileFormChildfulProps) {
       const fetchedFolder:FolderItem[] = [];
       fetchedFolder.push({
         label: "",
-        value: 0,
+        value: -1,
         description: Promise.resolve(""), // Filepath address
       });
       for (const items of all_folder) {

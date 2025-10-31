@@ -157,30 +157,26 @@ class FileVersionSerializer(serializers.ModelSerializer):
         else:
             try:
                 parent_folder = int(parent_folder)
+                folder = Folder.objects.get(id=parent_folder) if parent_folder != -1 else None
             except (TypeError, ValueError):
                 raise serializers.ValidationError({"parent_folder": "Invalid folder ID."})
         # Create File Instance
-        if file_id != 0:
+        if file_id != -1:
             file_instance = File.objects.get(id=file_id)
             if parent_folder != file_instance.parent_folder and parent_folder != None:
                 get_parent_folder = Folder.objects.get(id=parent_folder)
                 file_instance.parent_folder = get_parent_folder
                 file_instance.save()
         else:
-            if parent_folder is None or parent_folder == -1:
-                file_instance = File.objects.create(
-                    parent_folder=None
-                )
-            else:
-                print("Hello",parent_folder)
-                folder = Folder.objects.get(id=parent_folder)
-                file_instance = File.objects.create(
-                    parent_folder=folder
-                )
+            file_instance = File.objects.create(
+                parent_folder=folder
+            )
 
         # Auto-calculate metadata
         if 'data' not in validated_data:
             fetched_old_file_data = FileVersion.objects.filter(original_file__id=file_id).order_by('original_file', '-version').distinct('original_file')
+            if not fetched_old_file_data:
+                raise serializers.ValidationError("No previous version to copy.")
             print("Getting old data: \n",fetched_old_file_data)
             data = fetched_old_file_data[0].data
             size = fetched_old_file_data[0].size

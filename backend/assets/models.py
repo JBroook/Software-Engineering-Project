@@ -25,6 +25,9 @@ class FileVersion(models.Model):
     version = models.PositiveSmallIntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Employee, on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.name
 
 class TagType(models.Model):
     name = models.CharField(max_length=100)
