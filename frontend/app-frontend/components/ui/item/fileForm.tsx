@@ -63,13 +63,19 @@ export const getFolderDetails = async (currentID: number) => {
 
 type FileFormChildfulProps = React.PropsWithChildren<FileFormProps>;
 
+type FolderItem = {
+  value : number;
+  label: string;
+  description : Promise<string>;
+}
+
 export default function FileForm(props: FileFormChildfulProps) {
   const textColor = useColorModeValue('black', 'white');
   const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#F5F5F5', '#383838');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [allFolder, setAllFolder] = useState<[{}]>([{}]);
+  const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
     defaultValues: {
       parent_folder: props.current_folder || null,
@@ -101,8 +107,9 @@ export default function FileForm(props: FileFormChildfulProps) {
   const handleOpenDialog = async () => {
     try{
       const all_folder = await fetchFolders();
-      const fetchedFolder:[{}] = [{}];
+      const fetchedFolder:FolderItem[] = [];
       for (const items of all_folder) {
+<<<<<<< Updated upstream
         fetchedFolder.push({
           label: items.name,
           value: items.id,
@@ -117,6 +124,24 @@ export default function FileForm(props: FileFormChildfulProps) {
             description: "", // Filepath address
           }
         };
+=======
+        // if (Object.keys(fetchedFolder[0]).length === 0){
+        //   console.log("accessing first element");
+        //   fetchedFolder[0] = {
+        //     label: items.name,
+        //     value: items.id,
+        //     description: getChain(items,all_folder), // Filepath address
+        //   }
+        // }else{
+          fetchedFolder.push({
+            label: items.name,
+            value: items.id,
+            description: getChain(items,all_folder), // Filepath address
+          }
+          )
+        // };
+      };
+>>>>>>> Stashed changes
       setAllFolder(fetchedFolder);
 
       setIsOpen(true);
@@ -260,8 +285,8 @@ export default function FileForm(props: FileFormChildfulProps) {
                         </Select.Control>
                         <Select.Positioner>
                             <Select.Content h={'auto'}>
-                              {folderframeworks.items.map((folder,index) => (
-                                <Select.Item item={folder} key={index} value={folder.value} color={textColor}>
+                              {folderframeworks.items.map((folder, index) => (
+                                <Select.Item item={folder} key={index} color={textColor} >
                                   <Stack gap="0">
                                     <Select.ItemText>{folder.label}</Select.ItemText>
                                     <Span color="fg.muted" textStyle="xs">

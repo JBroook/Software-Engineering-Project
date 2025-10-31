@@ -24,7 +24,16 @@ export default function ListView(props : ViewProps){
     ))
   
   const fileComponents = props.files.map(file => (
-    <ListItem key={file.id} id={file.original_file} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created} created_by={file.employee} submitEvent={props.submitEvent}/>
+    <ListItem 
+    parent_folder={file.parent_folder}
+    key={file.id} 
+    id={file.original_file} 
+    filename={file.name} 
+    filetype={file.filetype} 
+    image={file.data} 
+    date={file.date_created} 
+    created_by={file.employee} 
+    submitEvent={props.submitEvent}/>
   ))
 
   return (<>

@@ -168,11 +168,12 @@ class FileVersionSerializer(serializers.ModelSerializer):
                 file_instance.parent_folder = get_parent_folder
                 file_instance.save()
         else:
-            if parent_folder is None:
+            if parent_folder is None or parent_folder is -1:
                 file_instance = File.objects.create(
                     parent_folder=None
                 )
             else:
+                print("Hello",parent_folder)
                 folder = Folder.objects.get(id=parent_folder)
                 file_instance = File.objects.create(
                     parent_folder=folder
