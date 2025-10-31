@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsAdmin, IsEditor, AssetPermission, UserPermission
+from .permissions import IsAdmin, AssetPermission, UserPermission
 
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token

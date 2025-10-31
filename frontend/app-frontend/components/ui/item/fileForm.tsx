@@ -84,6 +84,7 @@ export default function FileForm(props: FileFormChildfulProps) {
   });
   
   let folderframeworks = createListCollection({items: allFolder});
+  console.log(folderframeworks)
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -108,23 +109,20 @@ export default function FileForm(props: FileFormChildfulProps) {
     try{
       const all_folder = await fetchFolders();
       const fetchedFolder:FolderItem[] = [];
+      fetchedFolder.push({
+        label: "",
+        value: 0,
+        description: Promise.resolve(""), // Filepath address
+      });
       for (const items of all_folder) {
-        // if (Object.keys(fetchedFolder[0]).length === 0){
-        //   console.log("accessing first element");
-        //   fetchedFolder[0] = {
-        //     label: items.name,
-        //     value: items.id,
-        //     description: getChain(items,all_folder), // Filepath address
-        //   }
-        // }else{
           fetchedFolder.push({
             label: items.name,
             value: items.id,
             description: getChain(items,all_folder), // Filepath address
           }
           )
-        // };
       };
+      console.log(fetchedFolder)
       setAllFolder(fetchedFolder);
 
       setIsOpen(true);
@@ -257,6 +255,7 @@ export default function FileForm(props: FileFormChildfulProps) {
                         value={selectValue as string[] | undefined}
                         onValueChange={(e) => field.onChange(e.value)}
                         collection={folderframeworks}
+                        defaultValue={['0']}
                       >
                         <Select.Control>
                           <Select.Trigger>
@@ -269,8 +268,8 @@ export default function FileForm(props: FileFormChildfulProps) {
                         <Select.Positioner>
                             <Select.Content h={'auto'}>
                               {folderframeworks.items.map((folder, index) => (
-                                <Select.Item item={folder} key={index} color={textColor} >
-                                  <Stack gap="0">
+                                <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
+                                  <Stack gap="0" h={'5vh'}>
                                     <Select.ItemText>{folder.label}</Select.ItemText>
                                     <Span color="fg.muted" textStyle="xs">
                                       {folder.description}
