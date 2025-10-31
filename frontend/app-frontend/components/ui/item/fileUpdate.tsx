@@ -52,6 +52,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   });
 
   let folderframeworks = createListCollection({items: allFolder});
+  console.log(folderframeworks)
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -78,22 +79,20 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       const all_folder = await fetchFolders();
       const fetchedFolder:[{}] = [{}];
       for (const items of all_folder) {
-        if (Object.keys(fetchedFolder[0]).length === 0){
+        fetchedFolder.push({
+          label: items.name,
+          value: items.id,
+          description: getChain(items,all_folder), // Filepath address
+        });
+      };
+      if (Object.keys(fetchedFolder[0]).length === 0){
           console.log("accessing first element");
           fetchedFolder[0] = {
-            label: items.name,
-            value: items.id,
-            description: getChain(items,all_folder), // Filepath address
-          }
-        }else{
-          fetchedFolder.push({
-            label: items.name,
-            value: items.id,
-            description: getChain(items,all_folder), // Filepath address
-          }
-          )
-        }
-      }
+            label: "",
+            value: 0,
+            description: "", // Filepath address
+          };
+        };
       setAllFolder(fetchedFolder);
 
       // Get All Versions of this File
@@ -313,7 +312,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                         <Select.Content h={'auto'} >
                                           {folderframeworks.items.map((folder,index) => (
                                             <Select.Item item={folder} key={index} value={folder.value} color={textColor}>
-                                              <Stack gap="0">
+                                              <Stack gap="0" h={'5vh'}>
                                                 <Select.ItemText>{folder.label}</Select.ItemText>
                                                 <Span color="fg.muted" textStyle="xs">
                                                   {folder.description}

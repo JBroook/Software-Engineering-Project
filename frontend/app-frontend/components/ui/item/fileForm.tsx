@@ -103,22 +103,20 @@ export default function FileForm(props: FileFormChildfulProps) {
       const all_folder = await fetchFolders();
       const fetchedFolder:[{}] = [{}];
       for (const items of all_folder) {
-        if (Object.keys(fetchedFolder[0]).length === 0){
+        fetchedFolder.push({
+          label: items.name,
+          value: items.id,
+          description: getChain(items,all_folder), // Filepath address
+        });
+      };
+      if (Object.keys(fetchedFolder[0]).length === 0){
           console.log("accessing first element");
           fetchedFolder[0] = {
-            label: items.name,
-            value: items.id,
-            description: getChain(items,all_folder), // Filepath address
+            label: "",
+            value: 0,
+            description: "", // Filepath address
           }
-        }else{
-          fetchedFolder.push({
-            label: items.name,
-            value: items.id,
-            description: getChain(items,all_folder), // Filepath address
-          }
-          )
         };
-      };
       setAllFolder(fetchedFolder);
 
       setIsOpen(true);
