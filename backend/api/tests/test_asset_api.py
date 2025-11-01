@@ -104,7 +104,6 @@ class FileAPITests(APITestCase):
         self.new_file = File.objects.create(parent_folder=self.folder)
         new_file = SimpleUploadedFile("new.txt", b"Another file", content_type="text/plain")
         data = {
-            'parent_folder':self.folder.id,
             'file_id':-1,
             'name':"New File",
             'description':"this is a new sample",
@@ -112,7 +111,7 @@ class FileAPITests(APITestCase):
             'version':1,
         }
         
-        response = self.client.post(self.file_list_url, data, format='multipart')
+        response = self.client.post(self.file_list_url+f'?parent_folder={self.folder.id}', data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(File.objects.count(), 3)
         self.assertEqual(FileVersion.objects.last().name, "New File")

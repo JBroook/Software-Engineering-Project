@@ -86,7 +86,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       const fetchedFolder:FolderItem[] = [];
       fetchedFolder.push({
         label: "",
-        value: -1,
+        value: -2,
         description: Promise.resolve(""), // Filepath address
       });
       for (const items of all_folder) {

@@ -166,7 +166,7 @@ export default function FileForm(props: FileFormChildfulProps) {
 
     const newFileData: FileProp = {
       usage: "create",
-      id: null,
+      id: -1,
       filename: fetched.filename,
       description: fetched.description,
       parent_folder: fetched.parent_folder,

@@ -150,20 +150,25 @@ class FileVersionSerializer(serializers.ModelSerializer):
             )
         
         # Get parent_folder from request.POST        
-        parent_folder = self.context['request'].POST.get('parent_folder')
+        parent_folder = self.context['request'].query_params.get('parent_folder')
         file_id = validated_data.get('file_id')
         if parent_folder in ('', 'null', 'undefined'):
             parent_folder = None
+        elif parent_folder == '-2':
+            parent_folder = int(parent_folder)
         else:
             try:
                 parent_folder = int(parent_folder)
-                folder = Folder.objects.get(id=parent_folder) if parent_folder != -1 else None
+                folder = Folder.objects.get(id=parent_folder) if parent_folder != '-1' else None
             except (TypeError, ValueError):
                 raise serializers.ValidationError({"parent_folder": "Invalid folder ID."})
         # Create File Instance
         if file_id != -1:
             file_instance = File.objects.get(id=file_id)
-            if parent_folder != file_instance.parent_folder and parent_folder != None:
+            if parent_folder == -2:
+                file_instance.parent_folder = None
+                file_instance.save()
+            elif parent_folder != file_instance.parent_folder and parent_folder != None:
                 get_parent_folder = Folder.objects.get(id=parent_folder)
                 file_instance.parent_folder = get_parent_folder
                 file_instance.save()
