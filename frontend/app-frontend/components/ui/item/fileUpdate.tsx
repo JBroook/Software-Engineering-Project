@@ -29,6 +29,12 @@ export interface UpdateFileProps{
 
 type UpdateFileChildfulProps = React.PropsWithChildren<UpdateFileProps>;
 
+type FolderItem = {
+  value : number;
+  label: string;
+  description : Promise<string>;
+}
+
 export default function UpdateFile(props: UpdateFileChildfulProps) {
   const textColor = useColorModeValue('black', 'white');
   const basicbg = useColorModeValue('white', 'black');
@@ -42,7 +48,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const [versions, setVersions] = useState<Version>(); // Store fetched data
   const [loading, setLoading] = useState(false);
     
-  const [allFolder, setAllFolder] = useState<[{}]>([{}]);
+  const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<FileProp>({
@@ -77,7 +83,12 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
     try {
       // Get All Parent Folders
       const all_folder = await fetchFolders();
-      const fetchedFolder:[{}] = [{}];
+      const fetchedFolder:FolderItem[] = [];
+      fetchedFolder.push({
+        label: "",
+        value: -2,
+        description: Promise.resolve(""), // Filepath address
+      });
       for (const items of all_folder) {
         fetchedFolder.push({
           label: items.name,
@@ -85,14 +96,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
           description: getChain(items,all_folder), // Filepath address
         });
       };
-      if (Object.keys(fetchedFolder[0]).length === 0){
-          console.log("accessing first element");
-          fetchedFolder[0] = {
-            label: "",
-            value: 0,
-            description: "", // Filepath address
-          };
-        };
       setAllFolder(fetchedFolder);
 
       // Get All Versions of this File
@@ -293,6 +296,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 name="parent_folder"
                                 render={({ field }) => {
                                 const selectValue = field.value ?? undefined;
+                                console.log(selectValue)
                                 return(
                                 <Select.Root
                                   multiple={false}
@@ -311,7 +315,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                     <Select.Positioner>
                                         <Select.Content h={'auto'} >
                                           {folderframeworks.items.map((folder,index) => (
-                                            <Select.Item item={folder} key={index} value={folder.value} color={textColor}>
+                                            <Select.Item item={folder} key={index} color={textColor}>
                                               <Stack gap="0" h={'5vh'}>
                                                 <Select.ItemText>{folder.label}</Select.ItemText>
                                                 <Span color="fg.muted" textStyle="xs">

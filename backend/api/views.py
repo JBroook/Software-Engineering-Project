@@ -5,19 +5,20 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsAdmin, IsEditor
+from .permissions import IsAdmin, AssetPermission, UserPermission
 
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.db.models import Q, Sum, Count, OuterRef, Subquery
+
 from assets.models import Folder, File, FileVersion, TagType, Tag
 from users.models import Employee
 from . import serializers
-from django.db.models import Q, Sum, Count, OuterRef, Subquery
 
 class UserView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdmin]
 
     def get(self, request):
         user = request.user
@@ -30,7 +31,7 @@ class UserView(APIView):
         }, status=status.HTTP_200_OK)
 
 class StorageView(APIView):
-    permission_classes = [IsAuthenticated, IsAdmin]
+    permission_classes = [IsAdmin]
     # returns info on storage size and file number
     def get(self, request):
         storage_size = FileVersion.objects.distinct('original_file').aggregate(total_size=Sum('size'))['total_size']
@@ -71,6 +72,7 @@ class LogoutView(APIView):
         return Response({"message" : "Logged out successfully"}, status=status.HTTP_200_OK)
 
 class TagTypeViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, AssetPermission]
     serializer_class = serializers.TagTypeSerializer
 
     def get_queryset(self):
@@ -96,7 +98,7 @@ class TagTypeViewSet(ModelViewSet):
         return queryset
     
 class EmployeeViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdmin]
+    permission_classes = [UserPermission]
     serializer_class = serializers.EmployeeSerializer
 
     def get_queryset(self):
@@ -138,7 +140,7 @@ class EmployeeViewSet(ModelViewSet):
         return Response({"message" : "Delete successful"}, status=status.HTTP_200_OK)
     
 class FolderViewSet(ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [AssetPermission]
     serializer_class = serializers.FolderSerializer
 
     def get_queryset(self):
@@ -166,7 +168,7 @@ class FolderViewSet(ModelViewSet):
         return queryset
 
 class FileViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AssetPermission]
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = serializers.FileVersionSerializer
 
@@ -217,12 +219,10 @@ class FileViewSet(ModelViewSet):
         return queryset
     
     def perform_destroy(self, instance):
+        instance = File.objects.get(id=instance.original_file.id)
         instance.delete()
-    
-    def destroy(self, request, pk, *args, **kwargs):
-        instance = File.objects.get(id=pk)
-        self.perform_destroy(instance)
         return Response(
             {"message": "Delete successful"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_204_NO_CONTENT
         )
+    

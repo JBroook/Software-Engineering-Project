@@ -166,8 +166,10 @@ export default function Main() {
   }
   
   const handleFileCRUD = async (data: FileProp) => {
-    if (data.usage == "create" || data.usage == "update") {
+    if (data.usage == "create") {
       createFile(data)
+    } else if (data.usage == "update") {
+      updateFile(data)
     } else if (data.usage == 'delete') {
       deleteFile(data)
     }
@@ -175,7 +177,6 @@ export default function Main() {
 
   // handle uploading files
   const createFile = async (data : FileProp) => {
-
     const fileProp: FileProp = {
       usage: "",
       id: data.id ?? 0,
@@ -227,7 +228,61 @@ export default function Main() {
 
       throw new Error('Unexpected server error');
     };
+  }
 
+  const updateFile = async (data : FileProp) => {
+    console.log("id: ",data.parent_folder)
+    const fileProp: FileProp = {
+      usage: "",
+      id: data.id ?? 0,
+      parent_folder: data.parent_folder || '',
+      filename: data.filename,
+      description: data.description,
+      data: data.data,
+      version: data.version,
+    }
+
+    const formData = new FormData();
+    if (fileProp.data){
+      formData.append('data', fileProp.data);
+    }
+    formData.append('name', fileProp.filename);
+    formData.append('file_id', fileProp.id != null ? String(fileProp.id) : '0');
+    formData.append('description', fileProp.description);
+    formData.append('parent_folder', fileProp.parent_folder || "");
+    formData.append('version', fileProp.version.toString());
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : formData,
+      });
+
+      if(res.ok){
+        const fileData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
   }
 
   const deleteFile = async (data : FileProp) => {
