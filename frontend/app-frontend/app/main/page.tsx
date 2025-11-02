@@ -22,7 +22,7 @@ import { Folder, File, EditFolder } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
 import { TagType } from "@/components/ui/tags/tagForm";
 import UserForm from "@/components/ui/user/userForm";
-import FileForm, { FileProp } from "@/components/ui/item/fileForm";
+import FileForm, { FileProp, getFolderDetails } from "@/components/ui/item/fileForm";
 import { AiFillFileAdd } from "react-icons/ai";
 import { clickEventProps } from "@/components/ui/folder/folderCRUD";
 
@@ -88,6 +88,8 @@ export default function Main() {
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
   // SFS=Search Filter Sort, controls the search filter sort params
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
+
+  const [currentFoldername, setCurrentFolderName] = useState<string>("All files");
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -115,6 +117,7 @@ export default function Main() {
     const fChain = [...folderChain, currentParent]
     setFolderChain(fChain);
     setCurrentParent(newFolderId);
+    setCurrentFolderName(newFolderName);
 
     const nChain = [...nameChain, newFolderName]
     setNameChain(nChain);
@@ -137,7 +140,14 @@ export default function Main() {
     setFolderChain(fChain);
     const nChain = [...nameChain];
     nChain.pop();
+    const lastFolderName = nChain.at(-1);
     setNameChain(nChain);
+    console.log(lastFolderName)
+    console.log(nChain)
+    
+    if(lastFolderName!==undefined){
+      setCurrentFolderName(lastFolderName)
+    }
   }
 
   // check if user is logged in, else return to login page
@@ -446,6 +456,8 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
+        folderId={currentParent}
+        folderName={currentFoldername}
         folders={folders}
         files={files}
         clickEvent={handleFolder}
@@ -456,6 +468,8 @@ export default function Main() {
       />
   ) : (
       <ListView 
+        folderId={currentParent}
+        folderName={currentFoldername}
         folders={folders} 
         files={files} 
         clickEvent={handleFolder}

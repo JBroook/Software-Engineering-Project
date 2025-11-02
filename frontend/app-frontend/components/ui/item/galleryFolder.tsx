@@ -42,6 +42,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
   
   const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
   const [currentParent, setCurrentParent] = useState<number|null>();
+  const [currentParentIndex, setCurrentParentIndex] = useState<number>(0);
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<EditFolder>({
     defaultValues: {
       parent_folder: null,
@@ -113,6 +114,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
           value: -1,
           description: Promise.resolve(""), // Filepath address
         });
+        let index = 0;
         for (const items of all_folder) {
             fetchedFolder.push({
               label: items.name,
@@ -121,7 +123,9 @@ export default function GalleryFolder(props : GalleryFolderProps) {
             })
             if (items.id == props.id) {
               setCurrentParent(items.parent_folder)
+              setCurrentParentIndex(index)
             }
+            index++;
         };
         setAllFolder(fetchedFolder);
   
@@ -174,14 +178,14 @@ export default function GalleryFolder(props : GalleryFolderProps) {
           console.log("Folder Form submit event triggered"); // Debug log
           handleSubmit(onSubmit)(e);
         }} >
-          <Flex direction={'row'}>
-            <Flex justify="space-between" align="center" w={'340px'}>
+          <Flex direction={'row'} w={'340px'}>
+            <Flex justify="space-between" align="center" w={'90%'}>
       
               <HStack>
                 <FaFolder 
                     color={textColor}
                     size={25}/>
-                <Box h="fit-content">
+                <Box h="fit-content" w={'100%'}>
                   <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
                     <Field.Label>
                       File Name
@@ -220,7 +224,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                         value={selectValue as string[] | undefined}
                         onValueChange={(e) => field.onChange(e.value)}
                         collection={folderframeworks}
-                        defaultValue={['0']}
+                        defaultValue={[currentParentIndex.toString()]}
                       >
                         <Select.Control>
                           <Select.Trigger>
@@ -235,7 +239,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                               {folderframeworks.items.map((folder, index) => (
                                 <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
                                   <Stack gap="0" h={'5vh'}>
-                                    <Select.ItemText>{folder.label}</Select.ItemText>
+                                    <Select.ItemText maxW={'10vw'} truncate>{folder.label}</Select.ItemText>
                                     <Span color="fg.muted" textStyle="xs">
                                       {folder.description}
                                     </Span>
@@ -252,24 +256,24 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                       {errors['parent_folder']?.message}
                     </Field.ErrorText>
                   </Field.Root>
-                                    
                 </Box>
               </HStack>
             </Flex>
-            <Flex w={'40px'} direction={'column'}>
-            <Button w={'100%'} h={'50%'} 
-            type="submit" as={'button'}
-            bg={buttonbg} 
-            _hover={{bg : "#8aa0d7ff"}}
-            px={3}>
-              <SiTicktick />
-            </Button>
-            <Button w={'100%'} h={'50%'} onClick={closeChange}
-            bg={buttonbg2} 
-            _hover={{bg : "#df817dff"}}
-            px={3}>
-              <MdCancel />
-            </Button>
+            <Flex w={'16%'} direction={'column'}>
+              <Button w={'100%'} h={'45%'} 
+              type="submit" as={'button'}
+              bg={buttonbg} 
+              _hover={{bg : "#8aa0d7ff"}}
+              px={3}>
+                <SiTicktick />
+              </Button>
+              <Spacer />
+              <Button w={'100%'} h={'45%'} onClick={closeChange}
+              bg={buttonbg2} 
+              _hover={{bg : "#df817dff"}}
+              px={3}>
+                <MdCancel />
+              </Button>
             </Flex>
           </Flex>
         </form>

@@ -55,6 +55,8 @@ export interface File {
 }
 
 export interface ViewProps {
+  folderId: number;
+  folderName: string;
   folders : Folder[];
   files : File[];
   clickEvent : (data: clickEventProps) => void;

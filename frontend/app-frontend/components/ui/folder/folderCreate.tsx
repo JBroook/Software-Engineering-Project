@@ -9,7 +9,9 @@ import { FileProp, fetchFolders } from "../item/fileForm";
 import { clickEventProps } from "./folderCRUD";
 
 interface folderCRUD {
-    clickEvent:(data:clickEventProps) => void ;
+  id: number;
+  name: string;
+  clickEvent:(data:clickEventProps) => void ;
 }
 
 export const createFolder = async () => {
@@ -50,53 +52,25 @@ export default function FolderCreate(props: folderCRUD) {
   const addbuttonbg = useColorModeValue("#335098", '#9AB3F2');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
+  const [currentParent, setCurrentParent] = useState<number|null>();
   const {control, register, handleSubmit, setError, formState: {errors}} = useForm<clickEventProps>({
     defaultValues: {
       parent_folder: null,
     }
   });
-  
-  let folderframeworks = createListCollection({items: allFolder});
 
-  const getChain = async (item: any, all_Items: any):Promise<string> => {
-    const chain: number[] = [];
-    let breadcrumb: string = "All files";
-    let current = item;
-    while (current?.parent_folder != null) {
-      chain.push(current.parent_folder);
-      current = all_Items.find((f: any) => f.id === current.parent_folder);
-    };
-
-    let i = chain.length;
-    let j = 0;
-    while (j < i) {
-      const folder_name = await getFolderDetails(chain[j])
-      breadcrumb = breadcrumb + '/' + folder_name[0].name;
-      j++;
-    };
-    return breadcrumb;
-  }
+  console.log("Current Folder id: ", props.id)
+  console.log("Current Folder name: ", props.name)
 
   const handleOpenDialog = async () => {
     try{
-      const all_folder = await fetchFolders();
-      const fetchedFolder:FolderItem[] = [];
-      fetchedFolder.push({
-        label: "",
-        value: -1,
-        description: Promise.resolve(""), // Filepath address
-      });
+      const all_folder = await getFolderDetails(props.id);
+      console.log(all_folder)
       for (const items of all_folder) {
-          fetchedFolder.push({
-            label: items.name,
-            value: items.id,
-            description: getChain(items,all_folder), // Filepath address
-          }
-          )
+        setCurrentParent(items.id);
       };
-      console.log(fetchedFolder)
-      setAllFolder(fetchedFolder);
+      console.log("Current Parent: ", currentParent)
+      console.log("Current Parent Name: ", props.name)
 
       setIsOpen(true);
     } catch (error) {
@@ -109,7 +83,7 @@ export default function FolderCreate(props: folderCRUD) {
         'usage': "create",
         'folderId': null,
         'folderName': fetched.folderName,
-        'parent_folder': fetched.parent_folder == -1? null : fetched.parent_folder
+        'parent_folder': props.id != -1 ? props.id : null,
       }
   
       console.log("new File Data:", newFolderData);
@@ -136,22 +110,29 @@ export default function FolderCreate(props: folderCRUD) {
 
   return (
     <>
-    <Dialog.Root open={isOpen} onOpenChange={(v) => setIsOpen(v.open)}>
+    <Dialog.Root 
+      size="cover" 
+      placement="center"
+      open={isOpen}
+      onOpenChange={(v) => setIsOpen(v.open)}
+      trapFocus={true}
+    >
       <Dialog.Trigger asChild>
         <Button 
-            w="100%"
-            maxW="400px" 
-            h='70px'
-            borderRadius={"xl"}
-            bg={addbuttonbg}
-            >
-            <AiFillFolderAdd size={25} color={basicbg}/>
+          w="100%"
+          maxW="400px" 
+          h='70px'
+          borderRadius={"xl"}
+          bg={addbuttonbg}
+          onClick={handleOpenDialog}
+          >
+          <AiFillFolderAdd size={25} color={basicbg}/>
         </Button>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
-          <Dialog.Content w="30vw" minW="300px" p={4} maxH="70vh" overflowY="scroll">
+          <Dialog.Content w="25vw" minW="300px" p={4} maxH="70vh">
 
             <Dialog.Header mt={5}>
               <Dialog.Title 
@@ -163,67 +144,23 @@ export default function FolderCreate(props: folderCRUD) {
               </Dialog.Title>
             </Dialog.Header>
 
-            <Dialog.Body w="100%">
+            <Dialog.Body w="100%" mt={6}>
               <Flex color={useColorModeValue('black', 'white')} align={'center'} justify={'center'} grow={1}>
                 <form onSubmit={(e) => {
                     handleSubmit(onSubmit)(e);
                   }}>
                 <Flex direction={'column'} mb={8}>
                     
-                  <Field.Root key={1} mb={4} invalid={!!errors['parent_folder']}>
+                  <Field.Root key={1} mb={4} disabled>
                     <Field.Label>
                       Parent Folder
-                      <Field.RequiredIndicator
-                        fallback={
-                          <Badge size="xs" variant="surface">
-                            Optional
-                          </Badge>
-                        }
-                      />
                     </Field.Label> 
-                  
-                    <Controller
-                      control={control}
-                      name="parent_folder"
-                      render={({ field }) => {
-                      const selectValue = field.value ?? undefined;
-                      return(
-                      <Select.Root
-                        multiple={false}
-                        value={selectValue as string[] | undefined}
-                        onValueChange={(e) => field.onChange(e.value)}
-                        collection={folderframeworks}
-                        defaultValue={['0']}
-                      >
-                        <Select.Control>
-                          <Select.Trigger>
-                            <Select.ValueText placeholder="Parent Folder" />
-                          </Select.Trigger>
-                          <Select.IndicatorGroup>
-                            <Select.Indicator />
-                          </Select.IndicatorGroup>
-                        </Select.Control>
-                        <Select.Positioner>
-                            <Select.Content h={'auto'}>
-                              {folderframeworks.items.map((folder, index) => (
-                                <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
-                                  <Stack gap="0" h={'5vh'}>
-                                    <Select.ItemText>{folder.label}</Select.ItemText>
-                                    <Span color="fg.muted" textStyle="xs">
-                                      {folder.description}
-                                    </Span>
-                                  </Stack>
-                                  <Select.ItemIndicator />
-                                </Select.Item>
-                              ))}
-                            </Select.Content>
-                        </Select.Positioner>
-                      </Select.Root>
-                    )}} />
 
-                    <Field.ErrorText> 
-                      {errors['parent_folder']?.message}
-                    </Field.ErrorText>
+                    {props.id != -1 ? (
+                      <Input placeholder={props.name} />
+                    ):(
+                      <Input placeholder="All Files" />
+                    )}
                   </Field.Root>
                   
                   <Field.Root key={0} mb={4} invalid={!!errors['folderName']}>
@@ -243,7 +180,7 @@ export default function FolderCreate(props: folderCRUD) {
                   </Field.Root>
                 </Flex>
   
-                <Flex w="100%" justify="center" mt={2} mb={8} gap={5}>
+                <Flex w="100%" justify="center" mt={6} mb={8} gap={5}>
                   <Button type="submit" as={'button'}
                   bg={useColorModeValue("#9AB3F2", '#335098')} 
                   _hover={{bg : "#8aa0d7ff"}}

@@ -233,7 +233,7 @@ export default function ListFolder(props : ListFolderProps) {
                           {folderframeworks.items.map((folder, index) => (
                             <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
                               <Stack gap="0" h={'5vh'}>
-                                <Select.ItemText>{folder.label}</Select.ItemText>
+                                <Select.ItemText maxW={'20vw'} truncate>{folder.label}</Select.ItemText>
                                 <Span color="fg.muted" textStyle="xs">
                                   {folder.description}
                                 </Span>

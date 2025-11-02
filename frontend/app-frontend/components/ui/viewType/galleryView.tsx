@@ -70,7 +70,7 @@ export default function GalleryView(props : ViewProps){
       pb={10} 
       bg={buttonbg} 
       >
-        <FolderCreate clickEvent={props.clickEvent} />
+        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
         <ContentLoader 
           loading={props.loading}
           color="white"
@@ -85,7 +85,7 @@ export default function GalleryView(props : ViewProps){
       pb={10} 
       bg={buttonbg} 
       >
-        <FolderCreate clickEvent={props.clickEvent} />
+        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
         <ContentLoader 
           loading={props.loading}
           color="white"

@@ -66,7 +66,7 @@ export default function ListView(props : ViewProps){
     pl={8}
     pb={3}>
       
-      <FolderCreate clickEvent={props.clickEvent} />
+      <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
       <ContentLoader 
         loading={props.loading}
         color="white"
