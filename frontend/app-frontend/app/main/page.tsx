@@ -18,12 +18,13 @@ import Searchbar from "@/components/ui/searchbar/searchbar";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
-import { Folder, File } from "@/components/ui/viewType/interfaces";
+import { Folder, File, EditFolder } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
 import { TagType } from "@/components/ui/tags/tagForm";
 import UserForm from "@/components/ui/user/userForm";
 import FileForm, { FileProp } from "@/components/ui/item/fileForm";
 import { AiFillFileAdd } from "react-icons/ai";
+import { clickEventProps } from "@/components/ui/folder/folderCRUD";
 
 function getCookie(name:string) {
   const value = document.cookie
@@ -88,6 +89,18 @@ export default function Main() {
   // SFS=Search Filter Sort, controls the search filter sort params
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
   
+  // handle folder functions when clicked
+  const handleFolder = (data:clickEventProps) => {
+    if (data.usage == "rename") {
+      console.log("Getting renamed ", data)
+      updateFolder(data)
+    } else if (data.usage == "delete") {
+      console.log("Getting deleted", data)
+    } else {
+      openFolder(data.folderId, data.folderName)
+    }
+  }
+
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
     let f = await getFolders(newFolderId);
@@ -173,6 +186,46 @@ export default function Main() {
     } else if (data.usage == 'delete') {
       deleteFile(data)
     }
+  }
+
+  const updateFolder = async (data:clickEventProps) => {
+    const folderData = new FormData();
+    folderData.append('id', data.folderId.toString());
+    folderData.append('name', data.folderName);
+    folderData.append('parent_folder', data.parent_folder != null ? data.parent_folder.toString() : "-1");
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
+        credentials : 'include',
+        method : 'PATCH',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : folderData,
+      });
+
+      if(res.ok){
+        const folderData = await res.json();
+        console.log("returned baby",folderData)
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
   }
 
   // handle uploading files
@@ -322,7 +375,7 @@ export default function Main() {
       <GalleryView 
         folders={folders}
         files={files}
-        clickEvent={openFolder}
+        clickEvent={handleFolder}
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
@@ -332,7 +385,7 @@ export default function Main() {
       <ListView 
         folders={folders} 
         files={files} 
-        clickEvent={openFolder}
+        clickEvent={handleFolder}
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}

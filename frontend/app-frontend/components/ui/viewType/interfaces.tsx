@@ -1,3 +1,4 @@
+import { clickEventProps, folderCRUD } from "../folder/folderCRUD";
 import { FileProp } from "../item/fileForm";
 
 export interface Employee{
@@ -36,6 +37,12 @@ export interface Folder {
   subfolders: [];
 }
 
+export interface EditFolder {
+  id: number;
+  foldername: string;
+  parent_folder: number | null | undefined;
+}
+
 export interface File {
   id: string;
   name: string;
@@ -50,7 +57,7 @@ export interface File {
 export interface ViewProps {
   folders : Folder[];
   files : File[];
-  clickEvent : (folderId : number, folderName : string) => void;
+  clickEvent : (data: clickEventProps) => void;
   submitEvent: (data : FileProp) => void;
   loading : boolean;
   sortFileEvent : (sortOption : string, sortOrder : string) => void;

@@ -18,9 +18,9 @@ export default function GalleryView(props : ViewProps){
     <GalleryFolder 
       id={folder.id}
       key={folder.id} 
-      foldername={folder.name} 
+      foldername={folder.name}
       date={folder.date_modified}
-      clickEvent={() => props.clickEvent(folder.id, folder.name)}
+      clickEvent={props.clickEvent}
     />
   ))
 
