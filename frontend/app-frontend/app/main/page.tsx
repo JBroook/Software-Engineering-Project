@@ -92,12 +92,15 @@ export default function Main() {
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
     if (data.usage == "rename") {
-      console.log("Getting renamed ", data)
       updateFolder(data)
     } else if (data.usage == "delete") {
-      console.log("Getting deleted", data)
+      deleteFolder(data)
+    } else if (data.usage == "create"){
+      createFolder(data)
     } else {
-      openFolder(data.folderId, data.folderName)
+      if (data.folderId){
+        openFolder(data.folderId, data.folderName)
+      }
     }
   }
 
@@ -188,16 +191,17 @@ export default function Main() {
     }
   }
 
-  const updateFolder = async (data:clickEventProps) => {
+  const createFolder = async (data:clickEventProps) => {
     const folderData = new FormData();
-    folderData.append('id', data.folderId.toString());
     folderData.append('name', data.folderName);
-    folderData.append('parent_folder', data.parent_folder != null ? data.parent_folder.toString() : "-1");
+    if (data.parent_folder != null){
+      folderData.append('parent_folder', data.parent_folder.toString());
+    }
 
     try{
-      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
+      const res = await fetch(`http://localhost:8000/api/folders/`, {
         credentials : 'include',
-        method : 'PATCH',
+        method : 'POST',
         headers : {
           'X-CSRFToken': getCookie('csrftoken'), //give csrf token
         },
@@ -206,7 +210,6 @@ export default function Main() {
 
       if(res.ok){
         const folderData = await res.json();
-        console.log("returned baby",folderData)
         fetchSFS(SFS);
       }else{
         const errorData = await res.json();
@@ -228,12 +231,82 @@ export default function Main() {
     };
   }
 
+  const updateFolder = async (data:clickEventProps) => {
+    const folderData = new FormData();
+    if (data.folderId != null){
+      folderData.append('id', data.folderId.toString());
+    }
+    folderData.append('name', data.folderName);
+    if (data.parent_folder != null){
+      folderData.append('parent_folder', data.parent_folder.toString());
+    }
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
+        credentials : 'include',
+        method : 'PATCH',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : folderData,
+      });
+
+      if(res.ok){
+        const folderData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+  }
+
+  const deleteFolder = async (data : clickEventProps) => {
+    try{
+      const res = await fetch(`http://localhost:8000/api/folder/${data.folderId}/`, {
+        credentials : 'include',
+        method : 'DELETE',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+        }
+      });
+
+      if(res.ok){
+        const folderData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        throw new Error('Failed to delete file');
+      }
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+    }
+  }
+
   // handle uploading files
   const createFile = async (data : FileProp) => {
     const fileProp: FileProp = {
       usage: "",
       id: data.id ?? 0,
-      parent_folder: data.parent_folder || '',
+      parent_folder: data.parent_folder || null,
       filename: data.filename,
       description: data.description,
       data: data.data,
@@ -241,17 +314,19 @@ export default function Main() {
     }
 
     const formData = new FormData();
+    formData.append('file_id', '-1');
     if (fileProp.data){
       formData.append('data', fileProp.data);
     }
     formData.append('name', fileProp.filename);
-    formData.append('file_id', fileProp.id != null ? String(fileProp.id) : '0');
     formData.append('description', fileProp.description);
-    formData.append('parent_folder', fileProp.parent_folder || "");
+    if (fileProp.parent_folder != null){
+      formData.append('parent_folder', fileProp.parent_folder.toString());
+    }
     formData.append('version', fileProp.version.toString());
 
     try{
-      const res = await fetch('http://localhost:8000/api/files/', {
+      const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
         credentials : 'include',
         method : 'POST',
         headers : {
@@ -284,7 +359,6 @@ export default function Main() {
   }
 
   const updateFile = async (data : FileProp) => {
-    console.log("id: ",data.parent_folder)
     const fileProp: FileProp = {
       usage: "",
       id: data.id ?? 0,

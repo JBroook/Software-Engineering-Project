@@ -138,7 +138,6 @@ class FileVersionSerializer(serializers.ModelSerializer):
 
     # @transaction.atomic
     def create(self, validated_data):
-        print(validated_data)
         user = self.context['request'].user
         if not user.is_authenticated:
             raise serializers.ValidationError("User must be authenticated")
@@ -209,23 +208,32 @@ class FileVersionSerializer(serializers.ModelSerializer):
         return file_vers
 
 class FolderSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M", required=False)
     date_modified = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
+    parent_folder = serializers.PrimaryKeyRelatedField(queryset=Folder.objects.all(), allow_null=True, required=False)
 
     class Meta:
         model = Folder
         fields = ['id', 'name', 'parent_folder', 'date_created', 'date_modified']
 
     def create(self,validated_data):
-        print(validated_data)
+        
+        if validated_data.get('parent_folder'):
+            fetched_parent_folder = validated_data.get('parent_folder')
+        else:
+            fetched_parent_folder = None
+
         folder = Folder.objects.create(
-            name=validated_data.get('name'),
-            parent_folder=validated_data.get('parent_folder')
+            name = validated_data.get('name'),
+            parent_folder = fetched_parent_folder
         )
         return folder
     
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
-        instance.parent_folder = validated_data.get('parent_folder', instance.parent_folder)
+        if validated_data.get('parent_folder'):
+            instance.parent_folder = validated_data.get('parent_folder', instance.parent_folder)
+        else:
+            instance.parent_folder = None
         instance.save()
         return instance

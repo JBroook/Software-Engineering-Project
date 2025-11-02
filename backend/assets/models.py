@@ -6,7 +6,7 @@ class Folder(models.Model):
     name = models.CharField(max_length=100)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, default=None)
 
     def __str__(self):
         return self.name

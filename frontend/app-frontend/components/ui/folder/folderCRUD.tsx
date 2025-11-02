@@ -11,7 +11,7 @@ export interface folderCRUD {
 
 export interface clickEventProps {
     usage : string; 
-    folderId : number; 
+    folderId : number | null; 
     folderName : string;
     parent_folder: number | null | undefined;
 }

@@ -78,13 +78,13 @@ export default function GalleryFolder(props : GalleryFolderProps) {
       'usage': "rename", 
       'folderId': props.id, 
       'folderName': fetched.foldername,
-      'parent_folder': fetched.parent_folder || currentParent,
+      'parent_folder': fetched.parent_folder == -1? null : (fetched.parent_folder || currentParent)
     }
 
     console.log("new File Data:", newFolderData);
     
     try{
-      await props.clickEvent(newFolderData);
+      props.clickEvent(newFolderData);
       setChange(false)
     } catch (err: any){
       if (err.response && err.response.data) {
@@ -123,7 +123,6 @@ export default function GalleryFolder(props : GalleryFolderProps) {
               setCurrentParent(items.parent_folder)
             }
         };
-        console.log(fetchedFolder)
         setAllFolder(fetchedFolder);
   
         setChange(true);
@@ -180,7 +179,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
       
               <HStack>
                 <FaFolder 
-                    color="black"
+                    color={textColor}
                     size={25}/>
                 <Box h="fit-content">
                   <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
@@ -294,7 +293,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
         <Flex justify="space-between" align="center" w={'95%'} onClick={openFolder}>
           <HStack>
             <FaFolder 
-                color="black"
+                color={textColor}
                 size={25}/>
             <Box h="fit-content">
               <Heading fontFamily="var(--font-reddit-mono)">

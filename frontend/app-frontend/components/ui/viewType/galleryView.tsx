@@ -2,18 +2,25 @@ import {
   Heading, HStack, SimpleGrid,
   Separator, Spinner, Flex,
   Spacer,
+  Button,
 } from "@chakra-ui/react"
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
+import { AiFillFolderAdd } from "react-icons/ai";
 import GalleryItem from "@/components/ui/item/galleryItem";
 import GalleryFolder from "@/components/ui/item/galleryFolder";
 import { useColorModeValue } from '../color-mode'
 import {ViewProps} from './interfaces'
 import ContentLoader from "./contentLoader";
 import SortBar from "../searchbar/sortBar";
-
+import FolderCreate from "../folder/folderCreate";
 
 export default function GalleryView(props : ViewProps){
+  const textColor = useColorModeValue('#383838', 'white');
+  const background = useColorModeValue('white', 'black');
+  const basicbg = useColorModeValue('white', '#383838');
+  const buttonbg = useColorModeValue("#9AB3F2", '#335098');
+
   const folderComponents = props.folders.map(folder => (
     <GalleryFolder 
       id={folder.id}
@@ -32,18 +39,18 @@ export default function GalleryView(props : ViewProps){
     {/* Gallery view */}
     {/* Folders */}
     <HStack
-    bg={useColorModeValue("#9AB3F2", '#335098')}
+    bg={buttonbg}
     pl={8}
     pb={3}
     justify="space-between">
       <HStack>
         <FaFolder 
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={25}/>
         <Heading
         fontFamily="var(--font-roboto-condensed)"
         size={"2xl"}
-        color={useColorModeValue("black", 'white')}
+        color={textColor}
         >Folders</Heading>
       </HStack>
 
@@ -52,6 +59,7 @@ export default function GalleryView(props : ViewProps){
         { label : "Last modified", value : "date_modified"}]}/>
     </ HStack>
     
+    
     {folderComponents.length>=3 ?
       <SimpleGrid 
       w="100%" 
@@ -59,8 +67,9 @@ export default function GalleryView(props : ViewProps){
       gap="6px" 
       px={8} 
       pb={10} 
-      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      bg={buttonbg} 
       >
+        <FolderCreate clickEvent={props.clickEvent} />
         <ContentLoader 
           loading={props.loading}
           color="white"
@@ -73,8 +82,9 @@ export default function GalleryView(props : ViewProps){
       gap="6px" 
       px={8} 
       pb={10} 
-      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      bg={buttonbg} 
       >
+        <FolderCreate clickEvent={props.clickEvent} />
         <ContentLoader 
           loading={props.loading}
           color="white"
@@ -87,7 +97,7 @@ export default function GalleryView(props : ViewProps){
 
     {/* Files */}
     <Flex
-      bg={useColorModeValue("white", '#0D1835')}
+      bg={background}
       justify="space-between"
       w="100%">
 
@@ -97,11 +107,11 @@ export default function GalleryView(props : ViewProps){
       pt={5}
       >
         <FaFile 
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={22}/>
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={"2xl"}
           >Files</Heading>
       </ HStack>
@@ -120,7 +130,7 @@ export default function GalleryView(props : ViewProps){
       gap="6" 
       px={8} 
       pb={20} 
-      bg={useColorModeValue("white", '#0D1835')}
+      bg={background}
       >
         <ContentLoader 
           loading={props.loading}
@@ -136,7 +146,7 @@ export default function GalleryView(props : ViewProps){
       gap="6" 
       px={8} 
       pb={20} 
-      bg={useColorModeValue("white", '#0D1835')}
+      bg={basicbg}
       >
         <ContentLoader 
           loading={props.loading}
