@@ -166,6 +166,17 @@ class FolderViewSet(ModelViewSet):
             queryset = queryset.order_by(sort_order+sort_method)
         
         return queryset
+    
+    def perform_destroy(self, instance):
+        print(instance)
+        print("deleting data")
+        instance = Folder.objects.get(id=instance.id)
+        instance.delete()
+        return Response(
+            {"message": "Delete successful"},
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
 
 class FileViewSet(ModelViewSet):
     permission_classes = [AssetPermission]

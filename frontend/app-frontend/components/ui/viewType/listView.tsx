@@ -12,14 +12,16 @@ import { useColorModeValue } from '../color-mode'
 import SortBar from "../searchbar/sortBar";
 import {ViewProps} from "./interfaces"
 import ContentLoader from "./contentLoader";
+import FolderCreate from "../folder/folderCreate";
 
 export default function ListView(props : ViewProps){
   const folderComponents = props.folders.map(folder => (
       <ListFolder 
+        id={folder.id}
         key={folder.id} 
         foldername={folder.name} 
         date={folder.date_modified}
-        clickEvent={() => props.clickEvent(folder.id, folder.name)}
+        clickEvent={props.clickEvent}
       />
     ))
   
@@ -63,6 +65,8 @@ export default function ListView(props : ViewProps){
     bg={useColorModeValue("#9AB3F2", '#335098')}
     pl={8}
     pb={3}>
+      
+      <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
       <ContentLoader 
         loading={props.loading}
         color="white"

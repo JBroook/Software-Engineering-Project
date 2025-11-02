@@ -1,0 +1,216 @@
+import { createListCollection, useFileUpload, useFileUploadContext, FileUpload, Float, Dialog, Button, Portal, Flex, Heading, Field, Badge, Select, Stack, Span, Input, CloseButton } from "@chakra-ui/react";
+import { useState } from "react";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { AiFillFileAdd, AiFillFolderAdd } from "react-icons/ai";
+import { FaFile } from "react-icons/fa";
+import { LuX } from "react-icons/lu";
+import { useColorModeValue } from "../color-mode";
+import { FileProp, fetchFolders } from "../item/fileForm";
+import { clickEventProps } from "./folderCRUD";
+
+interface folderCRUD {
+  id: number;
+  name: string;
+  clickEvent:(data:clickEventProps) => void ;
+}
+
+export const createFolder = async () => {
+  const res = await fetch(`http://localhost:8000/api/folders/`, {
+  credentials: 'include',
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch file details');
+  }
+  let folders = await res.json();
+  return folders
+}
+
+export const getFolderDetails = async (currentID: number) => {
+  const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${currentID}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch file details');
+  }
+
+  const data = await res.json();
+
+  // If API returns a single object, wrap it in an array
+  return Array.isArray(data) ? data : [data];
+}
+
+export type FolderItem = {
+  value : number;
+  label: string;
+  description : Promise<string>;
+}
+
+export default function FolderCreate(props: folderCRUD) {
+  const textColor = useColorModeValue('black', 'white');
+  const basicbg = useColorModeValue('white', 'black');
+  const contentbg = useColorModeValue('#F5F5F5', '#383838');
+  const addbuttonbg = useColorModeValue("#335098", '#9AB3F2');
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentParent, setCurrentParent] = useState<number|null>();
+  const {control, register, handleSubmit, setError, formState: {errors}} = useForm<clickEventProps>({
+    defaultValues: {
+      parent_folder: null,
+    }
+  });
+
+  console.log("Current Folder id: ", props.id)
+  console.log("Current Folder name: ", props.name)
+
+  const handleOpenDialog = async () => {
+    try{
+      const all_folder = await getFolderDetails(props.id);
+      console.log(all_folder)
+      for (const items of all_folder) {
+        setCurrentParent(items.id);
+      };
+      console.log("Current Parent: ", currentParent)
+      console.log("Current Parent Name: ", props.name)
+
+      setIsOpen(true);
+    } catch (error) {
+      console.error('Error fetching file details:', error);
+    } 
+  }
+
+  const onSubmit: SubmitHandler<clickEventProps> = async (fetched) =>{
+      const newFolderData = {
+        'usage': "create",
+        'folderId': null,
+        'folderName': fetched.folderName,
+        'parent_folder': props.id != -1 ? props.id : null,
+      }
+  
+      console.log("new File Data:", newFolderData);
+      
+      try{
+        props.clickEvent(newFolderData);
+        setIsOpen(false);
+      } catch (err: any){
+        if (err.response && err.response.data) {
+          const backendErrors = err.response.data;
+  
+          Object.keys(backendErrors).forEach((field) => {
+            const message = Array.isArray(backendErrors[field])
+              ? backendErrors[field][0]
+              : backendErrors[field];
+            setError(field as keyof clickEventProps, { type: "server", message });
+          });
+        } else {
+          // fallback error handling
+          setError("root", { type: "server", message: "An unexpected error occurred." });
+        }
+      };
+    };
+
+  return (
+    <>
+    <Dialog.Root 
+      size="cover" 
+      placement="center"
+      open={isOpen}
+      onOpenChange={(v) => setIsOpen(v.open)}
+      trapFocus={true}
+    >
+      <Dialog.Trigger asChild>
+        <Button 
+          w="100%"
+          maxW="400px" 
+          h='70px'
+          borderRadius={"xl"}
+          bg={addbuttonbg}
+          onClick={handleOpenDialog}
+          >
+          <AiFillFolderAdd size={25} color={basicbg}/>
+        </Button>
+      </Dialog.Trigger>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner justifyContent="center" alignItems="center">
+          <Dialog.Content w="25vw" minW="300px" p={4} maxH="70vh">
+
+            <Dialog.Header mt={5}>
+              <Dialog.Title 
+                w="100%">
+                <Flex w="100%" justify="center" align='center' mb={3} color={useColorModeValue("black", "white")}>
+                  <FaFile />
+                  <Heading fontFamily="var(--font-roboto-condensed)">Create Folder</Heading>
+                </Flex>
+              </Dialog.Title>
+            </Dialog.Header>
+
+            <Dialog.Body w="100%" mt={6}>
+              <Flex color={useColorModeValue('black', 'white')} align={'center'} justify={'center'} grow={1}>
+                <form onSubmit={(e) => {
+                    handleSubmit(onSubmit)(e);
+                  }}>
+                <Flex direction={'column'} mb={8}>
+                    
+                  <Field.Root key={1} mb={4} disabled>
+                    <Field.Label>
+                      Parent Folder
+                    </Field.Label> 
+
+                    {props.id != -1 ? (
+                      <Input placeholder={props.name} />
+                    ):(
+                      <Input placeholder="All Files" />
+                    )}
+                  </Field.Root>
+                  
+                  <Field.Root key={0} mb={4} invalid={!!errors['folderName']}>
+                    <Field.Label>
+                      Folder Name
+                      <Field.RequiredIndicator />
+                    </Field.Label>
+                    <Input
+                      p={2}
+                      {...register('folderName', {required : "Folder Name is required"})}
+                      placeholder="A sample name"
+                    />
+                    {/* <Field.HelperText /> */}
+                    <Field.ErrorText> 
+                      {errors['folderName']?.message}
+                    </Field.ErrorText>
+                  </Field.Root>
+                </Flex>
+  
+                <Flex w="100%" justify="center" mt={6} mb={8} gap={5}>
+                  <Button type="submit" as={'button'}
+                  bg={useColorModeValue("#9AB3F2", '#335098')} 
+                  _hover={{bg : "#8aa0d7ff"}}
+                  px={3}
+                  >
+                    Confirm
+                  </Button>
+  
+                  <Dialog.ActionTrigger asChild>
+                    <Button 
+                    bg={useColorModeValue("#9AB3F2", '#335098')} 
+                    _hover={{bg : "#8aa0d7ff"}}
+                    px={3}
+                    >Cancel</Button>
+                  </Dialog.ActionTrigger>
+                </Flex>
+                </form>
+              </Flex>
+            </Dialog.Body>
+
+            <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
+              <CloseButton 
+                bg={contentbg}
+                color={textColor} 
+                size="sm" />
+            </Dialog.CloseTrigger>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+    </>
+  )
+}

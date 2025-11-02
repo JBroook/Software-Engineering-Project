@@ -63,7 +63,7 @@ export const getFolderDetails = async (currentID: number) => {
 
 type FileFormChildfulProps = React.PropsWithChildren<FileFormProps>;
 
-type FolderItem = {
+export type FolderItem = {
   value : number;
   label: string;
   description : Promise<string>;
@@ -71,7 +71,6 @@ type FolderItem = {
 
 export default function FileForm(props: FileFormChildfulProps) {
   const textColor = useColorModeValue('black', 'white');
-  const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#F5F5F5', '#383838');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -84,7 +83,6 @@ export default function FileForm(props: FileFormChildfulProps) {
   });
   
   let folderframeworks = createListCollection({items: allFolder});
-  console.log(folderframeworks)
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -122,7 +120,6 @@ export default function FileForm(props: FileFormChildfulProps) {
           }
           )
       };
-      console.log(fetchedFolder)
       setAllFolder(fetchedFolder);
 
       setIsOpen(true);
@@ -166,7 +163,7 @@ export default function FileForm(props: FileFormChildfulProps) {
 
     const newFileData: FileProp = {
       usage: "create",
-      id: -1,
+      id: null,
       filename: fetched.filename,
       description: fetched.description,
       parent_folder: fetched.parent_folder,
@@ -204,8 +201,8 @@ export default function FileForm(props: FileFormChildfulProps) {
     <>
     <Dialog.Root open={isOpen} onOpenChange={(v) => setIsOpen(v.open)}>
       <Dialog.Trigger asChild>
-        <Button bg={useColorModeValue("#335098", '#9AB3F2')} onClick={handleOpenDialog}>
-          <AiFillFileAdd />
+        <Button bg={useColorModeValue("#335098", '#9AB3F2')} color={contentbg} onClick={handleOpenDialog}>
+          <AiFillFileAdd color={contentbg}/>
           Create File
         </Button>
       </Dialog.Trigger>
@@ -227,7 +224,6 @@ export default function FileForm(props: FileFormChildfulProps) {
             <Dialog.Body w="100%">
               <Flex color={useColorModeValue('black', 'white')} align={'center'} justify={'center'} grow={1}>
                 <form onSubmit={(e) => {
-                    console.log("Form submit event triggered"); // Debug log
                     handleSubmit(onSubmit)(e);
                   }}>
                 <Flex direction={'column'} mb={8}>

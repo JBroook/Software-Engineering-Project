@@ -15,6 +15,6 @@ export default function ContentLoader(props : ContentLoaderProps) {
     }else if(props.content.length>0){
         return <>{props.content}</>;
     }else{
-        return <Flex justify="center" w="100%"><Text color={props.color}>No content found.</Text></Flex>;
+        return <Flex justify="center"><Text color={props.color}>No content found.</Text></Flex>;
     }
 }
