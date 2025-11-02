@@ -296,7 +296,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                 color={textColor}
                 size={25}/>
             <Box h="fit-content">
-              <Heading fontFamily="var(--font-reddit-mono)">
+              <Heading fontFamily="var(--font-reddit-mono)" truncate maxWidth="280px">
                 {props.foldername}
               </Heading>
               <Text fontFamily="var(--font-roboto)">

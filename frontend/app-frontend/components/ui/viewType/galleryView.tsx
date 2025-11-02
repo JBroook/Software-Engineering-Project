@@ -19,6 +19,7 @@ export default function GalleryView(props : ViewProps){
   const textColor = useColorModeValue('#383838', 'white');
   const background = useColorModeValue('white', 'black');
   const basicbg = useColorModeValue('white', '#383838');
+  const filebg = useColorModeValue('white', '#0D1835');
   const buttonbg = useColorModeValue("#9AB3F2", '#335098');
 
   const folderComponents = props.folders.map(folder => (
@@ -97,7 +98,7 @@ export default function GalleryView(props : ViewProps){
 
     {/* Files */}
     <Flex
-      bg={background}
+      bg={filebg}
       justify="space-between"
       w="100%">
 
@@ -130,7 +131,7 @@ export default function GalleryView(props : ViewProps){
       gap="6" 
       px={8} 
       pb={20} 
-      bg={background}
+      bg={filebg}
       >
         <ContentLoader 
           loading={props.loading}
@@ -146,7 +147,7 @@ export default function GalleryView(props : ViewProps){
       gap="6" 
       px={8} 
       pb={20} 
-      bg={basicbg}
+      bg={filebg}
       >
         <ContentLoader 
           loading={props.loading}

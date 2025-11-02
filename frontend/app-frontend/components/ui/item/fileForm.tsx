@@ -201,8 +201,8 @@ export default function FileForm(props: FileFormChildfulProps) {
     <>
     <Dialog.Root open={isOpen} onOpenChange={(v) => setIsOpen(v.open)}>
       <Dialog.Trigger asChild>
-        <Button bg={useColorModeValue("#335098", '#9AB3F2')} onClick={handleOpenDialog}>
-          <AiFillFileAdd />
+        <Button bg={useColorModeValue("#335098", '#9AB3F2')} color={contentbg} onClick={handleOpenDialog}>
+          <AiFillFileAdd color={contentbg}/>
           Create File
         </Button>
       </Dialog.Trigger>

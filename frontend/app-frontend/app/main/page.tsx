@@ -276,7 +276,7 @@ export default function Main() {
 
   const deleteFolder = async (data : clickEventProps) => {
     try{
-      const res = await fetch(`http://localhost:8000/api/folder/${data.folderId}/`, {
+      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
         credentials : 'include',
         method : 'DELETE',
         headers : {
@@ -286,7 +286,6 @@ export default function Main() {
       });
 
       if(res.ok){
-        const folderData = await res.json();
         fetchSFS(SFS);
       }else{
         throw new Error('Failed to delete file');
