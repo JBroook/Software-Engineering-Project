@@ -4,14 +4,15 @@ import {
 } from "@chakra-ui/react"
 import { IoFilter } from "react-icons/io5";
 import { useColorModeValue } from "../color-mode";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MiniPopover from "./miniPopover";
-
 
 interface FilterOptionsProps {
     iconTextColor : string;
     mediaTypeEvent : (mediaTypes : string[]) => void;
     fileExtensionEvent : (fileExtensions : string[]) => void;
+    tagEvent : (tags : string[]) => void;
+    tags : string[];
 }
 
 
@@ -26,6 +27,12 @@ export default function FilterOptions(props : FilterOptionsProps){
     const handleExtensionClick = (newExtensions : string[]) => {
         setExtensionTypes(newExtensions);
         props.fileExtensionEvent(newExtensions);
+    }
+
+    const [tags, setTags] = useState<string[]>([]);
+    const handleTagClick = (newTags : string[]) => {
+        setTags(newTags);
+        props.tagEvent(newTags);
     }
 
     return (<>
@@ -70,6 +77,16 @@ export default function FilterOptions(props : FilterOptionsProps){
                             {label : 'mp3', value : 'mp3'},
                             {label : 'mp4', value : 'mp4'},
                         ]}
+                    />
+
+                    {/* Tag-based filtering */}
+                    <MiniPopover 
+                        iconTextColor={props.iconTextColor}
+                        clickEvent={handleTagClick}
+                        label="Tags"
+                        options={props.tags.map((tag:string)=> {
+                            return {label : tag, value : tag};
+                        })}
                     />
                 </Stack>
 

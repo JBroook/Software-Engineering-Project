@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Flex, Heading,
     Box, Text, HStack, IconButton,
     Center, Image,
@@ -8,23 +8,68 @@ import { Flex, Heading,
     Spacer,
     Tabs,
     Portal,
-    Tooltip
+    Tooltip,
+    GridItem,
+    Button
 } from '@chakra-ui/react'
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
-import { useColorModeValue } from '../color-mode'
+import { useColorModeValue } from '../color-mode';
+import { Version, ViewItemProps } from '../viewType/interfaces';
+import DeleteFile from './fileDelete';
+import UpdateFile from './fileUpdate';
 
-interface ListItemProps {
-  filename: string;
-  image: string;
-  date: string;
-  size: number;
+const getFileDetails = async (currentID: number):Promise<Version[]> => {
+  const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch file details');
+  }
+
+  const data = await res.json();
+  console.log(data)
+
+  // If API returns a single object, wrap it in an array
+  return Array.isArray(data) ? data : [data];
 }
 
-export default function ListItem(props : ListItemProps) {
+function formatBytes (bytes: number,decimals: number) {
+  if(bytes == 0) return '0 Bytes';
+  var k = 1024,
+      dm = decimals || 2,
+      sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+      i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+export default function ListItem(props : ViewItemProps) {
+  const textColor = useColorModeValue('black', 'white');
+  const basicbg = useColorModeValue('white', 'black');
+  const contentbg = useColorModeValue('#F5F5F5', '#383838');
+  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const buttonbg = useColorModeValue("#79EB99", '#5BB975');
+  const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
+
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState("v1");
+  const [selectedVersion, setSelectedVersion] = useState("0");
+  const [versions, setVersions] = useState<Version[] | null>(); // Store fetched data
+  const [loading, setLoading] = useState(false);
+
+  const handleOpenDialog = async () => {
+    setLoading(true);
+    try {
+      const data = await getFileDetails(props.id);
+      setVersions(data);
+      setSelectedVersion(data[0]?.version?.toString() || '1');
+      setIsOpen(true);
+    } catch (error) {
+      console.error('Error fetching file details:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
   
   return (
     <>
@@ -32,7 +77,7 @@ export default function ListItem(props : ListItemProps) {
       size="cover" 
       placement="center"
       open={isOpen}
-      onOpenChange={(details) => setIsOpen(details.open)}
+      onOpenChange={(v) => setIsOpen(v.open)}
       trapFocus={true}
       >
         <Tooltip.Root positioning={{ placement: "top" }}>
@@ -48,7 +93,7 @@ export default function ListItem(props : ListItemProps) {
               cursor="pointer"
               _hover={{ bg: useColorModeValue("gray.200", "#2a2a2a") }}
               boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
-              onClick={() => setIsOpen(true)} // Manually open dialog
+              onClick={handleOpenDialog} // Manually open dialog
               role="button"
             >
                 <Flex justify="space-between" align="center">
@@ -60,8 +105,8 @@ export default function ListItem(props : ListItemProps) {
                       <Heading fontFamily="var(--font-reddit-mono)">
                         {props.filename}
                       </Heading>
-                      <Text fontFamily="var(--font-roboto)">
-                        file type
+                      <Text fontFamily="var(--font-roboto)" justifySelf={'left'} pl={4}>
+                        {props.filetype}
                       </Text>
                     </Box>
                   </HStack>
@@ -76,7 +121,7 @@ export default function ListItem(props : ListItemProps) {
                     </Flex>
 
                     <Flex mx={2} w="60px" justify="center">
-                      <Text>{props.size}</Text>
+                      <Text>{props.created_by.username}</Text>
                     </Flex>
 
                     <SlOptionsVertical/>
@@ -124,152 +169,187 @@ export default function ListItem(props : ListItemProps) {
             borderColor={useColorModeValue('#D9D9D9','#999999')}
             boxShadow="lg"
           >
+            {isOpen && versions && !loading ? (
+            <>
             <Dialog.Header>
-              <Dialog.Title 
-              color={useColorModeValue('black','white')}
-              fontSize="xl" 
-              fontWeight="bold"
-              mb={4}>
-                Test Dialog
+              <Dialog.Title
+                color={textColor}
+                fontSize="xl"
+                fontWeight="bold"
+                mb={4}>
+                {versions.find((v) => v.version.toString() === selectedVersion.toString())?.name}
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body spaceY={4}>
-            <Flex direction={"row"}>
-              <Flex 
-              w={"50vw"}
-              h={"80vh"}
-              p={2}
-              align={'center'}
-              justify={'center'}
-              rounded={'md'}
-              bg={useColorModeValue('#D9D9D9','#383838')}
-              overflow={'hidden'}>
-                <Center>
-                  {props.image ? (
-                    <Image src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
-                  ) : (
-                    <Box>No logo uploaded</Box>
-                  )}
-                </Center>
-              </Flex>
-              
-              <Spacer />
+            
+              <Flex direction={"row"}>
+                <Flex
+                  w={"50vw"}
+                  h={"80vh"}
+                  p={2}
+                  align={'center'}
+                  justify={'center'}
+                  rounded={'md'}
+                  bg={contentbg}
+                  overflow={'hidden'}>
+                  <Center>
+                    {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
+                      <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
+                    ) : (
+                      <Box>No logo uploaded</Box>
+                    )}
+                  </Center>
+                </Flex>
 
-              <Flex
-              w={"35vw"}
-              h={"80vh"}
-              direction={'column'}
-              bg={useColorModeValue('white','black')}>
+                <Spacer />
 
-                {/* File Version */}
-                <Flex w={"100%"}>
-                  <Tabs.Root 
+                <Flex
+                  w={"35vw"}
+                  h={"80vh"}
+                  direction={'column'}
+                  bg={basicbg}>
+
+                  {/* File Version */}
+                  <Tabs.Root
                     w={"100%"}
-                  variant="enclosed" 
-                  fitted 
-                  defaultValue={"v1"}
-                  value={selectedVersion}
-                  onValueChange={(v) => setSelectedVersion(v.value)}>
-                    <Tabs.List bg={useColorModeValue('#D9D9D9','#383838')}>
-                      <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v1">Version 1</Tabs.Trigger>
-                      <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v2">Version 2</Tabs.Trigger>
-                      <Tabs.Trigger color={useColorModeValue('#383838','#D9D9D')} value="v3">Version 3</Tabs.Trigger>
+                    variant="enclosed"
+                    fitted
+                    defaultValue={versions[0].version.toString()}
+                    value={selectedVersion}
+                    onValueChange={(v) => setSelectedVersion(v.value)}>
+                    <Tabs.List bg={contentbg}>
+                      {versions.map((versions: any) => (
+                        <Tabs.Trigger 
+                        key={versions.version}
+                        color={contentbg2} 
+                        value={versions.version.toString()}>
+                          Version {versions.version.toString()}
+                        </Tabs.Trigger>
+                      ))}
                     </Tabs.List>
+
+                    {versions.map((version: any) => (
+                      <Tabs.Content key={version.version.toString()} value={version.version.toString()}>
+                        {/* File Details */}
+                        <Flex
+                          w={'90%'}
+                          h={'68vh'}
+                          m={8}
+                          mb={6}
+                          direction={'column'}
+                          color={textColor}>
+
+                          <Flex h={'35%'} direction={'column'}>
+                            <Grid w={'100%'} h={'25%'} templateColumns="repeat(5, 1fr)" gap={4}>
+                              <GridItem colSpan={2}>
+                                <Text h={'30%'}>File Name:</Text>
+                              </GridItem>
+                              <GridItem colSpan={3}>
+                                <Text h={'30%'}>{version.name}</Text>
+                              </GridItem>
+                            </Grid>
+                            <Flex direction={'column'} h={'100%'}>
+                                <Text h={'20%'}>Description:</Text>
+                                <Text h={'70%'} bg={contentbg} rounded={6} p={4}>{version.description}</Text>
+                            </Flex>
+                          </Flex>
+
+                          <Spacer />
+
+                          <Flex h={'15%'}>
+                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
+                              <GridItem colSpan={2}>
+                                <Text h={'50%'}>File Type:</Text>
+                                <Text h={'50%'}>File Size:</Text>
+                              </GridItem>
+                              <GridItem colSpan={3}>
+                                <Text h={'50%'}>{version.filetype}</Text>
+                                <Text h={'50%'}>{formatBytes(version.size,2)}</Text>
+                              </GridItem>
+                            </Grid>
+                          </Flex>
+
+                          <Spacer />
+
+                          {/* File Created / Modified */}
+                          <Flex h={'15%'}>
+                            <Grid w={'100%'} templateColumns="repeat(5, 1fr)" gap={4}>
+                              {version.version == 1 ? (
+                                <>
+                                <GridItem colSpan={2}>
+                                  <Text h={'50%'}>Created On:</Text>
+                                  <Text h={'50%'}>Modified By:</Text>
+                                </GridItem>
+                                <GridItem colSpan={3}>
+                                  <Text h={'50%'}>{version.date_created}</Text>
+                                  <Text h={'50%'}>{version.employee.username}</Text>
+                                </GridItem>
+                                </>
+                              ) : (
+                                <>
+                                <GridItem colSpan={2}>
+                                  <Text h={'50%'}>Last Modified:</Text>
+                                  <Text h={'50%'}>Modified By:</Text>
+                                </GridItem>
+                                <GridItem colSpan={3}>
+                                  <Text h={'50%'}>{version.date_created}</Text>
+                                  <Text h={'50%'}>{version.employee.username}</Text>
+                                </GridItem>
+                                </>
+                              )}
+                            </Grid>
+                          </Flex>
+
+                          <Spacer />
+
+                          {/* Shared Tags */}
+                          <Flex w={'100%'} h={'25%'} direction={'column'}>
+                            <Text h={'20%'}>Tags:</Text>
+                            <Box
+                              w={'100%'}
+                              h={'70%'}
+                              p={4}
+                              rounded={6}
+                              bg={contentbg}>
+                              This Holds all tags that are able to view / edit
+                            </Box>
+                          </Flex>
+
+                          <Spacer />
+                          
+                          <Flex w={'full'} justify={'space-between'}>
+                            <Button bg={buttonbg} w={'48%'}>
+                              Download
+                            </Button>
+                            <Flex w={'45%'} justify={'space-between'}>
+                              <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
+                                <Button bg={buttonbg2} w={'48%'}>
+                                  Edit
+                                </Button>
+                              </UpdateFile>
+                              <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                            </Flex>
+                          </Flex>
+                        </Flex>
+                      </Tabs.Content>
+                    ))}
                   </Tabs.Root>
-                </Flex>
-
-                {/* File Details */}
-                <Flex 
-                w={'90%'} 
-                h={'100%'} 
-                m={8}
-                mb={6}
-                direction={'column'} 
-                justify={'space-between'}
-                color={useColorModeValue("black", 'white')}>
-
-                  <Flex w={'100%'} justify={'space-between'}>
-                    <Grid templateColumns="repeat(2, 1fr)" gap="4">
-                      { props.filename ? (
-                        <>
-                          <Text>File Name:</Text>
-                          <Text>{props.filename}</Text>
-                          
-                          <Text>File Type:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-
-                          <Text>File Size:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                        </>
-                      ):(
-                        <>
-                          <Text>File Name:</Text>
-                          <Text>Name Not Found</Text>
-                          
-                          <Text>File Type:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-
-                          <Text>File Size:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                        </>
-                        )}
-
-                      <Text></Text>
-                    </Grid>
-                  </Flex>
-
-                  {/* File Created / Modified */}
-                  <Flex w={'100%'}>
-                    <Grid templateColumns="repeat(2, 1fr)" gap="4">
-                      { props.filename ? (
-                        <>
-                          <Text>Created On:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                          
-                          <Text>Last Modified:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-
-                          <Text>Modified By:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                        </>
-                      ):(
-                        <>
-                          <Text>Created On:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                          
-                          <Text>Last Modified:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-
-                          <Text>Modified By:</Text>
-                          <Text>REMEMBER TO Change this</Text>
-                        </>
-                        )}
-                    </Grid>
-                  </Flex>
-                  
-                  {/* Shared Tags */}
-                  <Flex w={'100%'} h={'30%'} direction={'column'}>
-                    <Text>Tags:</Text>
-                    <Box 
-                    w={'100%'} 
-                    h={'100%'} 
-                    mt={4}
-                    p={4}
-                    bg={useColorModeValue('#D9D9D9','#383838')}>
-                      This Holds all tags that are able to view / edit 
-                    </Box>
-                  </Flex>
 
                 </Flex>
               </Flex>
-            </Flex>
             </Dialog.Body>
             <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
-              <CloseButton 
-                bg={useColorModeValue("white", '#383838')}
-                color={useColorModeValue("black", 'white')} 
+              <CloseButton
+                bg={contentbg}
+                color={textColor}
                 size="sm" />
             </Dialog.CloseTrigger>
+            </>
+            ) : (
+              <Center h="100%">
+                <Text>{loading ? 'Loading...' : 'No data available'}</Text>
+              </Center>
+            )}
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>

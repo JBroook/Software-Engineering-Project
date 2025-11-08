@@ -1,22 +1,37 @@
 'use client'
-import Searchbar from "@/components/ui/searchbar/searchbar";
-import { useColorModeValue } from "@/components/ui/color-mode";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { 
-  Box, Heading, Image, Grid,
-  GridItem, HStack, Flex, SimpleGrid,
-  Stack, IconButton, Input, Popover,
-  Text, Checkbox
+  Box, Heading,
+  HStack, Flex, IconButton,
+  Button
 } from "@chakra-ui/react"
+
+// Icons
 import { IoIosArrowBack } from "react-icons/io";
 import { IoSearchCircleOutline } from "react-icons/io5";
 import { RiGalleryView2 } from "react-icons/ri";
 import { IoIosList } from "react-icons/io";
-import { useEffect, useState } from "react";
+
+// UI Components
+import Searchbar from "@/components/ui/searchbar/searchbar";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import GalleryView from "@/components/ui/viewType/galleryView";
 import ListView from "@/components/ui/viewType/listView";
-import { Folder, File } from "@/components/ui/viewType/interfaces";
+import { Folder, File, EditFolder } from "@/components/ui/viewType/interfaces";
 import FilterOptions from "@/components/ui/searchbar/filterOptions";
-import { useRouter } from "next/navigation";
+import { TagType } from "@/components/ui/tags/tagForm";
+import UserForm from "@/components/ui/user/userForm";
+import FileForm, { FileProp, getFolderDetails } from "@/components/ui/item/fileForm";
+import { AiFillFileAdd } from "react-icons/ai";
+import { clickEventProps } from "@/components/ui/folder/folderCRUD";
+
+function getCookie(name:string) {
+  const value = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return value ? decodeURIComponent(value.split('=')[1]) : "";
+}
 
 const getFolders = async (parentFolder : number) => {
   const res = await fetch(`http://localhost:8000/api/folders/?parent_folder=${parentFolder}`, {
@@ -34,20 +49,31 @@ const getFiles = async (currentParent: number) => {
   return data;
 };
 
+const getTags = async () => {
+  const res = await fetch(`http://localhost:8000/api/tagtypes`, {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  const filteredTagTypes = data.map((item : TagType)=>item.name)
+  return filteredTagTypes;
+};
+
 type SFSParams = {
   searchKeyword : string;
   mediaType : string[];
   fileExtension : string[];
   sortMethod : string;
   sortOrder : string;
+  tagType : string[];
 }
 
 const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   mediaType : [],
   fileExtension : [],
-  sortMethod : "",
-  sortOrder : "asc"
+  sortMethod : "name",
+  sortOrder : "asc",
+  tagType : []
 }
 
 export default function Main() {
@@ -55,12 +81,30 @@ export default function Main() {
   //folders and files are the actual array of items
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [tagTypes, setTagTypes] = useState<string[]>([]);
 
   const [currentParent, setCurrentParent] = useState<number>(-1);
   const [folderChain, setFolderChain] = useState<number[]>([]);
   const [nameChain, setNameChain] = useState<string[]>(["All files"]);
   // SFS=Search Filter Sort, controls the search filter sort params
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
+
+  const [currentFoldername, setCurrentFolderName] = useState<string>("All files");
+  
+  // handle folder functions when clicked
+  const handleFolder = (data:clickEventProps) => {
+    if (data.usage == "rename") {
+      updateFolder(data)
+    } else if (data.usage == "delete") {
+      deleteFolder(data)
+    } else if (data.usage == "create"){
+      createFolder(data)
+    } else {
+      if (data.folderId){
+        openFolder(data.folderId, data.folderName)
+      }
+    }
+  }
 
   // handles entering a folder when it is clicked
   const openFolder = async (newFolderId: number, newFolderName: string) => {
@@ -73,6 +117,7 @@ export default function Main() {
     const fChain = [...folderChain, currentParent]
     setFolderChain(fChain);
     setCurrentParent(newFolderId);
+    setCurrentFolderName(newFolderName);
 
     const nChain = [...nameChain, newFolderName]
     setNameChain(nChain);
@@ -95,7 +140,14 @@ export default function Main() {
     setFolderChain(fChain);
     const nChain = [...nameChain];
     nChain.pop();
+    const lastFolderName = nChain.at(-1);
     setNameChain(nChain);
+    console.log(lastFolderName)
+    console.log(nChain)
+    
+    if(lastFolderName!==undefined){
+      setCurrentFolderName(lastFolderName)
+    }
   }
 
   // check if user is logged in, else return to login page
@@ -118,6 +170,10 @@ export default function Main() {
       f = await getFiles(currentParent);
       setFiles(f);
 
+      // fetch all tag types
+      f = await getTags();
+      setTagTypes(f)
+
       setLoading(false);
     }
 
@@ -129,9 +185,270 @@ export default function Main() {
     const newSFS = {...SFS};
     newSFS.sortMethod = sortMethod;
     newSFS.sortOrder = sortOrder;
+    console.log(sortMethod)
     setSFS(newSFS)
 
     fetchSFS(newSFS)
+  }
+  
+  const handleFileCRUD = async (data: FileProp) => {
+    if (data.usage == "create") {
+      createFile(data)
+    } else if (data.usage == "update") {
+      updateFile(data)
+    } else if (data.usage == 'delete') {
+      deleteFile(data)
+    }
+  }
+
+  const createFolder = async (data:clickEventProps) => {
+    const folderData = new FormData();
+    folderData.append('name', data.folderName);
+    if (data.parent_folder != null){
+      folderData.append('parent_folder', data.parent_folder.toString());
+    }
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/folders/`, {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : folderData,
+      });
+
+      if(res.ok){
+        const folderData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+  }
+
+  const updateFolder = async (data:clickEventProps) => {
+    const folderData = new FormData();
+    if (data.folderId != null){
+      folderData.append('id', data.folderId.toString());
+    }
+    folderData.append('name', data.folderName);
+    if (data.parent_folder != null){
+      folderData.append('parent_folder', data.parent_folder.toString());
+    }
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
+        credentials : 'include',
+        method : 'PATCH',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : folderData,
+      });
+
+      if(res.ok){
+        const folderData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+  }
+
+  const deleteFolder = async (data : clickEventProps) => {
+    try{
+      const res = await fetch(`http://localhost:8000/api/folders/${data.folderId}/`, {
+        credentials : 'include',
+        method : 'DELETE',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+        }
+      });
+
+      if(res.ok){
+        fetchSFS(SFS);
+      }else{
+        throw new Error('Failed to delete file');
+      }
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+    }
+  }
+
+  // handle uploading files
+  const createFile = async (data : FileProp) => {
+    const fileProp: FileProp = {
+      usage: "",
+      id: data.id ?? 0,
+      parent_folder: data.parent_folder || null,
+      filename: data.filename,
+      description: data.description,
+      data: data.data,
+      version: data.version,
+    }
+
+    const formData = new FormData();
+    formData.append('file_id', '-1');
+    if (fileProp.data){
+      formData.append('data', fileProp.data);
+    }
+    formData.append('name', fileProp.filename);
+    formData.append('description', fileProp.description);
+    if (fileProp.parent_folder != null){
+      formData.append('parent_folder', fileProp.parent_folder.toString());
+    }
+    formData.append('version', fileProp.version.toString());
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : formData,
+      });
+
+      if(res.ok){
+        const fileData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+  }
+
+  const updateFile = async (data : FileProp) => {
+    const fileProp: FileProp = {
+      usage: "",
+      id: data.id ?? 0,
+      parent_folder: data.parent_folder || '',
+      filename: data.filename,
+      description: data.description,
+      data: data.data,
+      version: data.version,
+    }
+
+    const formData = new FormData();
+    if (fileProp.data){
+      formData.append('data', fileProp.data);
+    }
+    formData.append('name', fileProp.filename);
+    formData.append('file_id', fileProp.id != null ? String(fileProp.id) : '0');
+    formData.append('description', fileProp.description);
+    formData.append('parent_folder', fileProp.parent_folder || "");
+    formData.append('version', fileProp.version.toString());
+
+    try{
+      const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
+        credentials : 'include',
+        method : 'POST',
+        headers : {
+          'X-CSRFToken': getCookie('csrftoken'), //give csrf token
+        },
+        body : formData,
+      });
+
+      if(res.ok){
+        const fileData = await res.json();
+        fetchSFS(SFS);
+      }else{
+        const errorData = await res.json();
+        console.log("error data:",errorData)
+        const error = new Error('Validation failed');
+        (error as any).response = {status: res.status, data:errorData}
+        throw error;
+      }
+
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+
+      throw new Error('Unexpected server error');
+    };
+  }
+
+  const deleteFile = async (data : FileProp) => {
+    try{
+      const res = await fetch(`http://localhost:8000/api/files/${data.id}/`, {
+        credentials : 'include',
+        method : 'DELETE',
+        headers : {
+          'Content-Type' : 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),// give csrf token
+        }
+      });
+
+      if(res.ok){
+        const newFile = [...files];
+        
+        const removeId = newFile.findIndex(file => file.id===data.id?.toString())
+        newFile.splice(removeId, 1);
+        setFiles(newFile);
+      }else{
+        throw new Error('Failed to delete file');
+      }
+    }catch (err:any){
+      console.error('Error creating file:', err);
+      // handle DRF validation errors (400)
+      if (err.response && err.response.status === 400) {
+        // throw so form's catch block can use setError()
+        throw err;
+      }
+    }
   }
 
   // handles gallery vs list view
@@ -139,18 +456,24 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
-        folders={folders} 
-        files={files} 
-        clickEvent={openFolder}
+        folderId={currentParent}
+        folderName={currentFoldername}
+        folders={folders}
+        files={files}
+        clickEvent={handleFolder}
+        submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
       />
   ) : (
       <ListView 
+        folderId={currentParent}
+        folderName={currentFoldername}
         folders={folders} 
         files={files} 
-        clickEvent={openFolder}
+        clickEvent={handleFolder}
+        submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
@@ -166,6 +489,7 @@ export default function Main() {
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
+    // folders
     const url1 = new URL('http://localhost:8000/api/folders/');
     url1.searchParams.set('parent_folder', currentParent.toString());
     url1.searchParams.set('name', SFS.searchKeyword);
@@ -178,15 +502,27 @@ export default function Main() {
     const folderData = await folderRes.json();
     setFolders(folderData)
 
+    // files
     const url2 = new URL('http://localhost:8000/api/files/');
     url2.searchParams.set('parent_folder', currentParent.toString());
+
+    // search
     if (SFS.searchKeyword.length>0){
       url2.searchParams.set('name', SFS.searchKeyword);
     }
+
+    // filtering
     if (SFS.mediaType.length>0){
       url2.searchParams.set('media_type', SFS.mediaType.join("_"));
     }
-    url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    if (SFS.fileExtension.length>0){
+      url2.searchParams.set('file_type', SFS.fileExtension.join("_"));
+    }
+    if (SFS.tagType.length>0){
+      url2.searchParams.set('tag_type', SFS.tagType.join("_"));
+    }
+
+    // sort
     if(SFS.sortMethod!==""){
       url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
     }
@@ -194,7 +530,6 @@ export default function Main() {
       credentials: 'include',
     });
     const fileData = await fileRes.json();
-    console.log(fileData)
     setFiles(fileData)
   }
 
@@ -217,6 +552,14 @@ export default function Main() {
   const filterFileExtension = (fileExtensions : string[]) => {
     const newSFS = {...SFS};
     newSFS.fileExtension = fileExtensions;
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const filterTags = (tags : string[]) => {
+    const newSFS = {...SFS};
+    newSFS.tagType = tags;
     setSFS(newSFS)
 
     fetchSFS(newSFS)
@@ -263,6 +606,8 @@ export default function Main() {
             iconTextColor={iconTextColor} 
             mediaTypeEvent={filterMediaType}
             fileExtensionEvent={filterFileExtension}
+            tags={tagTypes}
+            tagEvent={filterTags}
             />
 
             <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
@@ -276,6 +621,18 @@ export default function Main() {
 
       {view}
 
+      <Flex 
+      bg={useColorModeValue("#9AB3F2", '#335098')} 
+      position={'fixed'} 
+      zIndex={2} right={'2vw'} bottom={'4vh'}
+      >
+        <FileForm 
+        title="Upload File" 
+        current_folder={currentParent.toString()}
+        file={null} 
+        folders={folders}
+        submitEvent={createFile} />
+      </Flex>
     </Box>
   );
 }
