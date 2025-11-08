@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Flex, Heading,
     Box, Text, IconButton,
-    CloseButton,
-    Dialog,
-    Spacer, Image,
-    Center,
-    Tabs,
-    Grid,
-    GridItem,
-    Button,
+    CloseButton, Dialog, Spacer, 
+    Image, Center, Tabs,
+    Grid, GridItem, Button,
+    AspectRatio
 } from '@chakra-ui/react';
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
@@ -16,6 +12,8 @@ import UpdateFile from './fileUpdate';
 import { FileProp } from './fileForm';
 import { Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
+import VideoOnHover from '../preview/videoPreview';
+import ModelPreview from '../preview/model3dPreview';
 
 export const getFileDetails = async (currentID: number) => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -117,7 +115,19 @@ export default function GalleryItem(props : ViewItemProps) {
             overflow={'hidden'}>
               <Center>
                 {props.image ? (
-                  <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                  <>
+                    {props.media == "image" ? (
+                      <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                    ): props.media == "video" || props.media == "audio" ? (
+                      <>
+                      <VideoOnHover src={props.image} mediatype={props.media}/>
+                      </>
+                    ): props.media == "application" ?(
+                      <ModelPreview src={props.image}/>
+                    ): (
+                      <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                    )}
+                  </>
                 ) : (
                   <Box>No logo uploaded</Box>
                 )}
@@ -171,13 +181,23 @@ export default function GalleryItem(props : ViewItemProps) {
                       rounded={'md'}
                       bg={contentbg}
                       overflow={'hidden'}>
-                        <Center>
                           {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
-                            <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
+                            <>
+                              {props.media == "image" ? (
+                                <Image w={'full'} h={'full'} src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
+                              ): props.media == "video" || props.media == "audio" ? (
+                                <>
+                                <VideoOnHover src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} mediatype={props.media}/>
+                                </>
+                              ): props.media == "application" ?(
+                                <ModelPreview src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()}/>
+                              ): (
+                                <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                              )}
+                            </>
                           ) : (
                             <Box>No logo uploaded</Box>
                           )}
-                        </Center>
                       </Flex>
                       
                       <Spacer />

@@ -21,6 +21,7 @@ export default function GalleryView(props : ViewProps){
   const basicbg = useColorModeValue('white', '#383838');
   const filebg = useColorModeValue('white', '#0D1835');
   const buttonbg = useColorModeValue("#9AB3F2", '#335098');
+  console.log("files item",props.files)
 
   const folderComponents = props.folders.map(folder => (
     <GalleryFolder 
@@ -33,7 +34,17 @@ export default function GalleryView(props : ViewProps){
   ))
 
   const fileComponents = props.files.map(file => (
-    <GalleryItem key={file.id} id={file.original_file} parent_folder={file.parent_folder} filename={file.name} filetype={file.filetype} image={file.data} date={file.date_created} created_by={file.employee} submitEvent={props.submitEvent}/>
+    <GalleryItem 
+    key={file.id} 
+    id={file.original_file} 
+    parent_folder={file.parent_folder} 
+    filename={file.name} 
+    filetype={file.filetype} 
+    media={file.media_type}
+    image={file.data} 
+    date={file.date_created} 
+    created_by={file.employee} 
+    submitEvent={props.submitEvent}/>
   ))
 
   return (<>

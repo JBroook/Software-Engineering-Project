@@ -184,7 +184,7 @@ class FileViewSet(ModelViewSet):
     serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = FileVersion.objects.all().order_by('original_file', '-version').distinct('original_file')
+        queryset = FileVersion.objects.all().order_by('original_file', '-version', 'name').distinct('original_file')
         
         parent_id = self.request.query_params.get('parent_folder')
 

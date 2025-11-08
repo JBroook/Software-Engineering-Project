@@ -22,6 +22,7 @@ export interface ViewItemProps {
   parent_folder: number | null;
   filename: string;
   filetype: string;
+  media: string;
   created_by: any;
   image: string;
   date: string;
@@ -47,6 +48,7 @@ export interface File {
   id: string;
   name: string;
   filetype: string;
+  media: string;
   parent_folder: number | null;
   original_file: number;
   data: string;

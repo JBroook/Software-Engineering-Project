@@ -138,6 +138,7 @@ class FileVersionSerializer(serializers.ModelSerializer):
 
     # @transaction.atomic
     def create(self, validated_data):
+        print(validated_data)
         user = self.context['request'].user
         if not user.is_authenticated:
             raise serializers.ValidationError("User must be authenticated")
@@ -151,10 +152,10 @@ class FileVersionSerializer(serializers.ModelSerializer):
         # Get parent_folder from request.POST        
         parent_folder = self.context['request'].query_params.get('parent_folder')
         file_id = validated_data.get('file_id')
-        if parent_folder in ('', 'null', 'undefined'):
-            parent_folder = None
+        if parent_folder in ('', 'null', 'undefined', '-1'):
+            folder = None
         elif parent_folder == '-2':
-            parent_folder = int(parent_folder)
+            folder = int(parent_folder)
         else:
             try:
                 parent_folder = int(parent_folder)
@@ -167,10 +168,12 @@ class FileVersionSerializer(serializers.ModelSerializer):
             if parent_folder == -2:
                 file_instance.parent_folder = None
                 file_instance.save()
-            elif parent_folder != file_instance.parent_folder and parent_folder != None:
+            elif parent_folder != file_instance.parent_folder and parent_folder != "":
                 get_parent_folder = Folder.objects.get(id=parent_folder)
                 file_instance.parent_folder = get_parent_folder
                 file_instance.save()
+            elif parent_folder == "":
+                folder = file_instance.parent_folder
         else:
             file_instance = File.objects.create(
                 parent_folder=folder
