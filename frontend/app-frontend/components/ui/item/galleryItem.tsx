@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from 'react'
 import { Flex, Heading,
     Box, Text, IconButton,
@@ -16,13 +17,7 @@ import { Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 import VideoOnHover from '../preview/videoPreview';
 import ModelPreview from '../preview/model3dPreview';
-import fileDownload from 'js-file-download';
-import { Toaster, toaster } from "@/components/ui/toaster"
-
-interface downloadProp{
-  blob: Blob;
-  filename: String;
-}
+import router, { useRouter } from 'next/router';
 
 export const getFileDetails = async (currentID: number) => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -48,10 +43,10 @@ function formatBytes (bytes: number,decimals: number) {
 }
 
 export default function GalleryItem(props : ViewItemProps) {
-  const textColor = useColorModeValue('black', 'white');
-  const basicbg = useColorModeValue('white', 'black');
-  const contentbg = useColorModeValue('#F5F5F5', '#383838');
-  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const textColor = useColorModeValue('black', '#DAE1F6');
+  const basicbg = useColorModeValue('white', '#1A1F2B');
+  const contentbg = useColorModeValue('#F5F5F5', '#0E1117');
+  const contentbg2 = useColorModeValue('#0E1117', '#D9D9D9');
   const buttonbg = useColorModeValue("#79EB99", '#5BB975');
   const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
 
@@ -89,8 +84,8 @@ export default function GalleryItem(props : ViewItemProps) {
             w="100%"
             maxW="400px"
             aspectRatio="4/3"
-            bg={useColorModeValue("white", '#383838')}
-            color={useColorModeValue("black", 'white')}
+            bg={useColorModeValue("white", '#374466')}
+            color={useColorModeValue("black", '#DAE1F6')}
             // h={"2xs"}
             borderRadius={"xl"}
             py={2}
@@ -116,7 +111,7 @@ export default function GalleryItem(props : ViewItemProps) {
             </Flex>
             <Flex
             borderRadius={"xl"}
-            bg="#D9D9D9"
+            bg="#626262"
             w="100%"
             h="65%"
             align={'center'}
@@ -158,7 +153,7 @@ export default function GalleryItem(props : ViewItemProps) {
             />
             <Dialog.Positioner>
               <Dialog.Content
-                bg={useColorModeValue('white','black')}
+                bg={basicbg}
                 w={'90vw'}
                 h={'95vh'}
                 p={6}
@@ -327,7 +322,7 @@ export default function GalleryItem(props : ViewItemProps) {
 
                                 <Spacer />
                                 
-                                <Flex w={'full'} justify={'space-between'}>
+                                <Flex w={'full'} justify={'space-between'} mt={4}>
                                   <a
                                     href={`http://localhost:8000/api/download/?id=${version.id}`}
                                     download={true}
@@ -338,18 +333,27 @@ export default function GalleryItem(props : ViewItemProps) {
                                       onClick={(e) => e.stopPropagation()}
                                       size="sm"
                                       variant="solid"
+                                      fontWeight={'bold'}
+                                      color='black'
                                     >
                                       Download
                                     </Button>
                                   </a>
                                   
+                                  
                                   <Flex w={'45%'} justify={'space-between'}>
-                                    <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
-                                      <Button bg={buttonbg2} w={'48%'}>
-                                        Edit
-                                      </Button>
-                                    </UpdateFile>
-                                    <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                                    {props.isAllowedEdit == true ? (
+                                      <>
+                                      <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
+                                        <Button bg={buttonbg2} w={'48%'}>
+                                          Edit
+                                        </Button>
+                                      </UpdateFile>
+                                      <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                                      </>
+                                    ):(
+                                      <></>
+                                    )}
                                   </Flex>
                                 </Flex>
                               </Flex>

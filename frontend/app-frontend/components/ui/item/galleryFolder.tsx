@@ -25,6 +25,7 @@ import { fetchFolders, FolderItem, getFolderDetails } from './fileForm';
 import { EditFolder } from '../viewType/interfaces';
 
 export interface GalleryFolderProps {
+  isAllowedEdit: boolean;
   id : number;
   foldername: string;
   date: string;
@@ -32,11 +33,10 @@ export interface GalleryFolderProps {
 }
 
 export default function GalleryFolder(props : GalleryFolderProps) {
-  const textColor = useColorModeValue('black', 'white');
-  const basicbg = useColorModeValue('white', '#383838');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
+  const folderbg = useColorModeValue('white', '#374466');
   const buttonbg = useColorModeValue("#9AB3F2", '#335098');
   const buttonbg2 = useColorModeValue("#F29D9A", '#C04E4A');
-  const contentbg = useColorModeValue('#F5F5F5', '#383838');
 
   const [change, setChange] = useState(false);
   
@@ -166,7 +166,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
       w="100%"
       maxW="400px"
       h="fit-content"
-      bg={basicbg}
+      bg={folderbg}
       color={textColor}
       // h={"2xs"}
       borderRadius={"xl"}
@@ -284,14 +284,14 @@ export default function GalleryFolder(props : GalleryFolderProps) {
       w="100%"
       maxW="400px"
       h="fit-content"
-      bg={basicbg}
+      bg={folderbg}
       color={textColor}
       // h={"2xs"}
       borderRadius={"xl"}
       py={2}
       px={4}
       cursor="pointer"
-      _hover={{ bg: contentbg}}
+      _hover={{ bg: useColorModeValue("gray.200", '#2a2a2aff') }}
       direction={'row'}
       >
         <Flex justify="space-between" align="center" w={'95%'} onClick={openFolder}>
@@ -300,17 +300,21 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                 color={textColor}
                 size={25}/>
             <Box h="fit-content">
-              <Heading fontFamily="var(--font-reddit-mono)" truncate maxWidth="280px">
+              <Heading fontFamily="var(--font-reddit-mono)" truncate maxWidth="280px" textStyle={'xl'}>
                 {props.foldername}
               </Heading>
-              <Text fontFamily="var(--font-roboto)">
+              <Text fontFamily="var(--font-roboto)" textStyle={'sm'}>
                 {props.date}
               </Text>
             </Box>
           </HStack>
         </Flex>
         
-        <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+        {props.isAllowedEdit == true ? (
+          <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+        ):(
+          <></>
+        )}
       </Flex>
     )}
     </>

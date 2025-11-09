@@ -18,6 +18,7 @@ export interface Version {
 }
 
 export interface ViewItemProps {
+  isAllowedEdit: boolean;
   id: number;
   parent_folder: number | null;
   filename: string;
@@ -57,6 +58,7 @@ export interface File {
 }
 
 export interface ViewProps {
+  isAllowedEdit: boolean;
   folderId: number;
   folderName: string;
   folders : Folder[];

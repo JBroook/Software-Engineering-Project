@@ -22,6 +22,7 @@ import { MdCancel } from 'react-icons/md';
 import { SiTicktick } from 'react-icons/si';
 
 interface ListFolderProps {
+  isAllowedEdit: boolean;
   id : number;
   foldername: string;
   date: string;
@@ -29,128 +30,125 @@ interface ListFolderProps {
 }
 
 export default function ListFolder(props : ListFolderProps) {
-  const textColor = useColorModeValue('black', 'white');
-    const basicbg = useColorModeValue('white', '#383838');
-    const buttonbg = useColorModeValue("#9AB3F2", '#335098');
-    const buttonbg2 = useColorModeValue("#F29D9A", '#C04E4A');
-    const contentbg = useColorModeValue('#F5F5F5', '#383838');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
+  const folderbg = useColorModeValue('white', '#374466');
+  const buttonbg = useColorModeValue("#9AB3F2", '#335098');
+  const buttonbg2 = useColorModeValue("#F29D9A", '#C04E4A');
+
+  const [change, setChange] = useState(false);
   
-    const [change, setChange] = useState(false);
-    
-    const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
-    const [currentParent, setCurrentParent] = useState<number|null>();
-    const {control, register, handleSubmit, setError, formState: {errors}} = useForm<EditFolder>({
-      defaultValues: {
-        parent_folder: null,
-      }
-    });
-  
-    let folderframeworks = createListCollection({items: allFolder});
-  
-    function closeChange () {
-      setChange(false)
+  const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
+  const [currentParent, setCurrentParent] = useState<number|null>();
+  const {control, register, handleSubmit, setError, formState: {errors}} = useForm<EditFolder>({
+    defaultValues: {
+      parent_folder: null,
     }
-  
-    const getChain = async (item: any, all_Items: any):Promise<string> => {
-      const chain: number[] = [];
-      let breadcrumb: string = "All files";
-      let current = item;
-      while (current?.parent_folder != null) {
-        chain.push(current.parent_folder);
-        current = all_Items.find((f: any) => f.id === current.parent_folder);
-      };
-  
-      let i = chain.length;
-      let j = 0;
-      while (j < i) {
-        const folder_name = await getFolderDetails(chain[j])
-        breadcrumb = breadcrumb + '/' + folder_name[0].name;
-        j++;
-      };
-      return breadcrumb;
-    }
-  
-    const onSubmit: SubmitHandler<EditFolder> = async (fetched) =>{
-      const newFolderData = {
-        'usage': "rename", 
-        'folderId': props.id, 
-        'folderName': fetched.foldername,
-        'parent_folder': fetched.parent_folder == -1? null : (fetched.parent_folder || currentParent)
-      }
-  
-      console.log("new File Data:", newFolderData);
-      
-      try{
-        props.clickEvent(newFolderData);
-        setChange(false)
-      } catch (err: any){
-        if (err.response && err.response.data) {
-          const backendErrors = err.response.data;
-  
-          Object.keys(backendErrors).forEach((field) => {
-            const message = Array.isArray(backendErrors[field])
-              ? backendErrors[field][0]
-              : backendErrors[field];
-            setError(field as keyof EditFolder, { type: "server", message });
-          });
-        } else {
-          // fallback error handling
-          setError("root", { type: "server", message: "An unexpected error occurred." });
-        }
-      };
+  });
+
+  let folderframeworks = createListCollection({items: allFolder});
+
+  function closeChange () {
+    setChange(false)
+  }
+
+  const getChain = async (item: any, all_Items: any):Promise<string> => {
+    const chain: number[] = [];
+    let breadcrumb: string = "All files";
+    let current = item;
+    while (current?.parent_folder != null) {
+      chain.push(current.parent_folder);
+      current = all_Items.find((f: any) => f.id === current.parent_folder);
     };
-  
-    const handleCRUD = async (data:clickEventProps) => {
-      if (data.usage == 'rename'){
-        try{
-          const all_folder = await fetchFolders();
-          const fetchedFolder:FolderItem[] = [];
-          fetchedFolder.push({
-            label: "",
-            value: -1,
-            description: Promise.resolve(""), // Filepath address
-          });
-          for (const items of all_folder) {
-              fetchedFolder.push({
-                label: items.name,
-                value: items.id,
-                description: getChain(items,all_folder), // Filepath address
-              })
-              if (items.id == props.id) {
-                setCurrentParent(items.parent_folder)
-              }
-          };
-          setAllFolder(fetchedFolder);
+
+    let i = chain.length;
+    let j = 0;
+    while (j < i) {
+      const folder_name = await getFolderDetails(chain[j])
+      breadcrumb = breadcrumb + '/' + folder_name[0].name;
+      j++;
+    };
+    return breadcrumb;
+  }
+
+  const onSubmit: SubmitHandler<EditFolder> = async (fetched) =>{
+    const newFolderData = {
+      'usage': "rename", 
+      'folderId': props.id, 
+      'folderName': fetched.foldername,
+      'parent_folder': fetched.parent_folder == -1? null : (fetched.parent_folder || currentParent)
+    }
     
-          setChange(true);
-        } catch (error) {
-          console.error('Error fetching file details:', error);
-        } 
-  
-      } else if (data.usage == 'delete') {
-        const data = {
-          'usage': "delete", 
-          'folderId': props.id, 
-          'folderName': props.foldername,
-          'parent_folder': null,
-        }
-        props.clickEvent(data)
+    try{
+      props.clickEvent(newFolderData);
+      setChange(false)
+    } catch (err: any){
+      if (err.response && err.response.data) {
+        const backendErrors = err.response.data;
+
+        Object.keys(backendErrors).forEach((field) => {
+          const message = Array.isArray(backendErrors[field])
+            ? backendErrors[field][0]
+            : backendErrors[field];
+          setError(field as keyof EditFolder, { type: "server", message });
+        });
+      } else {
+        // fallback error handling
+        setError("root", { type: "server", message: "An unexpected error occurred." });
       }
-    }
+    };
+  };
+
+  const handleCRUD = async (data:clickEventProps) => {
+    if (data.usage == 'rename'){
+      try{
+        const all_folder = await fetchFolders();
+        const fetchedFolder:FolderItem[] = [];
+        fetchedFolder.push({
+          label: "",
+          value: -1,
+          description: Promise.resolve(""), // Filepath address
+        });
+        for (const items of all_folder) {
+            fetchedFolder.push({
+              label: items.name,
+              value: items.id,
+              description: getChain(items,all_folder), // Filepath address
+            })
+            if (items.id == props.id) {
+              setCurrentParent(items.parent_folder)
+            }
+        };
+        setAllFolder(fetchedFolder);
   
-    const handleClickEvent = (data:clickEventProps) => {
-      props.clickEvent(data)
-    }
-    
-    const openFolder = () => {
+        setChange(true);
+      } catch (error) {
+        console.error('Error fetching file details:', error);
+      } 
+
+    } else if (data.usage == 'delete') {
       const data = {
-        'usage': "access", 
+        'usage': "delete", 
         'folderId': props.id, 
         'folderName': props.foldername,
         'parent_folder': null,
       }
-      handleClickEvent(data)
+      props.clickEvent(data)
     }
+  }
+
+  const handleClickEvent = (data:clickEventProps) => {
+    props.clickEvent(data)
+  }
+  
+  const openFolder = () => {
+    const data = {
+      'usage': "access", 
+      'folderId': props.id, 
+      'folderName': props.foldername,
+      'parent_folder': null,
+    }
+    handleClickEvent(data)
+  }
   
   return (
     <>
@@ -159,7 +157,7 @@ export default function ListFolder(props : ListFolderProps) {
       w="100%"
       maxW="74vw"
       h="fit-content"
-      bg={basicbg}
+      bg={folderbg}
       color={textColor}
       // h={"2xs"}
       borderRadius={"xl"}
@@ -273,11 +271,11 @@ export default function ListFolder(props : ListFolderProps) {
       
     ) : (
       <Flex 
-        w="95%"
-        maxW="74vw"
+        w="100%"
+        maxW="79vw"
         h="fit-content"
-        bg={useColorModeValue("white", '#383838')}
-        color={useColorModeValue("black", 'white')}
+        bg={folderbg}
+        color={textColor}
         // h={"2xs"}
         borderRadius={"xl"}
         py={2}
@@ -289,7 +287,7 @@ export default function ListFolder(props : ListFolderProps) {
           <Flex justify="space-between" align="center" onClick={openFolder} w='98%'>
             <HStack>
               <FaFolder
-                  color={useColorModeValue("black", 'white')}
+                  color={textColor}
                   size={25}/>
               <Box h="fit-content">
                 <Heading fontFamily="var(--font-reddit-mono)" truncate maxWidth="60vw">
@@ -301,7 +299,11 @@ export default function ListFolder(props : ListFolderProps) {
               </Box>
             </HStack>
           </Flex>
-          <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+          {props.isAllowedEdit == true ? (
+            <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+          ):(
+            <></>
+          )}
         </Flex>
     )}
     </>

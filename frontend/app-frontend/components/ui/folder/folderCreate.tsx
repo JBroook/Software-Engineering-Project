@@ -46,7 +46,7 @@ export type FolderItem = {
 }
 
 export default function FolderCreate(props: folderCRUD) {
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
   const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#F5F5F5', '#383838');
   const addbuttonbg = useColorModeValue("#335098", '#9AB3F2');

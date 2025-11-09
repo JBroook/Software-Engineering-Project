@@ -45,7 +45,7 @@ class UserView(APIView):
 class StorageView(APIView):
     permission_classes = [IsAdmin]
     # returns info on storage size and file number
-    def get(self, request):
+    def get(self):
         storage_size = FileVersion.objects.distinct('original_file').aggregate(total_size=Sum('size'))['total_size']
         file_number = len(File.objects.all())
         tag_count = len(Tag.objects.all())

@@ -17,7 +17,7 @@ function Model(props:ModelPreviewProps) {
 // Main viewer component
 const ModelViewer = (props:ModelPreviewProps) => {
   return (
-    <Flex w="100%" h="full" bg="gray.100" borderRadius="lg" background={'white'}>
+    <Flex w="100%" h="full" bg="gray.100" borderRadius="lg" background={'#626262'}>
         <Canvas camera={{ fov: 75, near: 1.5, far: 1000, position: [0, 0, 7] }}>
             <ambientLight intensity={1} />
             <directionalLight color="yellow" position={[0, 5, 5]} />

@@ -70,7 +70,7 @@ export type FolderItem = {
 }
 
 export default function FileForm(props: FileFormChildfulProps) {
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
   const contentbg = useColorModeValue('#F5F5F5', '#383838');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);

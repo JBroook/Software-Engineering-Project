@@ -15,18 +15,24 @@ import ContentLoader from "./contentLoader";
 import FolderCreate from "../folder/folderCreate";
 
 export default function ListView(props : ViewProps){
+  const textColor = useColorModeValue('black', '#DAE1F6');
+  const filebg = useColorModeValue('white', '#2A385B');
+  const folderbg = useColorModeValue("#9AB3F2", '#1D263F');
+
   const folderComponents = props.folders.map(folder => (
-      <ListFolder 
-        id={folder.id}
-        key={folder.id} 
-        foldername={folder.name} 
-        date={folder.date_modified}
-        clickEvent={props.clickEvent}
-      />
-    ))
+    <ListFolder 
+      isAllowedEdit={props.isAllowedEdit}
+      id={folder.id}
+      key={folder.id} 
+      foldername={folder.name} 
+      date={folder.date_modified}
+      clickEvent={props.clickEvent}
+    />
+  ))
   
   const fileComponents = props.files.map(file => (
     <ListItem 
+    isAllowedEdit={props.isAllowedEdit}
     parent_folder={file.parent_folder}
     key={file.id} 
     id={file.original_file} 
@@ -42,17 +48,17 @@ export default function ListView(props : ViewProps){
   return (<>
     {/* Folders */}
     <HStack
-    bg={useColorModeValue("#9AB3F2", '#335098')}
+    bg={folderbg}
     pl={8}
     pb={3}
     justify="space-between">
       <HStack>
         <FaFolder 
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={25}/>
         <Heading
         fontFamily="var(--font-roboto-condensed)"
-        color={useColorModeValue("black", 'white')}
+        color={textColor}
         size={"2xl"}
         >Folders</Heading>
       </HStack>
@@ -63,11 +69,14 @@ export default function ListView(props : ViewProps){
     </ HStack>
     
     <Stack
-    bg={useColorModeValue("#9AB3F2", '#335098')}
+    bg={folderbg}
     pl={8}
-    pb={3}>
-      
-      <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+    pb={10}>
+      {props.isAllowedEdit == true ? (
+        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+      ):(
+        <></>
+      )}
       <ContentLoader 
         loading={props.loading}
         color="white"
@@ -79,7 +88,7 @@ export default function ListView(props : ViewProps){
 
     {/* Files */}
     <Flex
-      bg={useColorModeValue("white", '#0D1835')}
+      bg={filebg}
       justify="space-between"
       w="100%">
 
@@ -89,11 +98,11 @@ export default function ListView(props : ViewProps){
       pt={5}
       >
         <FaFile 
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={22}/>
           <Heading
           fontFamily="var(--font-roboto-condensed)"
-          color={useColorModeValue("black", 'white')}
+          color={textColor}
           size={"2xl"}
           >Files</Heading>
       </ HStack>
@@ -107,7 +116,7 @@ export default function ListView(props : ViewProps){
     <Stack
     pl={8}
     pb={10}
-    bg={useColorModeValue("white", '#0D1835')}>
+    bg={filebg}>
       <ContentLoader 
         loading={props.loading}
         color="black"

@@ -36,7 +36,7 @@ type FolderItem = {
 }
 
 export default function UpdateFile(props: UpdateFileChildfulProps) {
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
   const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#D9D9D9', '#383838');
   const contentbg2 = useColorModeValue('#383838', '#D9D9D9');

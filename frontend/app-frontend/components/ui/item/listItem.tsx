@@ -48,10 +48,10 @@ function formatBytes (bytes: number,decimals: number) {
 }
 
 export default function ListItem(props : ViewItemProps) {
-  const textColor = useColorModeValue('black', 'white');
-  const basicbg = useColorModeValue('white', 'black');
-  const contentbg = useColorModeValue('#F5F5F5', '#383838');
-  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const textColor = useColorModeValue('black', '#F9FBFF');
+  const basicbg = useColorModeValue('white', '#1A1F2B');
+  const contentbg = useColorModeValue('#F5F5F5', '#0E1117');
+  const contentbg2 = useColorModeValue('#0E1117', '#D9D9D9');
   const buttonbg = useColorModeValue("#79EB99", '#5BB975');
   const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
 
@@ -88,8 +88,8 @@ export default function ListItem(props : ViewItemProps) {
             <Box
               w="95%"
               h="fit-content"
-              bg={useColorModeValue("white", "#383838")}
-              color={useColorModeValue("black", "white")}
+              bg={useColorModeValue("white", "#374466")}
+              color={textColor}
               borderRadius="xl"
               py={2}
               px={4}
@@ -99,38 +99,38 @@ export default function ListItem(props : ViewItemProps) {
               onClick={handleOpenDialog} // Manually open dialog
               role="button"
             >
-                <Flex justify="space-between" align="center">
-                  <HStack>
-                    <FaFile
-                        color={useColorModeValue("black", 'white')}
-                        size={25}/>
-                    <Box h="fit-content">
-                      <Heading fontFamily="var(--font-reddit-mono)">
-                        {props.filename}
-                      </Heading>
-                      <Text fontFamily="var(--font-roboto)" justifySelf={'left'} pl={4}>
-                        {props.filetype}
-                      </Text>
-                    </Box>
-                  </HStack>
+              <Flex justify="space-between" align="center">
+                <HStack>
+                  <FaFile
+                      color={textColor}
+                      size={25}/>
+                  <Box h="fit-content">
+                    <Heading fontFamily="var(--font-reddit-mono)">
+                      {props.filename}
+                    </Heading>
+                    <Text fontFamily="var(--font-roboto)" justifySelf={'left'} pl={4}>
+                      {props.filetype}
+                    </Text>
+                  </Box>
+                </HStack>
 
-                  <HStack fontFamily="var(--font-roboto)" fontSize={14}>
-                    <Flex mx={2} w="100px" justify="center">
-                      <Text>Only you</Text>
-                    </Flex>
+                <HStack fontFamily="var(--font-roboto)" fontSize={14}>
+                  <Flex mx={2} w="100px" justify="center">
+                    <Text>Only you</Text>
+                  </Flex>
 
-                    <Flex mx={2} w="200px" justify="center">
-                      <Text>{props.date}</Text>
-                    </Flex>
+                  <Flex mx={2} w="200px" justify="center">
+                    <Text>{props.date}</Text>
+                  </Flex>
 
-                    <Flex mx={2} w="60px" justify="center">
-                      <Text>{props.created_by.username}</Text>
-                    </Flex>
+                  <Flex mx={2} w="60px" justify="center">
+                    <Text>{props.created_by.username}</Text>
+                  </Flex>
 
-                    <SlOptionsVertical/>
-                  </HStack>
-                </Flex>
-              </Box>
+                  <SlOptionsVertical/>
+                </HStack>
+              </Flex>
+            </Box>
           </Tooltip.Trigger>
 
           <Tooltip.Positioner>
@@ -144,7 +144,7 @@ export default function ListItem(props : ViewItemProps) {
               align={'center'}
               justify={'center'}
               overflow='hidden'
-              background={contentbg2}
+              background="#626262"
               >
                 <Center>
                   {props.image ? (
@@ -176,7 +176,7 @@ export default function ListItem(props : ViewItemProps) {
         />
         <Dialog.Positioner>
           <Dialog.Content
-            bg={useColorModeValue('white','black')}
+            bg={useColorModeValue('white','#1A1F2B')}
             w={'90vw'}
             h={'95vh'}
             p={6}
@@ -343,7 +343,7 @@ export default function ListItem(props : ViewItemProps) {
 
                           <Spacer />
                           
-                          <Flex w={'full'} justify={'space-between'}>
+                          <Flex w={'full'} justify={'space-between'} mt={4}>
                             <a
                               href={`http://localhost:8000/api/download/?id=${version.id}`}
                               download={true}
@@ -354,17 +354,26 @@ export default function ListItem(props : ViewItemProps) {
                                 onClick={(e) => e.stopPropagation()}
                                 size="sm"
                                 variant="solid"
+                                fontWeight={'bold'}
+                                color='black'
                               >
                                 Download
                               </Button>
                             </a>
+
                             <Flex w={'45%'} justify={'space-between'}>
-                              <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
-                                <Button bg={buttonbg2} w={'48%'}>
-                                  Edit
-                                </Button>
-                              </UpdateFile>
-                              <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                              {props.isAllowedEdit == true ? (
+                                <>
+                                <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
+                                  <Button bg={buttonbg2} w={'48%'}>
+                                    Edit
+                                  </Button>
+                                </UpdateFile>
+                                <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                                </>
+                              ):(
+                                <></>
+                              )}
                             </Flex>
                           </Flex>
                         </Flex>

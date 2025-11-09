@@ -16,15 +16,13 @@ import SortBar from "../searchbar/sortBar";
 import FolderCreate from "../folder/folderCreate";
 
 export default function GalleryView(props : ViewProps){
-  const textColor = useColorModeValue('#383838', 'white');
-  const background = useColorModeValue('white', 'black');
-  const basicbg = useColorModeValue('white', '#383838');
-  const filebg = useColorModeValue('white', '#0D1835');
-  const buttonbg = useColorModeValue("#9AB3F2", '#335098');
-  console.log("files item",props.files)
+  const textColor = useColorModeValue('black', '#DAE1F6');
+  const filebg = useColorModeValue('white', '#2A385B');
+  const folderbg = useColorModeValue("#9AB3F2", '#1D263F');
 
   const folderComponents = props.folders.map(folder => (
     <GalleryFolder 
+      isAllowedEdit={props.isAllowedEdit}
       id={folder.id}
       key={folder.id} 
       foldername={folder.name}
@@ -35,6 +33,7 @@ export default function GalleryView(props : ViewProps){
 
   const fileComponents = props.files.map(file => (
     <GalleryItem 
+    isAllowedEdit={props.isAllowedEdit}
     key={file.id} 
     id={file.original_file} 
     parent_folder={file.parent_folder} 
@@ -51,7 +50,7 @@ export default function GalleryView(props : ViewProps){
     {/* Gallery view */}
     {/* Folders */}
     <HStack
-    bg={buttonbg}
+    bg={folderbg}
     pl={8}
     pb={3}
     justify="space-between">
@@ -76,12 +75,16 @@ export default function GalleryView(props : ViewProps){
       <SimpleGrid 
       w="100%" 
       minChildWidth={80} 
-      gap="6px" 
+      gap="10px" 
       px={8} 
       pb={10} 
-      bg={buttonbg} 
+      bg={folderbg} 
       >
-        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+        {props.isAllowedEdit == true ? (
+          <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+        ):(
+          <></>
+        )}
         <ContentLoader 
           loading={props.loading}
           color="white"
@@ -94,7 +97,7 @@ export default function GalleryView(props : ViewProps){
       gap="6px" 
       px={8} 
       pb={10} 
-      bg={buttonbg} 
+      bg={folderbg} 
       >
         <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
         <ContentLoader 
@@ -134,11 +137,12 @@ export default function GalleryView(props : ViewProps){
         { label : "Last modified", value : "date_created"}]}/>
     </Flex>
 
-    {fileComponents.length>=3 ?
+    {fileComponents.length>=4 ?
       <SimpleGrid 
       w="100%" 
       h='auto'
-      minChildWidth={80} 
+      minChildWidth={270} 
+      column={4}
       gap="6" 
       px={8} 
       pb={20} 
