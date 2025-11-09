@@ -130,7 +130,7 @@ export default function FileForm(props: FileFormChildfulProps) {
 
   const fileUpload = useFileUpload({
     maxFiles: 1,
-    accept: ["image/*", "application/octet-stream", "audio/*", "video/*"],
+    accept: ["image/*", ".glb,.obj,.fbx,.stl,.dae,.3ds", "audio/*", "video/*"],
   })
 
   const FileUploadList = () => {
