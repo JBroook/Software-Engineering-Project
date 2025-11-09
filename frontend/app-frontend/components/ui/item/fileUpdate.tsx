@@ -36,7 +36,7 @@ type FolderItem = {
 }
 
 export default function UpdateFile(props: UpdateFileChildfulProps) {
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
   const basicbg = useColorModeValue('white', 'black');
   const contentbg = useColorModeValue('#D9D9D9', '#383838');
   const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
@@ -111,6 +111,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
 
   const fileUpload = useFileUpload({
     maxFiles: 1,
+    accept: ["image/*", "application/octet-stream", "audio/*", "video/*"],
   })
   
   const FileUploadList = () => {
@@ -129,13 +130,26 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
             file={file}
             key={file.name}
           >
-            <FileUpload.ItemPreviewImage />
-            <Float placement="top-end">
-              <FileUpload.ItemDeleteTrigger boxSize="6" layerStyle="fill.solid" 
-              bg={basicbg} rounded={12}>
-                <LuX />
-              </FileUpload.ItemDeleteTrigger>
-            </Float>
+            {file.type.startsWith('image/') ? (
+              <>
+                <FileUpload.ItemPreviewImage />
+                <Float placement="top-end">
+                  <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
+                    <LuX />
+                  </FileUpload.ItemDeleteTrigger>
+                </Float>
+              </>
+              ):(
+              <>
+                <Flex w={'auto'}>No preview available</Flex>
+                <Float placement="top-end">
+                  <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
+                    <LuX />
+                  </FileUpload.ItemDeleteTrigger>
+                </Float>
+              </>
+              )
+            }
           </FileUpload.Item>
         ))}
       </FileUpload.ItemGroup>

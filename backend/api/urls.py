@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 from rest_framework.routers import DefaultRouter
 
@@ -14,4 +16,5 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('user/', views.UserView.as_view(), name='user'),
     path('storage/', views.StorageView.as_view(), name='storage'),
-]+router.urls
+    path('download/', views.DownloadFileView.as_view(), name='download'),
+]+router.urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

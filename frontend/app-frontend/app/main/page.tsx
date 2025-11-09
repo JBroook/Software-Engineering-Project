@@ -90,6 +90,7 @@ export default function Main() {
   const [SFS, setSFS] = useState<SFSParams>(defaultSFSParams);
 
   const [currentFoldername, setCurrentFolderName] = useState<string>("All files");
+  const [isAllowedEdit, setIsAllowedEdit] = useState<boolean>(false);
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -153,14 +154,24 @@ export default function Main() {
   // check if user is logged in, else return to login page
   const router = useRouter();
   useEffect(()=>{
-    // extra layer of protection in case the middleware doesn't catch unauthenticated users
-    fetch('http://localhost:8000/api/user', { credentials: 'include' })
-    .then(res => {
-      if (!res.ok) {
-        router.push('/login');
-        return;
+    const onPageLoad = async () => {
+      // extra layer of protection in case the middleware doesn't catch unauthenticated users
+      const res = await fetch('http://localhost:8000/api/user', { credentials: 'include' });
+      if (!res.ok){
+        router.push('/login')
+      }else{
+        const user = await res.json();
+        console.log(user)
+        if (user.role =='viewer'){
+          router.push('/main')
+        }else{
+          setIsAllowedEdit(true);
+        }
       }
-    });
+    }
+
+    onPageLoad()
+    console.log("is allowed: ",isAllowedEdit)
 
     // fetch current folder's child items, fetch items with no parents if at root folder
     const fetchAssets = async () =>{
@@ -456,6 +467,7 @@ export default function Main() {
   const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
+        isAllowedEdit={isAllowedEdit}
         folderId={currentParent}
         folderName={currentFoldername}
         folders={folders}
@@ -468,6 +480,7 @@ export default function Main() {
       />
   ) : (
       <ListView 
+        isAllowedEdit={isAllowedEdit}
         folderId={currentParent}
         folderName={currentFoldername}
         folders={folders} 
@@ -565,8 +578,10 @@ export default function Main() {
     fetchSFS(newSFS)
   }
 
+  const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
+
   return (
-    <Box bg={useColorModeValue("#9AB3F2", '#335098')} minH="100vh">
+    <Box bg={useColorModeValue("#6082D6", '#0E1117')} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
@@ -594,7 +609,7 @@ export default function Main() {
         </HStack>
 
         <HStack mr={10}>
-            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
@@ -610,7 +625,7 @@ export default function Main() {
             tagEvent={filterTags}
             />
 
-            <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
+            <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={changeViewType}>
               {viewType=="gallery"?<IoIosList color="#9AB3F2"/>:<RiGalleryView2 color="#9AB3F2"/>}
@@ -621,18 +636,23 @@ export default function Main() {
 
       {view}
 
-      <Flex 
-      bg={useColorModeValue("#9AB3F2", '#335098')} 
-      position={'fixed'} 
-      zIndex={2} right={'2vw'} bottom={'4vh'}
-      >
-        <FileForm 
-        title="Upload File" 
-        current_folder={currentParent.toString()}
-        file={null} 
-        folders={folders}
-        submitEvent={createFile} />
-      </Flex>
+      {isAllowedEdit == true ? (
+        <Flex 
+        bg={useColorModeValue("#9AB3F2", '#335098')} 
+        position={'fixed'} 
+        zIndex={2} right={'2vw'} bottom={'4vh'}
+        >
+          <FileForm 
+          title="Upload File" 
+          current_folder={currentParent.toString()}
+          file={null} 
+          folders={folders}
+          submitEvent={createFile} />
+        </Flex>
+      ):(
+        <></>
+      )}
+      
     </Box>
   );
 }

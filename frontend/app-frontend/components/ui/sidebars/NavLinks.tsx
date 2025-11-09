@@ -15,20 +15,18 @@ const NavItem = ({ icon, children, href, ...rest }: NavItemProps) => {
     <>
     <ChakraLink w={'full'} href={href} _hover={{ textDecoration: 'none' }}>
       <Button
-      align="center"
-      width="85%"
-      p="4"
-      mx="4"
-      borderRadius="lg"
-      role="group"
-      cursor="pointer"
-      justifyContent={'flex-start'}
-      color={useColorModeValue('black', 'white')}
-      _hover={{
-        bg: 'cyan.400',
-        color: useColorModeValue('black', 'white'),
-      }}
-      {...rest}>
+        width="85%"
+        p="4"
+        mx="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        justifyContent={'flex-start'}
+        color={useColorModeValue('black', 'white')}
+        _hover={{
+          bg: 'cyan.400',
+          color: useColorModeValue('black', 'white'),
+        }}>
         <Icon
           mr="4"
           fontSize="16"

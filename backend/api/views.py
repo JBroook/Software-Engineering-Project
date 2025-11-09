@@ -1,27 +1,39 @@
+import mimetypes
+import os
+from pathlib import Path
+from wsgiref.types import FileWrapper
+from django.conf import settings
+from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
+from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 from .permissions import IsAdmin, AssetPermission, UserPermission
 
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Sum, Count, OuterRef, Subquery
+from django.db.models import Q, Sum, Count
+from django.utils.decorators import method_decorator
+from django.utils.encoding import escape_uri_path
+from django.views.decorators.csrf import csrf_exempt
 
 from assets.models import Folder, File, FileVersion, TagType, Tag
 from users.models import Employee
 from . import serializers
 
 class UserView(APIView):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        print(request)
         user = request.user
+        print(user)
         employee = Employee.objects.get(user=user)
         return Response({
             "email": user.email,
@@ -33,7 +45,7 @@ class UserView(APIView):
 class StorageView(APIView):
     permission_classes = [IsAdmin]
     # returns info on storage size and file number
-    def get(self, request):
+    def get(self):
         storage_size = FileVersion.objects.distinct('original_file').aggregate(total_size=Sum('size'))['total_size']
         file_number = len(File.objects.all())
         tag_count = len(Tag.objects.all())
@@ -50,10 +62,13 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        print(email)
+        print(password)
 
         username = get_object_or_404(User, email=email).username
 
         user = authenticate(request, username=username, password=password)
+        print(user)
         if user is not None:
             login(request, user)
             return Response({"message": "Logged in successfully"},status=status.HTTP_200_OK)
@@ -184,7 +199,7 @@ class FileViewSet(ModelViewSet):
     serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = FileVersion.objects.all().order_by('original_file', '-version').distinct('original_file')
+        queryset = FileVersion.objects.all().order_by('original_file', '-version', 'name').distinct('original_file')
         
         parent_id = self.request.query_params.get('parent_folder')
 
@@ -237,3 +252,28 @@ class FileViewSet(ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
     
+class DownloadFileView(APIView):
+    permission_classes = [AssetPermission]
+
+    def get(self, request):
+        file_id = request.GET.get('id')
+        if not file_id:
+            return HttpResponse("id is required", status=400)
+
+        try:
+            file_instance = FileVersion.objects.get(id=file_id)
+        except FileVersion.DoesNotExist:
+            return HttpResponse("File not found", status=404)
+
+        file_path = Path(settings.MEDIA_ROOT +'/'+ file_instance.data.name)
+
+        response = FileResponse(
+            open(file_path, 'rb'),
+            as_attachment=True,  # This forces download
+            filename=os.path.basename(file_path)  # Suggested filename
+        )
+
+        # Optional: Set content type
+        response['Content-Type'] = 'application/octet-stream'
+
+        return response

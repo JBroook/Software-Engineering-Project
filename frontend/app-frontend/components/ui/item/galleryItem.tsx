@@ -1,14 +1,13 @@
+'use client'
 import React, { useEffect, useState } from 'react'
 import { Flex, Heading,
     Box, Text, IconButton,
-    CloseButton,
-    Dialog,
-    Spacer, Image,
-    Center,
-    Tabs,
-    Grid,
-    GridItem,
-    Button,
+    CloseButton, Dialog, Spacer, 
+    Image, Center, Tabs,
+    Grid, GridItem, Button,
+    AspectRatio, Toast,
+    chakra,
+    Link
 } from '@chakra-ui/react';
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
@@ -16,6 +15,9 @@ import UpdateFile from './fileUpdate';
 import { FileProp } from './fileForm';
 import { Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
+import VideoOnHover from '../preview/videoPreview';
+import ModelPreview from '../preview/model3dPreview';
+import router, { useRouter } from 'next/router';
 
 export const getFileDetails = async (currentID: number) => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -41,10 +43,10 @@ function formatBytes (bytes: number,decimals: number) {
 }
 
 export default function GalleryItem(props : ViewItemProps) {
-  const textColor = useColorModeValue('black', 'white');
-  const basicbg = useColorModeValue('white', 'black');
-  const contentbg = useColorModeValue('#F5F5F5', '#383838');
-  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const textColor = useColorModeValue('black', '#DAE1F6');
+  const basicbg = useColorModeValue('white', '#1A1F2B');
+  const contentbg = useColorModeValue('#F5F5F5', '#0E1117');
+  const contentbg2 = useColorModeValue('#0E1117', '#D9D9D9');
   const buttonbg = useColorModeValue("#79EB99", '#5BB975');
   const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
 
@@ -66,7 +68,7 @@ export default function GalleryItem(props : ViewItemProps) {
       setLoading(false);
     }
   }
-  
+
   return (
     <>
       <Dialog.Root 
@@ -82,8 +84,8 @@ export default function GalleryItem(props : ViewItemProps) {
             w="100%"
             maxW="400px"
             aspectRatio="4/3"
-            bg={useColorModeValue("white", '#383838')}
-            color={useColorModeValue("black", 'white')}
+            bg={useColorModeValue("white", '#374466')}
+            color={useColorModeValue("black", '#DAE1F6')}
             // h={"2xs"}
             borderRadius={"xl"}
             py={2}
@@ -109,7 +111,7 @@ export default function GalleryItem(props : ViewItemProps) {
             </Flex>
             <Flex
             borderRadius={"xl"}
-            bg="#D9D9D9"
+            bg="#626262"
             w="100%"
             h="65%"
             align={'center'}
@@ -117,7 +119,19 @@ export default function GalleryItem(props : ViewItemProps) {
             overflow={'hidden'}>
               <Center>
                 {props.image ? (
-                  <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                  <>
+                    {props.media == "image" ? (
+                      <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                    ): props.media == "video" || props.media == "audio" ? (
+                      <>
+                      <VideoOnHover src={props.image} mediatype={props.media}/>
+                      </>
+                    ): props.media == "application" ?(
+                      <ModelPreview src={props.image}/>
+                    ): (
+                      <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                    )}
+                  </>
                 ) : (
                   <Box>No logo uploaded</Box>
                 )}
@@ -139,7 +153,7 @@ export default function GalleryItem(props : ViewItemProps) {
             />
             <Dialog.Positioner>
               <Dialog.Content
-                bg={useColorModeValue('white','black')}
+                bg={basicbg}
                 w={'90vw'}
                 h={'95vh'}
                 p={6}
@@ -171,13 +185,23 @@ export default function GalleryItem(props : ViewItemProps) {
                       rounded={'md'}
                       bg={contentbg}
                       overflow={'hidden'}>
-                        <Center>
-                          {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
-                            <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
-                          ) : (
-                            <Box>No logo uploaded</Box>
-                          )}
-                        </Center>
+                        {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
+                          <>
+                            {props.media == "image" ? (
+                              <Image w={'full'} h={'full'} src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
+                            ): props.media == "video" || props.media == "audio" ? (
+                              <>
+                              <VideoOnHover src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} mediatype={props.media}/>
+                              </>
+                            ): props.media == "application" ?(
+                              <ModelPreview src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()}/>
+                            ): (
+                              <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                            )}
+                          </>
+                        ) : (
+                          <Box>No logo uploaded</Box>
+                        )}
                       </Flex>
                       
                       <Spacer />
@@ -298,17 +322,38 @@ export default function GalleryItem(props : ViewItemProps) {
 
                                 <Spacer />
                                 
-                                <Flex w={'full'} justify={'space-between'}>
-                                  <Button bg={buttonbg} w={'48%'}>
-                                    Download
-                                  </Button>
+                                <Flex w={'full'} justify={'space-between'} mt={4}>
+                                  <a
+                                    href={`http://localhost:8000/api/download/?id=${version.id}`}
+                                    download={true}
+                                  >
+                                    <Button
+                                      w='15vw'
+                                      bg={buttonbg}
+                                      onClick={(e) => e.stopPropagation()}
+                                      size="sm"
+                                      variant="solid"
+                                      fontWeight={'bold'}
+                                      color='black'
+                                    >
+                                      Download
+                                    </Button>
+                                  </a>
+                                  
+                                  
                                   <Flex w={'45%'} justify={'space-between'}>
-                                    <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
-                                      <Button bg={buttonbg2} w={'48%'}>
-                                        Edit
-                                      </Button>
-                                    </UpdateFile>
-                                    <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                                    {props.isAllowedEdit == true ? (
+                                      <>
+                                      <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
+                                        <Button bg={buttonbg2} w={'48%'}>
+                                          Edit
+                                        </Button>
+                                      </UpdateFile>
+                                      <DeleteFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent} />
+                                      </>
+                                    ):(
+                                      <></>
+                                    )}
                                   </Flex>
                                 </Flex>
                               </Flex>

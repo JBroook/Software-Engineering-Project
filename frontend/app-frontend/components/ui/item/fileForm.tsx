@@ -70,7 +70,7 @@ export type FolderItem = {
 }
 
 export default function FileForm(props: FileFormChildfulProps) {
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('#0D1835', '#F9FBFF');
   const contentbg = useColorModeValue('#F5F5F5', '#383838');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -130,6 +130,7 @@ export default function FileForm(props: FileFormChildfulProps) {
 
   const fileUpload = useFileUpload({
     maxFiles: 1,
+    accept: ["image/*", ".glb,.obj,.fbx,.stl,.dae,.3ds", "audio/*", "video/*"],
   })
 
   const FileUploadList = () => {
@@ -146,12 +147,26 @@ export default function FileForm(props: FileFormChildfulProps) {
             file={file}
             key={file.name}
           >
-            <FileUpload.ItemPreviewImage />
-            <Float placement="top-end">
-              <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
-                <LuX />
-              </FileUpload.ItemDeleteTrigger>
-            </Float>
+            {file.type.startsWith('image/') ? (
+              <>
+                <FileUpload.ItemPreviewImage />
+                <Float placement="top-end">
+                  <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
+                    <LuX />
+                  </FileUpload.ItemDeleteTrigger>
+                </Float>
+              </>
+            ):(
+              <>
+                <Flex w={'auto'}>No preview available</Flex>
+                <Float placement="top-end">
+                  <FileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
+                    <LuX />
+                  </FileUpload.ItemDeleteTrigger>
+                </Float>
+              </>
+            )
+              }
           </FileUpload.Item>
         ))}
       </FileUpload.ItemGroup>
@@ -194,6 +209,34 @@ export default function FileForm(props: FileFormChildfulProps) {
         // fallback error handling
         setError("root", { type: "server", message: "An unexpected error occurred." });
       }
+      return (
+        <Dialog.Root>
+          <Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Dialog Title</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                    eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  </p>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </Dialog.ActionTrigger>
+                  <Button>Save</Button>
+                </Dialog.Footer>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton size="sm" />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
+        )
     };
   };
 
@@ -322,7 +365,7 @@ export default function FileForm(props: FileFormChildfulProps) {
                     </Field.Label>
                     <FileUpload.RootProvider
                     value={fileUpload}
-                    {...register('data',)}
+                    {...register('data')}
                     >
                       <FileUpload.HiddenInput />
                       <FileUpload.Dropzone asChild>

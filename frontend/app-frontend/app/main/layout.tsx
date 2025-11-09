@@ -13,6 +13,6 @@ export default function RootLayout({
 }>) {
   return (<>
       <SimpleSidebar />
-      <Box w="80vw" ml="20vw">{children}</Box>
+      <Box w="85vw" ml="15vw">{children}</Box>
   </>);
 }
