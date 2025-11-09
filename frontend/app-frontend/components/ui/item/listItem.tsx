@@ -19,6 +19,9 @@ import { useColorModeValue } from '../color-mode';
 import { Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 import UpdateFile from './fileUpdate';
+import VideoOnHover from '../preview/videoPreview';
+import ModelPreview from '../preview/model3dPreview';
+import { toaster } from '../toaster';
 
 const getFileDetails = async (currentID: number):Promise<Version[]> => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -141,10 +144,23 @@ export default function ListItem(props : ViewItemProps) {
               align={'center'}
               justify={'center'}
               overflow='hidden'
+              background={contentbg2}
               >
                 <Center>
                   {props.image ? (
-                    <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                    <>
+                      {props.media == "image" ? (
+                        <Image w={'full'} h={'full'} src={props.image} alt="Image" objectFit="contain" borderRadius="md" />
+                      ): props.media == "video" || props.media == "audio" ? (
+                        <>
+                        <VideoOnHover src={props.image} mediatype={props.media}/>
+                        </>
+                      ): props.media == "application" ?(
+                        <ModelPreview src={props.image}/>
+                      ): (
+                        <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                      )}
+                    </>
                   ) : (
                     <Box>No logo uploaded</Box>
                   )}
@@ -184,21 +200,31 @@ export default function ListItem(props : ViewItemProps) {
             
               <Flex direction={"row"}>
                 <Flex
-                  w={"50vw"}
-                  h={"80vh"}
-                  p={2}
-                  align={'center'}
-                  justify={'center'}
-                  rounded={'md'}
-                  bg={contentbg}
-                  overflow={'hidden'}>
-                  <Center>
-                    {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
-                      <Image src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
-                    ) : (
-                      <Box>No logo uploaded</Box>
-                    )}
-                  </Center>
+                w={"50vw"}
+                h={"80vh"}
+                p={2}
+                align={'center'}
+                justify={'center'}
+                rounded={'md'}
+                bg={contentbg}
+                overflow={'hidden'}>
+                  {versions.find((v) => v.version.toString() === selectedVersion.toString())?.data ? (
+                    <>
+                      {props.media == "image" ? (
+                        <Image w={'full'} h={'full'} src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} alt="Image" objectFit="contain" borderRadius="md" />
+                      ): props.media == "video" || props.media == "audio" ? (
+                        <>
+                        <VideoOnHover src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} mediatype={props.media}/>
+                        </>
+                      ): props.media == "application" ?(
+                        <ModelPreview src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()}/>
+                      ): (
+                        <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
+                      )}
+                    </>
+                  ) : (
+                    <Box>No logo uploaded</Box>
+                  )}
                 </Flex>
 
                 <Spacer />
@@ -318,9 +344,20 @@ export default function ListItem(props : ViewItemProps) {
                           <Spacer />
                           
                           <Flex w={'full'} justify={'space-between'}>
-                            <Button bg={buttonbg} w={'48%'}>
-                              Download
-                            </Button>
+                            <a
+                              href={`http://localhost:8000/api/download/?id=${version.id}`}
+                              download={true}
+                            >
+                              <Button
+                                w='15vw'
+                                bg={buttonbg}
+                                onClick={(e) => e.stopPropagation()}
+                                size="sm"
+                                variant="solid"
+                              >
+                                Download
+                              </Button>
+                            </a>
                             <Flex w={'45%'} justify={'space-between'}>
                               <UpdateFile filedata={props} closeModal={()=> setIsOpen(false)} submitEvent={props.submitEvent}>
                                 <Button bg={buttonbg2} w={'48%'}>

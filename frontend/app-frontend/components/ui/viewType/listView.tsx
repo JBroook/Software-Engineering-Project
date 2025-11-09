@@ -32,6 +32,7 @@ export default function ListView(props : ViewProps){
     id={file.original_file} 
     filename={file.name} 
     filetype={file.filetype} 
+    media={file.media_type}
     image={file.data} 
     date={file.date_created} 
     created_by={file.employee} 

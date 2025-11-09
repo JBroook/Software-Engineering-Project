@@ -59,9 +59,6 @@ export default function FolderCreate(props: folderCRUD) {
     }
   });
 
-  console.log("Current Folder id: ", props.id)
-  console.log("Current Folder name: ", props.name)
-
   const handleOpenDialog = async () => {
     try{
       const all_folder = await getFolderDetails(props.id);

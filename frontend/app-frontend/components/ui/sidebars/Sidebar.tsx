@@ -37,6 +37,15 @@ function getCookie(name:string) {
 
 // Main Sidebar Component
 export default function SimpleSidebar() {
+  const titleText = useColorModeValue('blue.700', 'blue.400');
+  const textColor = useColorModeValue('black', 'white');
+  const basicbg = useColorModeValue('white', 'black');
+  const contentbg = useColorModeValue('white', 'gray.900');
+  const contentbg2 = useColorModeValue('#383838', '#D9D9D9');
+  const border = useColorModeValue('gray.200', 'gray.700')
+  const buttonbg = useColorModeValue("#79EB99", '#5BB975');
+  const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
+
   // logout user logic
   const router = useRouter();
   const handleLogout = async () => {
@@ -54,10 +63,10 @@ export default function SimpleSidebar() {
     <>
     <Flex w={'20vw'} direction={'column'} position="fixed" top="0">
       <Box
-        bg={useColorModeValue('white', 'gray.900')}
+        bg={contentbg}
         borderRight="1px"
         borderStyle={"solid"}
-        borderRightColor={useColorModeValue('gray.200', 'gray.700')}
+        borderRightColor={border}
         w={{ base: '20vw'}}
         pos="absolute"
         top={0}
@@ -67,7 +76,7 @@ export default function SimpleSidebar() {
           <Text 
           fontSize="2xl"
           fontFamily="var(--font-roboto-condensed)"
-          color={useColorModeValue('blue.700', 'blue.400')}>
+          color={titleText}>
             DAM-N
           </Text>
         </Flex>
@@ -88,17 +97,17 @@ export default function SimpleSidebar() {
             role="group"
             cursor="pointer"
             justifyContent={'flex-start'}
-            color={useColorModeValue('black', 'white')}
+            color={textColor}
             _hover={{
               bg: 'cyan.400',
-              color: useColorModeValue('black', 'white'),
+              color: textColor,
             }}
             onClick={handleLogout}>
               <Icon
                 mr="4"
                 fontSize="16"
                 _groupHover={{
-                  color: useColorModeValue('black', 'white'),
+                  color: textColor,
                 }}
                 as={RiLogoutBoxLine}
               /> Logout

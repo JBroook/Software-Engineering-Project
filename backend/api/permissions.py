@@ -1,7 +1,5 @@
 from rest_framework import permissions
 from users.models import Employee
-from assets.models import File
-from django.contrib.auth.models import User
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -11,7 +9,7 @@ class IsAdmin(permissions.BasePermission):
 
 # for accessing tags, files and folders
 class AssetPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view):            
         if not request.user.is_authenticated:
             return False
 
