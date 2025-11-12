@@ -396,7 +396,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 mt={4}
                                 p={4}
                                 bg={contentbg}>
-                                This Holds all tags that are able to view / edit
+                                add tags here
                               </Box>
                             </Flex>
 

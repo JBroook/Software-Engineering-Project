@@ -7,7 +7,9 @@ import { Flex, Heading,
     Grid, GridItem, Button,
     AspectRatio, Toast,
     chakra,
-    Link
+    Link,
+    Wrap,
+    Tag
 } from '@chakra-ui/react';
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
@@ -68,6 +70,20 @@ export default function GalleryItem(props : ViewItemProps) {
       setLoading(false);
     }
   }
+
+  const tagComponents = props.tags.map(
+    (tag, index)=>{
+      return <Tag.Root 
+        key={index}
+        variant="solid"
+        bg="gray"
+        color="white"
+        p="7px"
+        borderRadius={10}
+        h="fit-content">
+        <Tag.Label>{tag.type.name}</Tag.Label>
+      </Tag.Root>
+    });
 
   return (
     <>
@@ -310,14 +326,14 @@ export default function GalleryItem(props : ViewItemProps) {
                                 {/* Shared Tags */}
                                 <Flex w={'100%'} h={'25%'} direction={'column'}>
                                   <Text h={'20%'}>Tags:</Text>
-                                  <Box
-                                    w={'100%'}
-                                    h={'70%'}
+                                  <Wrap
+                                    w='100%'
+                                    h='70%'
                                     p={4}
                                     rounded={6}
                                     bg={contentbg}>
-                                    This Holds all tags that are able to view / edit
-                                  </Box>
+                                    {tagComponents}
+                                  </Wrap>
                                 </Flex>
 
                                 <Spacer />

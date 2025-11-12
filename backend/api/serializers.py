@@ -109,12 +109,21 @@ class FileSerializer(serializers.ModelSerializer):
         file = File.objects.create(**validated_data)
         return file
     
+class TagSerializer(serializers.ModelSerializer):
+    file = FileSerializer()
+    type = TagTypeSerializer()
+
+    class Meta:
+        model = Tag
+        fields = ['id', 'file', 'type']
+
 class FileVersionSerializer(serializers.ModelSerializer):
     file = FileSerializer(source='original_file', read_only=True)
     employee = EmployeeSerializer(source='created_by', read_only=True)
     date_created = serializers.DateTimeField(format="%Y-%m-%d %H:%M", read_only=True)
     data = serializers.FileField(required=False)
     file_id = serializers.IntegerField(write_only=True, required=False, default=0)
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = FileVersion
@@ -133,8 +142,13 @@ class FileVersionSerializer(serializers.ModelSerializer):
             'created_by', 
             'file',
             'employee',
+            'tags'
         ]
         read_only_fields = ['size', 'date_created', 'created_by', 'file', 'employee','filetype','media_type']
+
+    def get_tags(self, obj):
+        serializer = TagSerializer(obj.original_file.tag.all(), many=True)
+        return serializer.data 
 
     # @transaction.atomic
     def create(self, validated_data):

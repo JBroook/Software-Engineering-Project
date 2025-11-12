@@ -27,6 +27,7 @@ export interface ViewItemProps {
   created_by: any;
   image: string;
   date: string;
+  tags : Tag[];
   submitEvent: (data : FileProp) => void;
 }
 
@@ -45,6 +46,24 @@ export interface EditFolder {
   parent_folder: number | null | undefined;
 }
 
+type TagType = {
+  id : number;
+  name : string;
+  tag_count : number;
+  description : string;
+}
+
+type ParentFile = {
+  id : number;
+  parent_folder : number | null;
+}
+
+export interface Tag {
+  id : number;
+  type : TagType;
+  file : ParentFile;
+}
+
 export interface File {
   id: string;
   name: string;
@@ -55,6 +74,7 @@ export interface File {
   data: string;
   date_created: string;
   employee: any;
+  tags : Tag[];
 }
 
 export interface ViewProps {
