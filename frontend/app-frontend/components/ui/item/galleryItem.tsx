@@ -15,7 +15,7 @@ import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
 import UpdateFile from './fileUpdate';
 import { FileProp } from './fileForm';
-import { Version, ViewItemProps } from '../viewType/interfaces';
+import { FileTag, Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 import VideoOnHover from '../preview/videoPreview';
 import ModelPreview from '../preview/model3dPreview';
@@ -71,19 +71,25 @@ export default function GalleryItem(props : ViewItemProps) {
     }
   }
 
-  const tagComponents = props.tags.map(
-    (tag, index)=>{
-      return <Tag.Root 
-        key={index}
-        variant="solid"
-        bg="gray"
-        color="white"
-        p="7px"
-        borderRadius={10}
-        h="fit-content">
-        <Tag.Label>{tag.type.name}</Tag.Label>
-      </Tag.Root>
-    });
+  let tagComponents : React.JSX.Element[] | React.JSX.Element;
+
+  if(props.tags){
+    tagComponents = props.tags.length>0 ? props.tags.map(
+      (tag, index)=>{
+        return <Tag.Root 
+          key={index}
+          variant="solid"
+          bg="gray"
+          color="white"
+          p="7px"
+          borderRadius={10}
+          h="fit-content">
+          <Tag.Label>{tag.type.name}</Tag.Label>
+        </Tag.Root>
+      }) : <Text>No tags yet</Text>;
+  }else{
+    tagComponents = <Text>No tags yet</Text>;
+  }
 
   return (
     <>

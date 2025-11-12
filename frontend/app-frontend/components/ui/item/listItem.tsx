@@ -10,7 +10,8 @@ import { Flex, Heading,
     Portal,
     Tooltip,
     GridItem,
-    Button
+    Button,
+    Tag
 } from '@chakra-ui/react'
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
@@ -72,6 +73,26 @@ export default function ListItem(props : ViewItemProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  let tagComponents : React.JSX.Element[] | React.JSX.Element;
+  
+  if(props.tags){
+    tagComponents = props.tags.length>0 ? props.tags.map(
+      (tag, index)=>{
+        return <Tag.Root 
+          key={index}
+          variant="solid"
+          bg="gray"
+          color="white"
+          p="7px"
+          borderRadius={10}
+          h="fit-content">
+          <Tag.Label>{tag.type.name}</Tag.Label>
+        </Tag.Root>
+      }) : <Text>No tags yet</Text>;
+  }else{
+    tagComponents = <Text>No tags yet</Text>;
   }
   
   return (
@@ -337,7 +358,7 @@ export default function ListItem(props : ViewItemProps) {
                               p={4}
                               rounded={6}
                               bg={contentbg}>
-                              This Holds all tags that are able to view / edit
+                              {tagComponents}
                             </Box>
                           </Flex>
 

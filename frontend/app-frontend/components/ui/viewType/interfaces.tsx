@@ -27,7 +27,7 @@ export interface ViewItemProps {
   created_by: any;
   image: string;
   date: string;
-  tags : Tag[];
+  tags : FileTag[];
   submitEvent: (data : FileProp) => void;
 }
 
@@ -58,7 +58,7 @@ type ParentFile = {
   parent_folder : number | null;
 }
 
-export interface Tag {
+export type FileTag = {
   id : number;
   type : TagType;
   file : ParentFile;
@@ -68,13 +68,13 @@ export interface File {
   id: string;
   name: string;
   filetype: string;
-  media: string;
+  media_type: string;
   parent_folder: number | null;
   original_file: number;
   data: string;
   date_created: string;
   employee: any;
-  tags : Tag[];
+  tags : FileTag[];
 }
 
 export interface ViewProps {
