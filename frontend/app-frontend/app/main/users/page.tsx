@@ -52,7 +52,7 @@ type OverviewInfo = {
   editors : number;
   viewers : number;
   files : number;
-  storage : number;
+  storage : string;
 }
 
 function convertISOTime(data : User[]){
@@ -78,7 +78,7 @@ export default function UsersPage(){
     editors : 0,
     viewers : 0,
     files : 0,
-    storage : 0
+    storage : "0gb"
   });
 
   // calculate users function for overview
@@ -105,7 +105,7 @@ export default function UsersPage(){
       if(storageInfo.ok){
         const data = await storageInfo.json();
         newOverviewInfo.files = data.fileNumber;
-        newOverviewInfo.storage = data.storageSize;
+        newOverviewInfo.storage = ((data.storageSize/(1000**3)).toFixed(2)).toString()+"GB";
       }
 
       setOverviewInfo(newOverviewInfo);
