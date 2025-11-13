@@ -92,6 +92,16 @@ export default function Main() {
 
   const [currentFoldername, setCurrentFolderName] = useState<string>("All files");
   const [isAllowedEdit, setIsAllowedEdit] = useState<boolean>(false);
+  const [searchbar, setSearchbar] = useState(true);
+  const [viewType, setViewType] = useState("gallery");
+  const [mounted, setMounted] = useState(false);
+
+  //controls text and arrow color
+  const iconTextColor = useColorModeValue("black", 'white');
+  const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
+  const fileFormColor = useColorModeValue("#9AB3F2", '#335098');
+  const headerColor = useColorModeValue("#6082D6", '#0E1117');
+
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -190,7 +200,13 @@ export default function Main() {
     }
 
     fetchAssets()
+
+    setMounted(true);
   }, []);
+
+  if (!mounted) {
+    return null; // or a simple loader
+  }
 
   // sort function
   const sortFiles = (sortMethod : string, sortOrder : string) => {
@@ -467,8 +483,6 @@ export default function Main() {
   }
 
   // handles gallery vs list view
-  const [searchbar, setSearchbar] = useState(true);
-  const [viewType, setViewType] = useState("gallery");
   const view = viewType=="gallery" ? (
       <GalleryView 
         isAllowedEdit={isAllowedEdit}
@@ -500,9 +514,6 @@ export default function Main() {
   const changeViewType = () => {
     setViewType(viewType=="gallery"?"list" : "gallery" );
   }
-
-  //controls text and arrow color
-  const iconTextColor = useColorModeValue("black", 'white');
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {
@@ -582,10 +593,8 @@ export default function Main() {
     fetchSFS(newSFS)
   }
 
-  const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
-
   return (
-    <Box bg={useColorModeValue("#6082D6", '#0E1117')} minH="100vh">
+    <Box bg={headerColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
@@ -642,7 +651,7 @@ export default function Main() {
 
       {isAllowedEdit == true ? (
         <Flex 
-        bg={useColorModeValue("#9AB3F2", '#335098')} 
+        bg={fileFormColor} 
         position={'fixed'} 
         zIndex={2} right={'2vw'} bottom={'4vh'}
         >
