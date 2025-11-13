@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, OuterRef, Subquery
 from django.utils.decorators import method_decorator
 from django.utils.encoding import escape_uri_path
 from django.views.decorators.csrf import csrf_exempt
@@ -228,7 +228,13 @@ class FileViewSet(ModelViewSet):
     serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = FileVersion.objects.all().order_by('original_file', '-version', 'name').distinct('original_file')
+        latest_versions = FileVersion.objects.filter(
+            original_file=OuterRef('original_file')
+        ).order_by('-version')
+
+        queryset = FileVersion.objects.filter(
+            id=Subquery(latest_versions.values('id')[:1])
+        )
         
         parent_id = self.request.query_params.get('parent_folder')
 
