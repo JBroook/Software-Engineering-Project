@@ -63,8 +63,10 @@ type SFSParams = {
   searchKeyword : string;
   mediaType : string[];
   fileExtension : string[];
-  sortMethod : string;
-  sortOrder : string;
+  sortFileMethod : string;
+  sortFileOrder : string;
+  sortFolderMethod : string;
+  sortFolderOrder : string;
   tagType : string[];
 }
 
@@ -72,8 +74,10 @@ const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   mediaType : [],
   fileExtension : [],
-  sortMethod : "name",
-  sortOrder : "asc",
+  sortFileMethod : "name",
+  sortFileOrder : "asc",
+  sortFolderMethod : "name",
+  sortFolderOrder : "asc",
   tagType : []
 }
 
@@ -211,8 +215,18 @@ export default function Main() {
   // sort function
   const sortFiles = (sortMethod : string, sortOrder : string) => {
     const newSFS = {...SFS};
-    newSFS.sortMethod = sortMethod;
-    newSFS.sortOrder = sortOrder;
+    newSFS.sortFileMethod = sortMethod;
+    newSFS.sortFileOrder = sortOrder;
+    console.log(sortMethod)
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const sortFolders = (sortMethod : string, sortOrder : string) => {
+    const newSFS = {...SFS};
+    newSFS.sortFolderMethod = sortMethod;
+    newSFS.sortFolderOrder = sortOrder;
     console.log(sortMethod)
     setSFS(newSFS)
 
@@ -500,7 +514,7 @@ export default function Main() {
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
-        sortFolderEvent={sortFiles}
+        sortFolderEvent={sortFolders}
         lastUpdatedItem={lastUpdated}
         afterOpened={handleReturnedLastUpdatedItem}
       />
@@ -515,7 +529,7 @@ export default function Main() {
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
-        sortFolderEvent={sortFiles}
+        sortFolderEvent={sortFolders}
         lastUpdatedItem={lastUpdated}
         afterOpened={handleReturnedLastUpdatedItem}
       />
@@ -531,9 +545,7 @@ export default function Main() {
     const url1 = new URL('http://localhost:8000/api/folders/');
     url1.searchParams.set('parent_folder', currentParent.toString());
     url1.searchParams.set('name', SFS.searchKeyword);
-    if(SFS.sortMethod==='name' || SFS.sortMethod==='date_modified'){
-      url1.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
-    }
+    url1.searchParams.set('sort_method', SFS.sortFolderMethod+"__"+SFS.sortFolderOrder);
     const folderRes = await fetch(url1, {
       credentials: 'include',
     });
@@ -561,8 +573,8 @@ export default function Main() {
     }
 
     // sort
-    if(SFS.sortMethod!==""){
-      url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    if(SFS.sortFileMethod!==""){
+      url2.searchParams.set('sort_method', SFS.sortFileMethod+"__"+SFS.sortFileOrder);
     }
     const fileRes = await fetch(url2.toString(), {
       credentials: 'include',
