@@ -351,20 +351,15 @@ export default function ListItem(props : ViewItemProps) {
                               p={4}
                               rounded={6}
                               bg={contentbg}>
-                              {version.tags ? version.tags.map(
-                                (tag : FileTag, index : number)=>{
-                                  return <Tag.Root 
-                                    key={index}
-                                    variant="solid"
-                                    bg="gray"
-                                    color="white"
-                                    p="7px"
-                                    borderRadius={10}
-                                    h="fit-content">
+                              {version.tags?.length ? (
+                                version.tags.map((tag: FileTag, index: number) => (
+                                  <Tag.Root key={index} variant="solid" bg="gray" color="white" p="7px" borderRadius={10} h="fit-content">
                                     <Tag.Label>{tag.type.name}</Tag.Label>
                                   </Tag.Root>
-                                }):<Text>No tags yet  </Text>
-                              }
+                                ))
+                              ) : (
+                                <Text>No tags yet</Text>
+                              )}
                             </Wrap>
                           </Flex>
 
