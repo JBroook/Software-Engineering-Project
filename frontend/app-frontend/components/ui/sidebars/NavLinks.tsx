@@ -1,4 +1,4 @@
-import {  FlexProps, Icon, Link as ChakraLink, Button } from "@chakra-ui/react"
+import {  FlexProps, Icon, Link as ChakraLink, Button, Text } from "@chakra-ui/react"
 import { ReactNode, useEffect, useState } from "react"
 import { IconType } from "react-icons"
 import { useColorModeValue } from '../color-mode'
@@ -6,15 +6,19 @@ import NextLink  from "next/link"
 
 // Navigation Item
 interface NavItemProps extends FlexProps {
-  icon: IconType
-  children: String | ReactNode,
+  icon: IconType;
   href : string;
+  name : string;
+  iconTextColor : string;
 }
-const NavItem = ({ icon, children, href, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, href, name, iconTextColor, ...rest }: NavItemProps) => {
   return (
     <>
-    <ChakraLink w={'full'} href={href} _hover={{ textDecoration: 'none' }}>
-      <Button
+      <ChakraLink
+      as={NextLink}
+      href={href}
+      >
+        <Button
         width="85%"
         p="4"
         mx="4"
@@ -22,22 +26,22 @@ const NavItem = ({ icon, children, href, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         justifyContent={'flex-start'}
-        color={useColorModeValue('black', 'white')}
+        color={iconTextColor}
         _hover={{
           bg: 'cyan.400',
-          color: useColorModeValue('black', 'white'),
+          color: iconTextColor,
         }}>
         <Icon
           mr="4"
           fontSize="16"
           _groupHover={{
-            color: useColorModeValue('black', 'white'),
+            color: iconTextColor,
           }}
           as={icon}
         />
-        {children}
+        {name}
       </Button>
-    </ChakraLink>
+      </ChakraLink>
     </>
   )
 }
