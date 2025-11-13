@@ -205,6 +205,12 @@ export default function Main() {
 
     fetchAssets()
 
+    // set view type preference
+    const viewTypePreference = getCookie("viewType");
+    if(viewTypePreference!==""){
+      setViewType(viewTypePreference)
+    }
+
     setMounted(true);
   }, []);
 
@@ -536,7 +542,9 @@ export default function Main() {
   );
 
   const changeViewType = () => {
-    setViewType(viewType=="gallery"?"list" : "gallery" );
+    const newViewType = viewType=="gallery"?"list" : "gallery";
+    document.cookie = "viewType="+newViewType;
+    setViewType(newViewType);
   }
 
   //search-filter-sort function
