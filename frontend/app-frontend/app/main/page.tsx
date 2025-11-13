@@ -101,7 +101,7 @@ export default function Main() {
   const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
   const fileFormColor = useColorModeValue("#9AB3F2", '#335098');
   const headerColor = useColorModeValue("#6082D6", '#0E1117');
-
+  const [lastUpdated, setLastUpdated] = useState<number|null>(-1);
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -431,6 +431,8 @@ export default function Main() {
 
       if(res.ok){
         const fileData = await res.json();
+        setLastUpdated(data.id);
+        console.log("Updated prop: ", lastUpdated);
         fetchSFS(SFS);
       }else{
         const errorData = await res.json();
@@ -482,7 +484,11 @@ export default function Main() {
     }
   }
 
-  // handles gallery vs list view
+  const handleReturnedLastUpdatedItem = () => {
+    setLastUpdated(-1);
+  }
+  console.log(lastUpdated)
+  
   const view = viewType=="gallery" ? (
       <GalleryView 
         isAllowedEdit={isAllowedEdit}
@@ -495,6 +501,8 @@ export default function Main() {
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
+        lastUpdatedItem={lastUpdated}
+        afterOpened={handleReturnedLastUpdatedItem}
       />
   ) : (
       <ListView 
@@ -508,6 +516,8 @@ export default function Main() {
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
+        lastUpdatedItem={lastUpdated}
+        afterOpened={handleReturnedLastUpdatedItem}
       />
   );
 
@@ -594,7 +604,7 @@ export default function Main() {
   }
 
   return (
-    <Box bg={headerColor} minH="100vh">
+    <Box bg={fileFormColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"

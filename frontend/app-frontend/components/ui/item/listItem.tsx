@@ -76,6 +76,17 @@ export default function ListItem(props : ViewItemProps) {
     }
   }
   
+  const updatedChecker = () => {
+    if (props.lastUpdatedItem == props.id) {
+      props.afterOpened(-1);
+      handleOpenDialog();
+    }
+  }
+
+  useEffect(() => {
+    updatedChecker();
+  }, [])
+
   return (
     <>
       <Dialog.Root 
@@ -128,8 +139,6 @@ export default function ListItem(props : ViewItemProps) {
                   <Flex mx={2} w="60px" justify="center">
                     <Text>{props.created_by.username}</Text>
                   </Flex>
-
-                  <SlOptionsVertical/>
                 </HStack>
               </Flex>
             </Box>
@@ -245,16 +254,20 @@ export default function ListItem(props : ViewItemProps) {
                     defaultValue={versions[0].version.toString()}
                     value={selectedVersion}
                     onValueChange={(v) => setSelectedVersion(v.value)}>
-                    <Tabs.List bg={contentbg}>
-                      {versions.map((versions: any) => (
-                        <Tabs.Trigger 
-                        key={versions.version}
-                        color={contentbg2} 
-                        value={versions.version.toString()}>
-                          Version {versions.version.toString()}
-                        </Tabs.Trigger>
-                      ))}
-                    </Tabs.List>
+                    
+                    <Flex overflowX="scroll" >
+                      <Tabs.List bg={contentbg} width={"auto"}>
+                        {versions.map((versions: any) => (
+                          <Tabs.Trigger 
+                          width='150px'
+                          key={versions.version.toString()}
+                          color={contentbg2} 
+                          value={versions.version.toString()}>
+                            Version {versions.version}
+                          </Tabs.Trigger>
+                        ))}
+                      </Tabs.List>
+                    </Flex>
 
                     {versions.map((version: any) => (
                       <Tabs.Content key={version.version.toString()} value={version.version.toString()}>

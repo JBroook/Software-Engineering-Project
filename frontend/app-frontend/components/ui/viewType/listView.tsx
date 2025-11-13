@@ -43,7 +43,10 @@ export default function ListView(props : ViewProps){
     image={file.data} 
     date={file.date_created} 
     created_by={file.employee} 
-    submitEvent={props.submitEvent}/>
+    submitEvent={props.submitEvent}
+    lastUpdatedItem={props.lastUpdatedItem}
+    afterOpened={props.afterOpened}
+    />
   ))
 
   return (<>
@@ -74,15 +77,20 @@ export default function ListView(props : ViewProps){
     pl={8}
     pb={10}>
       {props.isAllowedEdit == true ? (
-        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+        <FolderCreate id={props.folderId} name={props.folderName} maxW="79vw" clickEvent={props.clickEvent} />
       ):(
         <></>
       )}
-      <ContentLoader 
+      {folderComponents.length == 0 ? (
+        <></>
+      ):(
+        <ContentLoader 
         loading={props.loading}
         color="white"
         content={folderComponents}
       />
+      )}
+      
     </Stack>
 
     <Separator size={"md"} />

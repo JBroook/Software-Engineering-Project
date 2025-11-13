@@ -2,7 +2,8 @@ import {
   Heading, HStack, SimpleGrid,
   Separator, Spinner, Flex,
   Spacer,
-  Button,
+  Button, Text,
+  Center,
 } from "@chakra-ui/react"
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
@@ -44,7 +45,10 @@ export default function GalleryView(props : ViewProps){
     image={file.data} 
     date={file.date_created} 
     created_by={file.employee} 
-    submitEvent={props.submitEvent}/>
+    submitEvent={props.submitEvent}
+    lastUpdatedItem={props.lastUpdatedItem}
+    afterOpened={props.afterOpened}
+    />
   ))
 
   return (<>
@@ -72,7 +76,7 @@ export default function GalleryView(props : ViewProps){
     </ HStack>
     
     
-    {folderComponents.length>=3 ?
+    {folderComponents.length>=3 ? (
       <SimpleGrid 
       w="100%" 
       minChildWidth={80} 
@@ -82,7 +86,7 @@ export default function GalleryView(props : ViewProps){
       bg={folderbg} 
       >
         {props.isAllowedEdit == true ? (
-          <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+          <FolderCreate id={props.folderId} name={props.folderName} maxW="26vw"  clickEvent={props.clickEvent} />
         ):(
           <></>
         )}
@@ -92,21 +96,33 @@ export default function GalleryView(props : ViewProps){
           content={folderComponents}
         />
       </SimpleGrid>
-      :
-      <Flex 
-      w="100%" 
-      gap="6px" 
-      px={8} 
-      pb={10} 
-      bg={folderbg} 
-      >
-        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
-        <ContentLoader 
-          loading={props.loading}
-          color="white"
-          content={folderComponents}
-        />
-      </Flex>
+      ) : folderComponents.length == 0 ? (
+        <Flex 
+          w="100%" 
+          gap="6px" 
+          px={8} 
+          pb={10} 
+          bg={folderbg} 
+          >
+          <FolderCreate id={props.folderId} name={props.folderName} maxW="26vw"  clickEvent={props.clickEvent} />
+          
+        </Flex>
+      ) : (
+        <Flex 
+        w="100%" 
+        gap="6px" 
+        px={8} 
+        pb={10} 
+        bg={folderbg} 
+        >
+          <FolderCreate id={props.folderId} name={props.folderName} maxW="26vw"  clickEvent={props.clickEvent} />
+          <ContentLoader 
+            loading={props.loading}
+            color="white"
+            content={folderComponents}
+          />
+        </Flex>
+      )
     }
 
     <Separator size={"md"} />
@@ -138,7 +154,7 @@ export default function GalleryView(props : ViewProps){
         { label : "Last modified", value : "date_created"}]}/>
     </Flex>
 
-    {fileComponents.length>=4 ?
+    {fileComponents.length>=4 ? (
       <SimpleGrid 
       w="100%" 
       h='auto'
@@ -156,7 +172,24 @@ export default function GalleryView(props : ViewProps){
         />
         <Spacer></Spacer>
       </SimpleGrid>
-    :
+    ) : fileComponents.length <=0 ? (
+      <Flex 
+      w="100%" 
+      h='auto'
+      gap="6" 
+      px={8} 
+      pb={20} 
+      bg={filebg}
+      justifyContent={'center'}
+      align={'center'}
+      >
+          <ContentLoader 
+            loading={props.loading}
+            color="black"
+            content={fileComponents}
+          />
+      </Flex>
+    ) : (
       <Flex 
       w="100%" 
       h='auto'
@@ -171,6 +204,7 @@ export default function GalleryView(props : ViewProps){
           content={fileComponents}
         />
       </Flex>
+    )
     }
     </>);
 }

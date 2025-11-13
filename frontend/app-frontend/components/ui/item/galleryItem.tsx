@@ -71,6 +71,17 @@ export default function GalleryItem(props : ViewItemProps) {
     }
   }
 
+  const updatedChecker = () => {
+    if (props.lastUpdatedItem == props.id) {
+      props.afterOpened(-1);
+      handleOpenDialog();
+    }
+  }
+
+  useEffect(() => {
+    updatedChecker();
+  }, [])
+
   return (
     <>
       <Dialog.Root 
@@ -104,12 +115,6 @@ export default function GalleryItem(props : ViewItemProps) {
                 <Heading fontFamily="var(--font-reddit-mono)">
                     {props.filename}
                 </Heading>
-                <IconButton
-                    variant="ghost"
-                    _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
-                    borderRadius="100%">
-                    <SlOptionsVertical/>
-                </IconButton>
             </Flex>
             <Flex
             borderRadius={"xl"}
@@ -218,22 +223,27 @@ export default function GalleryItem(props : ViewItemProps) {
                         {/* File Version */}
                         <Tabs.Root
                           w={"100%"}
+                          h='auto'
                           variant="enclosed"
-                          activationMode='automatic'
                           fitted
+                          activationMode='automatic'
                           defaultValue={versions[0].version.toString()}
                           value={selectedVersion}
                           onValueChange={(v) => setSelectedVersion(v.value)}>
-                          <Tabs.List bg={contentbg}>
-                            {versions.map((versions: any) => (
-                              <Tabs.Trigger 
-                              key={versions.version.toString()}
-                              color={contentbg2} 
-                              value={versions.version.toString()}>
-                                Version {versions.version}
-                              </Tabs.Trigger>
-                            ))}
-                          </Tabs.List>
+                            
+                          <Flex overflowX="scroll" >
+                            <Tabs.List bg={contentbg} width={"auto"}>
+                              {versions.map((versions: any) => (
+                                <Tabs.Trigger 
+                                width='150px'
+                                key={versions.version.toString()}
+                                color={contentbg2} 
+                                value={versions.version.toString()}>
+                                  Version {versions.version}
+                                </Tabs.Trigger>
+                              ))}
+                            </Tabs.List>
+                          </Flex>
 
                           {versions.map((version: any) => (
                             <Tabs.Content key={version.version.toString()} value={version.version.toString()}>

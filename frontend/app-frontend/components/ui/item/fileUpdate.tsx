@@ -72,7 +72,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   });
 
   let folderframeworks = createListCollection({items: allFolder});
-  console.log(folderframeworks)
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -99,8 +98,13 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       const all_folder = await fetchFolders();
       const fetchedFolder:FolderItem[] = [];
       fetchedFolder.push({
-        label: "",
+        label: "No Changes",
         value: -2,
+        description: Promise.resolve(""), // Filepath address
+      });
+      fetchedFolder.push({
+        label: "All files",
+        value: -1,
         description: Promise.resolve(""), // Filepath address
       });
       for (const items of all_folder) {
@@ -132,7 +136,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
     const fileUpload = useFileUploadContext();
     const files = fileUpload.acceptedFiles;
     
-    console.log("Uploaded File11: ",fileUpload.acceptedFiles[0]);
     return (
       <FileUpload.ItemGroup>
         {files.map((file) => (
@@ -350,8 +353,8 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                   color={textColor} 
                   align={'center'} justify={'center'} grow={1}
                   >
+
                     <Box h="100%" as="form" onSubmit={(e) => {
-                        console.log("Form submit event triggered"); // Debug log
                         handleSubmit(onSubmit)(e);
                       }}>
                         <VisuallyHidden asChild>
@@ -376,7 +379,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 <FileUpload.HiddenInput required={false}/>
                                 <Center>
                                   <FileUpload.Dropzone asChild w='83%' h='75%'>
-                                    <Image src={versions.data.toString()} alt="Image" objectFit="contain" borderRadius="md" p={8}/>
+                                    <Image src={versions.data.toString()} alt="Previously Uploaded File" objectFit="contain" borderRadius="md" p={8}/>
                                   </FileUpload.Dropzone>
                                 </Center>
                                 <FileUploadList />
@@ -420,7 +423,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 name="parent_folder"
                                 render={({ field }) => {
                                 const selectValue = field.value ?? undefined;
-                                console.log(selectValue)
                                 return(
                                 <Select.Root
                                   multiple={false}

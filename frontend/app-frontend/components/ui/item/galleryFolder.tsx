@@ -174,111 +174,118 @@ export default function GalleryFolder(props : GalleryFolderProps) {
       px={4}
       cursor="pointer"
       >
-        <form onSubmit={(e) => {
-          console.log("Folder Form submit event triggered"); // Debug log
+        <Box as="form" w="100%" onSubmit={(e) => {
           handleSubmit(onSubmit)(e);
         }} >
-          <Flex direction={'row'} w={'340px'}>
-            <Flex justify="space-between" align="center" w={'90%'}>
-      
-              <HStack>
+          <Flex w="100%" justify="space-between" direction={'row'}>
+    
+            <HStack w="80%">
+              <Flex mr={2}>
                 <FaFolder 
-                    color={textColor}
-                    size={25}/>
-                <Box h="fit-content" w={'100%'}>
-                  <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
-                    <Field.Label>
-                      File Name
-                    </Field.Label>
-                    <Input
-                      p={2}
-                      {...register('foldername')}
-                      defaultValue={props.foldername}
-                      placeholder={props.foldername}
+                  color={textColor}
+                  size={25}/>
+              </Flex>
+              <Flex h="fit-content" w={'100%'} direction={'column'}>
+                <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
+                  <Field.Label>
+                    File Name
+                  </Field.Label>
+                  <Input
+                    w="100%"
+                    p={2}
+                    {...register('foldername')}
+                    defaultValue={props.foldername}
+                    placeholder={props.foldername}
+                  />
+                  <Field.ErrorText> 
+                    A Name must be given for the Folder
+                  </Field.ErrorText>
+                </Field.Root>
+                    
+                <Field.Root key={1} w="100%" mb={4} invalid={!!errors['parent_folder']}>
+                  <Field.Label>
+                    Parent Folder
+                    <Field.RequiredIndicator
+                      fallback={
+                        <Badge size="xs" variant="surface">
+                          Optional
+                        </Badge>
+                      }
                     />
-                    <Field.ErrorText> 
-                      A Name must be given for the Folder
-                    </Field.ErrorText>
-                  </Field.Root>
-                      
-                  <Field.Root key={1} mb={4} invalid={!!errors['parent_folder']}>
-                    <Field.Label>
-                      Parent Folder
-                      <Field.RequiredIndicator
-                        fallback={
-                          <Badge size="xs" variant="surface">
-                            Optional
-                          </Badge>
-                        }
-                      />
-                    </Field.Label> 
-                  
-                    <Controller
-                      control={control}
-                      name="parent_folder"
-                      render={({ field }) => {
-                      const selectValue = field.value ?? undefined;
-                      return(
-                      <Select.Root
-                        multiple={false}
-                        value={selectValue as string[] | undefined}
-                        onValueChange={(e) => field.onChange(e.value)}
-                        collection={folderframeworks}
-                        defaultValue={[currentParentIndex.toString()]}
-                      >
-                        <Select.Control>
-                          <Select.Trigger>
-                            <Select.ValueText placeholder="Parent Folder" />
-                          </Select.Trigger>
-                          <Select.IndicatorGroup>
-                            <Select.Indicator />
-                          </Select.IndicatorGroup>
-                        </Select.Control>
-                        <Select.Positioner>
-                            <Select.Content h={'auto'}>
-                              {folderframeworks.items.map((folder, index) => (
-                                <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
-                                  <Stack gap="0" h={'5vh'}>
-                                    <Select.ItemText maxW={'10vw'} truncate>{folder.label}</Select.ItemText>
-                                    <Span color="fg.muted" textStyle="xs">
-                                      {folder.description}
-                                    </Span>
-                                  </Stack>
-                                  <Select.ItemIndicator />
-                                </Select.Item>
-                              ))}
-                            </Select.Content>
-                        </Select.Positioner>
-                      </Select.Root>
-                    )}} />
+                  </Field.Label> 
+                
+                  <Controller
+                    control={control}
+                    name="parent_folder"
+                    render={({ field }) => {
+                    const selectValue = field.value ?? undefined;
+                    return(
+                    <Select.Root 
+                      w="100%"
+                      multiple={false}
+                      value={selectValue as string[] | undefined}
+                      onValueChange={(e) => field.onChange(e.value)}
+                      collection={folderframeworks}
+                      defaultValue={[currentParentIndex.toString()]}
+                    >
+                      <Select.Control>
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="Parent Folder" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                          <Select.Indicator />
+                        </Select.IndicatorGroup>
+                      </Select.Control>
+                      <Select.Positioner>
+                          <Select.Content h={'auto'}>
+                            {folderframeworks.items.map((folder, index) => (
+                              <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
+                                <Stack gap="0" h={'5vh'}>
+                                  <Select.ItemText maxW={'10vw'} truncate>{folder.label}</Select.ItemText>
+                                  <Span color="fg.muted" textStyle="xs">
+                                    {folder.description}
+                                  </Span>
+                                </Stack>
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                      </Select.Positioner>
+                    </Select.Root>
+                  )}} />
 
-                    <Field.ErrorText> 
-                      {errors['parent_folder']?.message}
-                    </Field.ErrorText>
-                  </Field.Root>
-                </Box>
-              </HStack>
-            </Flex>
-            <Flex w={'16%'} direction={'column'}>
+                  <Field.ErrorText> 
+                    {errors['parent_folder']?.message}
+                  </Field.ErrorText>
+                </Field.Root>
+              </Flex>
+            </HStack>
+            
+            <Flex w={'15%'} direction={'column'}>
               <Button w={'100%'} h={'45%'} 
               type="submit" as={'button'}
               bg={buttonbg} 
+              borderColor={textColor}
+              borderWidth="0.5px"
               _hover={{bg : "#8aa0d7ff"}}
-              px={3}>
+              px={3}
+              mr={2}
+              >
                 <SiTicktick />
               </Button>
               <Spacer />
               <Button w={'100%'} h={'45%'} onClick={closeChange}
               bg={buttonbg2} 
+              borderColor={textColor}
+              borderWidth="0.5px"
               _hover={{bg : "#df817dff"}}
               px={3}>
                 <MdCancel />
               </Button>
             </Flex>
           </Flex>
-        </form>
+        </Box>
       </Flex>
-      
     ) : (
       <Flex 
       w="100%"
@@ -310,11 +317,11 @@ export default function GalleryFolder(props : GalleryFolderProps) {
           </HStack>
         </Flex>
         
-        {props.isAllowedEdit == true ? (
-          <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
-        ):(
-          <></>
-        )}
+          {props.isAllowedEdit == true ? (
+            <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+          ):(
+            <></>
+          )}
       </Flex>
     )}
     </>
