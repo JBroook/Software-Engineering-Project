@@ -11,13 +11,14 @@ import { Flex, Heading,
     Tooltip,
     GridItem,
     Button,
-    Tag
+    Tag,
+    Wrap
 } from '@chakra-ui/react'
 import { FaFolder } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
-import { Version, ViewItemProps } from '../viewType/interfaces';
+import { FileTag, Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 import UpdateFile from './fileUpdate';
 import VideoOnHover from '../preview/videoPreview';
@@ -329,17 +330,29 @@ export default function ListItem(props : ViewItemProps) {
 
                           <Spacer />
 
-                          {/* Shared Tags */}
                           <Flex w={'100%'} h={'25%'} direction={'column'}>
                             <Text h={'20%'}>Tags:</Text>
-                            <Box
-                              w={'100%'}
-                              h={'70%'}
+                            <Wrap
+                              w='100%'
+                              h='70%'
                               p={4}
                               rounded={6}
                               bg={contentbg}>
-                              {tagComponents}
-                            </Box>
+                              {version.tags ? version.tags.map(
+                                (tag : FileTag, index : number)=>{
+                                  return <Tag.Root 
+                                    key={index}
+                                    variant="solid"
+                                    bg="gray"
+                                    color="white"
+                                    p="7px"
+                                    borderRadius={10}
+                                    h="fit-content">
+                                    <Tag.Label>{tag.type.name}</Tag.Label>
+                                  </Tag.Root>
+                                }):<Text>No tags yet  </Text>
+                              }
+                            </Wrap>
                           </Flex>
 
                           <Spacer />

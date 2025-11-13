@@ -29,6 +29,7 @@ export interface ViewItemProps {
   image: string;
   date: string;
   submitEvent: (data : FileProp) => void;
+  tags : FileTag[];
 }
 
 export interface Folder {
