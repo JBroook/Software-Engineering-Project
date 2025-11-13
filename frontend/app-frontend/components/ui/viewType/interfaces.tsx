@@ -15,6 +15,7 @@ export interface Version {
   created_by: string;
   data: File;
   employee: any;
+  tags : FileTag[];
 }
 
 export interface ViewItemProps {
@@ -27,7 +28,6 @@ export interface ViewItemProps {
   created_by: any;
   image: string;
   date: string;
-  tags : FileTag[];
   submitEvent: (data : FileProp) => void;
 }
 

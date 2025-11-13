@@ -46,6 +46,7 @@ const getFiles = async (currentParent: number) => {
     credentials: 'include',
   });
   const data = await res.json();
+  console.log("Fetched file:",data)
   return data;
 };
 

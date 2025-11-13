@@ -31,6 +31,6 @@ class TagTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('id', 'file', 'type')
+    list_display = ('id', 'file_version', 'type')
     list_filter = ('type',)
-    search_fields = ('file__name', 'type__name')
+    search_fields = ('file_version__name', 'type__name')

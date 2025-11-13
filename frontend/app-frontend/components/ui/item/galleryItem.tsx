@@ -71,26 +71,6 @@ export default function GalleryItem(props : ViewItemProps) {
     }
   }
 
-  let tagComponents : React.JSX.Element[] | React.JSX.Element;
-
-  if(props.tags){
-    tagComponents = props.tags.length>0 ? props.tags.map(
-      (tag, index)=>{
-        return <Tag.Root 
-          key={index}
-          variant="solid"
-          bg="gray"
-          color="white"
-          p="7px"
-          borderRadius={10}
-          h="fit-content">
-          <Tag.Label>{tag.type.name}</Tag.Label>
-        </Tag.Root>
-      }) : <Text>No tags yet</Text>;
-  }else{
-    tagComponents = <Text>No tags yet</Text>;
-  }
-
   return (
     <>
       <Dialog.Root 
@@ -338,7 +318,20 @@ export default function GalleryItem(props : ViewItemProps) {
                                     p={4}
                                     rounded={6}
                                     bg={contentbg}>
-                                    {tagComponents}
+                                    {version.tags ? version.tags.map(
+                                      (tag : FileTag, index : number)=>{
+                                        return <Tag.Root 
+                                          key={index}
+                                          variant="solid"
+                                          bg="gray"
+                                          color="white"
+                                          p="7px"
+                                          borderRadius={10}
+                                          h="fit-content">
+                                          <Tag.Label>{tag.type.name}</Tag.Label>
+                                        </Tag.Root>
+                                      }):<Text>No tags yet  </Text>
+                                    }
                                   </Wrap>
                                 </Flex>
 

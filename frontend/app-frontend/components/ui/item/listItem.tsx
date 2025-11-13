@@ -74,26 +74,6 @@ export default function ListItem(props : ViewItemProps) {
       setLoading(false);
     }
   }
-
-  let tagComponents : React.JSX.Element[] | React.JSX.Element;
-  
-  if(props.tags){
-    tagComponents = props.tags.length>0 ? props.tags.map(
-      (tag, index)=>{
-        return <Tag.Root 
-          key={index}
-          variant="solid"
-          bg="gray"
-          color="white"
-          p="7px"
-          borderRadius={10}
-          h="fit-content">
-          <Tag.Label>{tag.type.name}</Tag.Label>
-        </Tag.Root>
-      }) : <Text>No tags yet</Text>;
-  }else{
-    tagComponents = <Text>No tags yet</Text>;
-  }
   
   return (
     <>
