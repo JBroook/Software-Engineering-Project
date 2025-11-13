@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useColorModeValue } from "../color-mode";
 import { 
@@ -15,11 +15,24 @@ import {
   createListCollection,
   Select,
   Span,
-  Stack} from "@chakra-ui/react";
+  Stack,
+  Wrap,
+  Tag,
+  IconButton} from "@chakra-ui/react";
 import { LuX } from "react-icons/lu";
 import { FileProp, getFolderDetails, fetchFolders } from "./fileForm";
 import { getFileDetails } from "./galleryItem";
-import { ViewItemProps, Version } from '../viewType/interfaces';
+import { ViewItemProps, Version, FileTag, TagType } from '../viewType/interfaces';
+import { IoIosAddCircleOutline } from "react-icons/io";
+import TagSearchbar from "./tagSearchbar";
+
+
+function getCookie(name:string) {
+  const value = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return value ? decodeURIComponent(value.split('=')[1]) : "";
+}
 
 export interface UpdateFileProps{
   filedata: ViewItemProps;
@@ -47,6 +60,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const [selectedFolder, setSelectedFolder] = useState<string>();
   const [versions, setVersions] = useState<Version>(); // Store fetched data
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState<FileTag[]>([]);
     
   const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
 
@@ -172,9 +186,8 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
         parent_folder: selectedFolder || fetched.parent_folder || null,
         data: files, // Single File object
         version: versions.version + 1, 
+        tags: tags
       }
-
-      console.log("new File Data:", newFileData);
       
       try{
         await props.submitEvent(newFileData);
@@ -197,6 +210,103 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       }
     }
   }
+
+  useEffect(()=>{
+    setTags(props.filedata.tags);
+  }, [])
+
+  const removeTag = (index : number) => {
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+    setTags(newTags);
+  }
+
+  let tagComponents : React.JSX.Element[] | React.JSX.Element = <Text>No tags yet</Text>;
+  
+  const renderTags = () => {
+    if(tags){
+      tagComponents = tags.length>0 ? tags.map(
+        (tag, index)=>{
+          return <Tag.Root 
+            key={index}
+            variant="solid"
+            bg="gray"
+            color="white"
+            p="7px"
+            borderRadius={10}
+            h="fit-content">
+            <Tag.Label>{tag.type.name}</Tag.Label>
+            <Tag.EndElement>
+              <Tag.CloseTrigger asChild>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();// stop default CloseTrigger behavior
+                    e.stopPropagation();// stop bubbling up
+                    removeTag(index);
+                  }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    width: "100%",
+                    height: "100%"
+                  }}
+                >
+                  ✕
+                </button>
+              </Tag.CloseTrigger>
+            </Tag.EndElement>
+          </Tag.Root>
+        }) : <Text>No tags yet</Text>;
+    }else{
+      tagComponents = <Text>No tags yet</Text>;
+    }
+  }
+  renderTags();
+
+  const searchTags = async (input : string)=>{
+    const res = await fetch(`http://localhost:8000/api/tagtypes/?search=${input}`, {
+      credentials: 'include',
+    });
+
+    if(res.ok){
+      const data = await res.json();
+      return data;
+    }
+    return [];
+  };
+
+  const addNewTag = async (tagType : TagType) => {
+    console.log(props.filedata.id, tagType)
+    const newTags = [...tags];
+    const newFileTag : FileTag = {
+      id : -1,
+      type: tagType,
+      file : props.filedata
+    };
+
+    if(!newTags.some(obj => obj.type.id === newFileTag.type.id)){
+      newTags.push(newFileTag);
+      setTags(newTags);
+    }
+
+    // const res = await fetch(`http://localhost:8000/api/tags/`, {
+    //   method: 'POST',
+    //   credentials: 'include',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'X-CSRFToken': getCookie('csrftoken'),
+    //   },
+    //   body: JSON.stringify({
+    //     "file_version_id" : props.filedata.id,
+    //     "tagtype_id" : tagId
+    //   }),
+    // });
+
+    // if(res.ok){
+    //   fetchTags();
+    // }
+  };
   
   return (
     <>
@@ -240,7 +350,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                   color={textColor} 
                   align={'center'} justify={'center'} grow={1}
                   >
-                    <form onSubmit={(e) => {
+                    <Box h="100%" as="form" onSubmit={(e) => {
                         console.log("Form submit event triggered"); // Debug log
                         handleSubmit(onSubmit)(e);
                       }}>
@@ -388,16 +498,22 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                             <Spacer />
 
                             {/* Shared Tags */}
-                            <Flex w={'100%'} h={'25%'} direction={'column'}>
+                            <Flex w={'100%'} h="fit-content" direction={'column'} marginBottom={5}>
                               <Text>Tags:</Text>
-                              <Box
-                                w={'100%'}
-                                h={'100%'}
-                                mt={4}
+                              <TagSearchbar 
+                                inputEvent={searchTags}
+                                addTagEvent={addNewTag}
+                              />
+
+                              <Wrap
+                                marginTop={5}
+                                w='100%'
+                                h={20}
                                 p={4}
+                                rounded={6}
                                 bg={contentbg}>
-                                This Holds all tags that are able to view / edit
-                              </Box>
+                                {tagComponents}
+                              </Wrap>
                             </Flex>
 
                             <Spacer />
@@ -413,7 +529,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                           </Flex>
                         </Flex>
                       </Flex>
-                    </form>
+                    </Box>
                   </Flex>
                 </Dialog.Body>
                 <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>

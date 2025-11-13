@@ -40,6 +40,7 @@ export default function GalleryView(props : ViewProps){
     filename={file.name} 
     filetype={file.filetype} 
     media={file.media_type}
+    tags={file.tags}
     image={file.data} 
     date={file.date_created} 
     created_by={file.employee} 

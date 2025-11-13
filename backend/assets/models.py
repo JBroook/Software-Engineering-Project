@@ -37,8 +37,11 @@ class TagType(models.Model):
         return self.name
 
 class Tag(models.Model):
-    file = models.ForeignKey(File, on_delete=models.CASCADE, related_name='tag')
+    file_version = models.ForeignKey(FileVersion, on_delete=models.CASCADE, related_name='tag')
     type = models.ForeignKey(TagType, on_delete=models.CASCADE, related_name='tag')
+
+    class Meta:
+        unique_together = ('file_version', 'type')
 
     def __str__(self):
         return self.type.name
