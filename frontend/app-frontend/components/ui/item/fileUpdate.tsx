@@ -186,9 +186,8 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
         parent_folder: selectedFolder || fetched.parent_folder || null,
         data: files, // Single File object
         version: versions.version + 1, 
+        tags: tags
       }
-
-      console.log("new File Data:", newFileData);
       
       try{
         await props.submitEvent(newFileData);
@@ -222,7 +221,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
     setTags(newTags);
   }
 
-  let tagComponents : React.JSX.Element[] | React.JSX.Element;
+  let tagComponents : React.JSX.Element[] | React.JSX.Element = <Text>No tags yet</Text>;
   
   const renderTags = () => {
     if(tags){
@@ -264,17 +263,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
     }
   }
   renderTags();
-
-  const fetchTags = async () => {
-    const res = await fetch(`http://localhost:8000/api/tags/?file=${props.filedata.id}`, {
-      credentials: 'include',
-    });
-
-    if(res.ok){
-      const data = await res.json();
-      setTags(data);
-    }
-  }
 
   const searchTags = async (input : string)=>{
     const res = await fetch(`http://localhost:8000/api/tagtypes/?search=${input}`, {

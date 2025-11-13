@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from assets.models import File, FileVersion, Folder, TagType, Tag
@@ -222,6 +223,15 @@ class FileVersionSerializer(serializers.ModelSerializer):
             size=size,
             created_by=employee
         )
+
+        # create associated tags
+        tags = json.loads(self.context['request'].data.get('tags'))
+        for tag in tags:
+            Tag.objects.create(
+                file=file_vers.original_file,
+                type=TagType.objects.get(pk=tag['type']['id'])
+            )
+
         return file_vers
 
 class FolderSerializer(serializers.ModelSerializer):

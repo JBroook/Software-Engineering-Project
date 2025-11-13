@@ -17,6 +17,7 @@ import { LuX } from "react-icons/lu";
 import { Folder } from "../viewType/interfaces";
 import { AiFillFileAdd } from "react-icons/ai";
 import { color } from "framer-motion";
+import { FileTag } from "../viewType/interfaces";
 
 export type FileProp = {
   usage: string;
@@ -26,6 +27,7 @@ export type FileProp = {
   parent_folder: string | null;
   data: File | null;
   version: number;
+  tags: FileTag[];
 }
 
 interface FileFormProps {
@@ -184,6 +186,7 @@ export default function FileForm(props: FileFormChildfulProps) {
       parent_folder: fetched.parent_folder,
       data: file, // Single File object
       version: 1, 
+      tags: []
     };
 
     console.log("new File Data:", newFileData);

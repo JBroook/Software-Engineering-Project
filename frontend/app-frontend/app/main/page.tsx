@@ -331,6 +331,7 @@ export default function Main() {
       description: data.description,
       data: data.data,
       version: data.version,
+      tags: []
     }
 
     const formData = new FormData();
@@ -387,6 +388,7 @@ export default function Main() {
       description: data.description,
       data: data.data,
       version: data.version,
+      tags: data.tags
     }
 
     const formData = new FormData();
@@ -398,6 +400,7 @@ export default function Main() {
     formData.append('description', fileProp.description);
     formData.append('parent_folder', fileProp.parent_folder || "");
     formData.append('version', fileProp.version.toString());
+    formData.append('tags', JSON.stringify(fileProp.tags));
 
     try{
       const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
