@@ -46,7 +46,7 @@ export interface EditFolder {
   parent_folder: number | null | undefined;
 }
 
-type TagType = {
+export type TagType = {
   id : number;
   name : string;
   tag_count : number;

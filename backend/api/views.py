@@ -112,6 +112,35 @@ class TagTypeViewSet(ModelViewSet):
 
         return queryset
     
+class TagViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, AssetPermission]
+    serializer_class = serializers.TagSerializer
+    
+    def get_queryset(self):
+        queryset = Tag.objects.all()
+        
+        file = self.request.query_params.get('file')
+        if file:
+            queryset = queryset.filter(file=file)
+
+    def create(self, request, *args, **kwargs):
+        file = File.objects.get(pk=request.data.get('file_version_id'))
+        tag_type = TagType.objects.get(pk=request.data.get('tagtype_id'))
+        
+        # completely custom creation logic
+        if not file or not tag_type:
+            return Response({"error": "Invalid details provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        tag = Tag.objects.create(
+            file=file,
+            type=tag_type
+        )
+
+        # serialize for response if you want to reuse DRF serializers
+        serializer = self.get_serializer(tag)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    
 class EmployeeViewSet(ModelViewSet):
     permission_classes = [UserPermission]
     serializer_class = serializers.EmployeeSerializer
