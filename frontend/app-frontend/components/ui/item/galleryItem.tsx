@@ -69,6 +69,14 @@ export default function GalleryItem(props : ViewItemProps) {
     }
   }
 
+  if (props.lastUpdatedItem == props.id) {
+    console.log("opened updated item: ", props.lastUpdatedItem)
+    handleOpenDialog()
+  } else {
+    console.log("current item: ", props.id)
+    console.log("last updated item: ", props.lastUpdatedItem)
+  }
+
   return (
     <>
       <Dialog.Root 
@@ -102,12 +110,6 @@ export default function GalleryItem(props : ViewItemProps) {
                 <Heading fontFamily="var(--font-reddit-mono)">
                     {props.filename}
                 </Heading>
-                <IconButton
-                    variant="ghost"
-                    _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
-                    borderRadius="100%">
-                    <SlOptionsVertical/>
-                </IconButton>
             </Flex>
             <Flex
             borderRadius={"xl"}

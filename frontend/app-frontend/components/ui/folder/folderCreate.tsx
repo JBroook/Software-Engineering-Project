@@ -1,4 +1,4 @@
-import { createListCollection, useFileUpload, useFileUploadContext, FileUpload, Float, Dialog, Button, Portal, Flex, Heading, Field, Badge, Select, Stack, Span, Input, CloseButton } from "@chakra-ui/react";
+import { createListCollection, useFileUpload, useFileUploadContext, FileUpload, Float, Dialog, Button, Portal, Flex, Heading, Field, Badge, Select, Stack, Span, Input, CloseButton, Center } from "@chakra-ui/react";
 import { useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { AiFillFileAdd, AiFillFolderAdd } from "react-icons/ai";
@@ -11,6 +11,7 @@ import { clickEventProps } from "./folderCRUD";
 interface folderCRUD {
   id: number;
   name: string;
+  maxW:string;
   clickEvent:(data:clickEventProps) => void ;
 }
 
@@ -117,7 +118,7 @@ export default function FolderCreate(props: folderCRUD) {
       <Dialog.Trigger asChild>
         <Button 
           w="100%"
-          maxW="400px" 
+          maxW={props.maxW}
           h='70px'
           borderRadius={"xl"}
           bg={addbuttonbg}
@@ -129,9 +130,8 @@ export default function FolderCreate(props: folderCRUD) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
-          <Dialog.Content w="25vw" minW="300px" p={4} maxH="70vh">
-
-            <Dialog.Header mt={5}>
+          <Dialog.Content w="25vw" minW="300px" p={4} maxH="60vh">
+            <Dialog.Header mt={10}>
               <Dialog.Title 
                 w="100%">
                 <Flex w="100%" justify="center" align='center' mb={3} color={useColorModeValue("black", "white")}>

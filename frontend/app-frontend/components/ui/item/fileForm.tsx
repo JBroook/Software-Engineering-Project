@@ -252,7 +252,7 @@ export default function FileForm(props: FileFormChildfulProps) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
-          <Dialog.Content w="30vw" minW="300px" p={4} maxH="70vh" overflowY="scroll">
+          <Dialog.Content w="30vw" minW="300px" p={4} maxH="70vh">
 
             <Dialog.Header mt={5}>
               <Dialog.Title 
@@ -264,7 +264,7 @@ export default function FileForm(props: FileFormChildfulProps) {
               </Dialog.Title>
             </Dialog.Header>
 
-            <Dialog.Body w="100%">
+            <Dialog.Body w="100%" overflowY="scroll">
               <Flex color={useColorModeValue('black', 'white')} align={'center'} justify={'center'} grow={1}>
                 <form onSubmit={(e) => {
                     handleSubmit(onSubmit)(e);

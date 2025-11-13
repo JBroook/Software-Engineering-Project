@@ -74,6 +74,10 @@ export default function ListItem(props : ViewItemProps) {
     }
   }
   
+  if (props.lastUpdatedItem == props.id) {
+    handleOpenDialog()
+  }
+  
   return (
     <>
       <Dialog.Root 
@@ -126,8 +130,6 @@ export default function ListItem(props : ViewItemProps) {
                   <Flex mx={2} w="60px" justify="center">
                     <Text>{props.created_by.username}</Text>
                   </Flex>
-
-                  <SlOptionsVertical/>
                 </HStack>
               </Flex>
             </Box>

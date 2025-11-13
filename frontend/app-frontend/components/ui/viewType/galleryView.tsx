@@ -81,7 +81,7 @@ export default function GalleryView(props : ViewProps){
       bg={folderbg} 
       >
         {props.isAllowedEdit == true ? (
-          <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+          <FolderCreate id={props.folderId} name={props.folderName} maxW="26vw"  clickEvent={props.clickEvent} />
         ):(
           <></>
         )}
@@ -99,7 +99,7 @@ export default function GalleryView(props : ViewProps){
       pb={10} 
       bg={folderbg} 
       >
-        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+        <FolderCreate id={props.folderId} name={props.folderName} maxW="26vw"  clickEvent={props.clickEvent} />
         <ContentLoader 
           loading={props.loading}
           color="white"

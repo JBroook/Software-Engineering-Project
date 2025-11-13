@@ -58,7 +58,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   });
 
   let folderframeworks = createListCollection({items: allFolder});
-  console.log(folderframeworks)
 
   const getChain = async (item: any, all_Items: any):Promise<string> => {
     const chain: number[] = [];
@@ -118,7 +117,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
     const fileUpload = useFileUploadContext();
     const files = fileUpload.acceptedFiles;
     
-    console.log("Uploaded File11: ",fileUpload.acceptedFiles[0]);
     return (
       <FileUpload.ItemGroup>
         {files.map((file) => (
@@ -173,8 +171,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
         data: files, // Single File object
         version: versions.version + 1, 
       }
-
-      console.log("new File Data:", newFileData);
       
       try{
         await props.submitEvent(newFileData);
@@ -241,7 +237,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                   align={'center'} justify={'center'} grow={1}
                   >
                     <form onSubmit={(e) => {
-                        console.log("Form submit event triggered"); // Debug log
                         handleSubmit(onSubmit)(e);
                       }}>
                         <VisuallyHidden asChild>
@@ -310,7 +305,6 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 name="parent_folder"
                                 render={({ field }) => {
                                 const selectValue = field.value ?? undefined;
-                                console.log(selectValue)
                                 return(
                                 <Select.Root
                                   multiple={false}

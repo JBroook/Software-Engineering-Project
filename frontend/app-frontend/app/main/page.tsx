@@ -411,6 +411,8 @@ export default function Main() {
 
       if(res.ok){
         const fileData = await res.json();
+        console.log(fileData);
+        setLastUpdated(fileData.id);
         fetchSFS(SFS);
       }else{
         const errorData = await res.json();
@@ -465,6 +467,8 @@ export default function Main() {
   // handles gallery vs list view
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
+  const [lastUpdated, setLastUpdated] = useState<number>(-1);
+  
   const view = viewType=="gallery" ? (
       <GalleryView 
         isAllowedEdit={isAllowedEdit}
@@ -477,6 +481,7 @@ export default function Main() {
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
+        lastUpdatedItem={lastUpdated}
       />
   ) : (
       <ListView 
@@ -490,6 +495,7 @@ export default function Main() {
         loading={loading}
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
+        lastUpdatedItem={lastUpdated}
       />
   );
 
@@ -579,9 +585,11 @@ export default function Main() {
   }
 
   const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
+  const fileFormBG = useColorModeValue("#9AB3F2", '#335098');
+  const bgColor = useColorModeValue("#6082D6", '#0E1117');
 
   return (
-    <Box bg={useColorModeValue("#6082D6", '#0E1117')} minH="100vh">
+    <Box bg={bgColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
@@ -638,7 +646,7 @@ export default function Main() {
 
       {isAllowedEdit == true ? (
         <Flex 
-        bg={useColorModeValue("#9AB3F2", '#335098')} 
+        bg={fileFormBG} 
         position={'fixed'} 
         zIndex={2} right={'2vw'} bottom={'4vh'}
         >

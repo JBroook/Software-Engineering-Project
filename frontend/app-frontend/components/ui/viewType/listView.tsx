@@ -73,7 +73,7 @@ export default function ListView(props : ViewProps){
     pl={8}
     pb={10}>
       {props.isAllowedEdit == true ? (
-        <FolderCreate id={props.folderId} name={props.folderName} clickEvent={props.clickEvent} />
+        <FolderCreate id={props.folderId} name={props.folderName} maxW="79vw" clickEvent={props.clickEvent} />
       ):(
         <></>
       )}
