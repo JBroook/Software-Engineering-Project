@@ -164,10 +164,11 @@ export default function GalleryView(props : ViewProps){
       px={8} 
       pb={20} 
       bg={filebg}
+      minH="60vh"
       >
         <ContentLoader 
           loading={props.loading}
-          color="black"
+          color={textColor}
           content={fileComponents}
         />
         <Spacer></Spacer>
@@ -182,10 +183,11 @@ export default function GalleryView(props : ViewProps){
       bg={filebg}
       justifyContent={'center'}
       align={'center'}
+      minH="60vh"
       >
           <ContentLoader 
             loading={props.loading}
-            color="black"
+            color={textColor}
             content={fileComponents}
           />
       </Flex>
@@ -200,7 +202,7 @@ export default function GalleryView(props : ViewProps){
       >
         <ContentLoader 
           loading={props.loading}
-          color="black"
+          color={textColor}
           content={fileComponents}
         />
       </Flex>

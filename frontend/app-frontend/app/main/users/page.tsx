@@ -24,6 +24,7 @@ import { IoEye } from "react-icons/io5";
 import { FaFile } from "react-icons/fa6";
 import { GrStorage } from "react-icons/gr";
 import { useRouter } from "next/navigation";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type SFSParams = {
   searchKeyword : string;
@@ -397,10 +398,12 @@ export default function UsersPage(){
 
       <Box minH="100vh" pt={5} bg={lowerPortionColor}>
         <HStack mr={8} w="250px" mb={3}  justifySelf="flex-end">
-          <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-            _hover={{ bg: '#e0e0e0ff' }}>
-              <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
-          </IconButton>
+          <Tooltip content="Search">
+            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+              _hover={{ bg: '#e0e0e0ff' }}>
+                <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
+            </IconButton>
+          </Tooltip>
           <Searchbar color={iconTextColor} placeholder="Search users" inputEvent={searchKeyword}/>
 
           <RoleFilter 
@@ -435,9 +438,11 @@ export default function UsersPage(){
                   user={item}
                   submitEvent={updateUser}
                   >
-                    <IconButton _hover={{color : "#4ceb34"}}>
-                      <MdEdit />
-                    </IconButton>
+                    <Tooltip content="Edit">
+                      <IconButton _hover={{color : "#4ceb34"}}>
+                        <MdEdit />
+                      </IconButton>
+                    </Tooltip>
                   </UserForm>
 
                   <DeleteConfirmation
@@ -445,9 +450,11 @@ export default function UsersPage(){
                   objectName={item.first_name+"s account"}
                   deleteEvent={deleteUser}
                   >
-                    <IconButton _hover={{color : "red"}}>
-                      <MdDelete />
-                    </IconButton>
+                    <Tooltip content="Delete">
+                      <IconButton _hover={{color : "red"}}>
+                        <MdDelete />
+                      </IconButton>
+                    </Tooltip>
                   </DeleteConfirmation>
                 </HStack>
               </Table.Cell>

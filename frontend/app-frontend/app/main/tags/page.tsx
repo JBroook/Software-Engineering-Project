@@ -20,6 +20,7 @@ import { FaHashtag } from "react-icons/fa";
 import { IoMdPricetags } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import TagForm, { TagType } from "@/components/ui/tags/tagForm";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type SFSParams = {
   searchKeyword : string;
@@ -307,10 +308,12 @@ export default function TagsPage(){
 
       <Box minH="100vh" pt={5} bg={lowerPortionColor}>
         <HStack mr={8} w="250px" mb={3}  justifySelf="flex-end">
-          <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-            _hover={{ bg: '#e0e0e0ff' }}>
-              <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
-          </IconButton>
+          <Tooltip content="Search">
+            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+              _hover={{ bg: '#e0e0e0ff' }}>
+                <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
+            </IconButton>
+          </Tooltip>
           <Searchbar color={iconTextColor} placeholder="Search tag types" inputEvent={searchKeyword}/>
 
         </HStack>
@@ -338,9 +341,11 @@ export default function TagsPage(){
                   tagType={item}
                   submitEvent={updateTagType}
                   >
-                    <IconButton _hover={{color : "#4ceb34"}}>
-                      <MdEdit />
-                    </IconButton>
+                    <Tooltip content="Edit">
+                      <IconButton _hover={{color : "#4ceb34"}}>
+                        <MdEdit />
+                      </IconButton>
+                    </Tooltip>
                   </TagForm>
 
                   <DeleteConfirmation
@@ -348,9 +353,11 @@ export default function TagsPage(){
                   objectName={"this tag ("+item.name+")"}
                   deleteEvent={deleteTagType}
                   >
-                    <IconButton _hover={{color : "red"}}>
-                      <MdDelete />
-                    </IconButton>
+                    <Tooltip content="Delete">
+                      <IconButton _hover={{color : "red"}}>
+                        <MdDelete />
+                      </IconButton>
+                    </Tooltip>
                   </DeleteConfirmation>
                 </HStack>
               </Table.Cell>

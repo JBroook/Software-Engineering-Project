@@ -6,6 +6,7 @@ import { IoFilter } from "react-icons/io5";
 import { useColorModeValue } from "../color-mode";
 import { useState } from "react";
 import MiniPopover from "./miniPopover";
+import { Tooltip } from "@/components/ui/tooltip";
 
 
 interface RoleFilterProps {
@@ -24,10 +25,12 @@ export default function RoleFilter(props : RoleFilterProps){
     return (<>
         <Popover.Root>
             <Popover.Trigger asChild>
-            <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-                _hover={{ bg: '#e0e0e0ff' }}>
-                <IoFilter color="#9AB3F2"/>
-            </IconButton>
+            <Tooltip content="Filter by role">
+                <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+                    _hover={{ bg: '#e0e0e0ff' }}>
+                    <IoFilter color="#9AB3F2"/>
+                </IconButton>
+            </Tooltip>
             </Popover.Trigger>
             <Popover.Positioner>
             <Popover.Content>

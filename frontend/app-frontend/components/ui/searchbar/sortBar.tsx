@@ -5,6 +5,7 @@ Text
 import { LuArrowUpDown } from "react-icons/lu";
 import { LuArrowDownUp } from "react-icons/lu";
 import { useColorModeValue } from '../color-mode'
+import { Tooltip } from "@/components/ui/tooltip";
 
 type option = {
     label : string;
@@ -33,11 +34,13 @@ export default function SortBar(props: SortBarProps){
 
     return (<>
         <HStack>
-        <IconButton 
-            _hover={{ bg: useColorModeValue("gray.300", '#585858ff') }}
-            onClick={()=>updateSortOptions(value, !toggle)}>
-            {icon}
-        </IconButton>
+        <Tooltip content={toggle ? "Descending" : "Ascending"}>
+            <IconButton 
+                _hover={{ bg: useColorModeValue("gray.300", '#585858ff') }}
+                onClick={()=>updateSortOptions(value, !toggle)}>
+                {icon}
+            </IconButton>
+        </Tooltip>
 
         <Menu.Root >
             <Menu.Trigger asChild 

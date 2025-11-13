@@ -25,6 +25,7 @@ import UserForm from "@/components/ui/user/userForm";
 import FileForm, { FileProp, getFolderDetails } from "@/components/ui/item/fileForm";
 import { AiFillFileAdd } from "react-icons/ai";
 import { clickEventProps } from "@/components/ui/folder/folderCRUD";
+import { Tooltip } from "@/components/ui/tooltip";
 
 function getCookie(name:string) {
   const value = document.cookie
@@ -652,14 +653,17 @@ export default function Main() {
         </HStack>
 
         <HStack mr={10}>
+          <Tooltip content={"Search"}>
             <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
             </IconButton>
+          </Tooltip>
             
             {searchbar && <Searchbar color={iconTextColor} placeholder="Search a file" inputEvent={searchKeyword}/>}
 
+          
             <FilterOptions 
             iconTextColor={iconTextColor} 
             mediaTypeEvent={filterMediaType}
@@ -668,12 +672,14 @@ export default function Main() {
             tagEvent={filterTags}
             />
 
+          <Tooltip content={(viewType=="gallery"?"List":"Gallery")+" view"}>
             <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={changeViewType}>
               {viewType=="gallery"?<IoIosList color="#9AB3F2"/>:<RiGalleryView2 color="#9AB3F2"/>}
             </IconButton>
-
+          </Tooltip>
+          
           </HStack>
       </Flex>
 
