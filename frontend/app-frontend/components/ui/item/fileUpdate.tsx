@@ -84,8 +84,13 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
       const all_folder = await fetchFolders();
       const fetchedFolder:FolderItem[] = [];
       fetchedFolder.push({
-        label: "",
+        label: "No Changes",
         value: -2,
+        description: Promise.resolve(""), // Filepath address
+      });
+      fetchedFolder.push({
+        label: "All files",
+        value: -1,
         description: Promise.resolve(""), // Filepath address
       });
       for (const items of all_folder) {
