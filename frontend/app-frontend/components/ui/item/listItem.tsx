@@ -117,19 +117,21 @@ export default function ListItem(props : ViewItemProps) {
                   <FaFile
                       color={textColor}
                       size={25}/>
-                  <Box h="fit-content">
-                    <Heading fontFamily="var(--font-reddit-mono)">
-                      {props.filename}
-                    </Heading>
-                    <Text fontFamily="var(--font-roboto)" justifySelf={'left'} pl={4}>
+                  <Box h="fit-content" w="500px">
+                    <Box h="fit-content" whiteSpace="nowrap">
+                      <Heading fontFamily="var(--font-reddit-mono)" textAlign="left" overflow="hidden" textOverflow="ellipsis">
+                        {props.filename}
+                      </Heading>
+                    </Box>
+                    <Text fontFamily="var(--font-roboto)" justifySelf={'left'} >
                       {props.filetype}
-                    </Text>
+                    </Text> 
                   </Box>
                 </HStack>
 
                 <HStack fontFamily="var(--font-roboto)" fontSize={14}>
                   <Flex mx={2} w="100px" justify="center">
-                    <Text>Only you</Text>
+                    <Text></Text>
                   </Flex>
 
                   <Flex mx={2} w="200px" justify="center">
