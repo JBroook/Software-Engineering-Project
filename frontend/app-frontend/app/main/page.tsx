@@ -101,7 +101,7 @@ export default function Main() {
   const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
   const fileFormColor = useColorModeValue("#9AB3F2", '#335098');
   const headerColor = useColorModeValue("#6082D6", '#0E1117');
-
+  const [lastUpdated, setLastUpdated] = useState<number|null>(-1);
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -483,12 +483,6 @@ export default function Main() {
       }
     }
   }
-
-  // handles gallery vs list view
-
-  const [searchbar, setSearchbar] = useState(true);
-  const [viewType, setViewType] = useState("gallery");
-  const [lastUpdated, setLastUpdated] = useState<number|null>(-1);
   
   const view = viewType=="gallery" ? (
       <GalleryView 
@@ -602,12 +596,8 @@ export default function Main() {
     fetchSFS(newSFS)
   }
 
-  const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
-  const fileFormBG = useColorModeValue("#9AB3F2", '#335098');
-  const bgColor = useColorModeValue("#6082D6", '#0E1117');
-
   return (
-    <Box bg={bgColor} minH="100vh">
+    <Box bg={fileFormColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
       w="100%"
@@ -664,7 +654,7 @@ export default function Main() {
 
       {isAllowedEdit == true ? (
         <Flex 
-        bg={fileFormBG} 
+        bg={fileFormColor} 
         position={'fixed'} 
         zIndex={2} right={'2vw'} bottom={'4vh'}
         >
