@@ -301,7 +301,7 @@ export default function FileForm(props: FileFormChildfulProps) {
                       >
                         <Select.Control>
                           <Select.Trigger>
-                            <Select.ValueText placeholder="Parent Folder" />
+                            <Select.ValueText placeholder="Current Folder" />
                           </Select.Trigger>
                           <Select.IndicatorGroup>
                             <Select.Indicator />
@@ -311,8 +311,8 @@ export default function FileForm(props: FileFormChildfulProps) {
                             <Select.Content h={'auto'}>
                               {folderframeworks.items.map((folder, index) => (
                                 <Select.Item h={'5vh'} item={folder} key={index} color={textColor} >
-                                  <Stack gap="0" h={'5vh'}>
-                                    <Select.ItemText>{folder.label}</Select.ItemText>
+                                  <Stack gap="0" w='90%' h={'5vh'}>
+                                    <Select.ItemText truncate w='90%'>{folder.label}</Select.ItemText>
                                     <Span color="fg.muted" textStyle="xs">
                                       {folder.description}
                                     </Span>

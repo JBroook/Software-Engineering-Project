@@ -379,7 +379,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                                 <FileUpload.HiddenInput required={false}/>
                                 <Center>
                                   <FileUpload.Dropzone asChild w='83%' h='75%'>
-                                    <Image src={versions.data.toString()} alt="Image" objectFit="contain" borderRadius="md" p={8}/>
+                                    <Image src={versions.data.toString()} alt="Previously Uploaded File" objectFit="contain" borderRadius="md" p={8}/>
                                   </FileUpload.Dropzone>
                                 </Center>
                                 <FileUploadList />

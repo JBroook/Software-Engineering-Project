@@ -73,7 +73,8 @@ export default function GalleryItem(props : ViewItemProps) {
 
   const updatedChecker = () => {
     if (props.lastUpdatedItem == props.id) {
-      return handleOpenDialog();
+      props.afterOpened(-1);
+      handleOpenDialog();
     }
   }
 

@@ -46,10 +46,10 @@ export default function GalleryView(props : ViewProps){
     date={file.date_created} 
     created_by={file.employee} 
     submitEvent={props.submitEvent}
-    lastUpdatedItem={props.lastUpdatedItem}/>
+    lastUpdatedItem={props.lastUpdatedItem}
+    afterOpened={props.afterOpened}
+    />
   ))
-
-  console.log(fileComponents.length)
 
   return (<>
     {/* Gallery view */}

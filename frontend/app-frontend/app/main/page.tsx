@@ -483,6 +483,11 @@ export default function Main() {
       }
     }
   }
+
+  const handleReturnedLastUpdatedItem = () => {
+    setLastUpdated(-1);
+  }
+  console.log(lastUpdated)
   
   const view = viewType=="gallery" ? (
       <GalleryView 
@@ -497,6 +502,7 @@ export default function Main() {
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
         lastUpdatedItem={lastUpdated}
+        afterOpened={handleReturnedLastUpdatedItem}
       />
   ) : (
       <ListView 
@@ -511,11 +517,11 @@ export default function Main() {
         sortFileEvent={sortFiles}
         sortFolderEvent={sortFiles}
         lastUpdatedItem={lastUpdated}
+        afterOpened={handleReturnedLastUpdatedItem}
       />
   );
 
   const changeViewType = () => {
-    setLastUpdated(-1);
     setViewType(viewType=="gallery"?"list" : "gallery" );
   }
 

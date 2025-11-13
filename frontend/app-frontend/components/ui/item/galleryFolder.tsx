@@ -163,32 +163,30 @@ export default function GalleryFolder(props : GalleryFolderProps) {
     <>
     { change ? (
       <Flex 
-      w="40vw" 
+      w="100%"
+      maxW="400px"
+      h="fit-content"
       bg={folderbg}
       color={textColor}
-      borderColor={textColor}
-      borderWidth="2px"
       // h={"2xs"}
       borderRadius={"xl"}
       py={2}
       px={4}
       cursor="pointer"
-      zIndex={100}
       >
         <Box as="form" w="100%" onSubmit={(e) => {
           handleSubmit(onSubmit)(e);
         }} >
-            <Flex 
-              justify="space-between"
-              >
-              <HStack>
-                <Flex mr={2}>
-                  <FaFolder 
-                    color={textColor}
-                    size={25}/>
-                </Flex>
-
-                <Field.Root key={0} w="44%" mb={4} invalid={!!errors['foldername']}>
+          <Flex w="100%" justify="space-between" direction={'row'}>
+    
+            <HStack w="80%">
+              <Flex mr={2}>
+                <FaFolder 
+                  color={textColor}
+                  size={25}/>
+              </Flex>
+              <Flex h="fit-content" w={'100%'} direction={'column'}>
+                <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
                   <Field.Label>
                     File Name
                   </Field.Label>
@@ -203,8 +201,8 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                     A Name must be given for the Folder
                   </Field.ErrorText>
                 </Field.Root>
-                      
-                <Field.Root key={1} w="44%" mb={4} invalid={!!errors['parent_folder']}>
+                    
+                <Field.Root key={1} w="100%" mb={4} invalid={!!errors['parent_folder']}>
                   <Field.Label>
                     Parent Folder
                     <Field.RequiredIndicator
@@ -260,31 +258,32 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                     {errors['parent_folder']?.message}
                   </Field.ErrorText>
                 </Field.Root>
-              </HStack>
-              
-              <Flex w={'26%'} pt={2} align='center'>
-                <Button w={'49%'} h={'45%'} 
-                type="submit" as={'button'}
-                bg={buttonbg} 
-                borderColor={textColor}
-                borderWidth="0.5px"
-                _hover={{bg : "#8aa0d7ff"}}
-                px={3}
-                mr={2}
-                >
-                  <SiTicktick />
-                </Button>
-                <Spacer />
-                <Button w={'49%'} h={'45%'} onClick={closeChange}
-                bg={buttonbg2} 
-                borderColor={textColor}
-                borderWidth="0.5px"
-                _hover={{bg : "#df817dff"}}
-                px={3}>
-                  <MdCancel />
-                </Button>
               </Flex>
+            </HStack>
+            
+            <Flex w={'15%'} direction={'column'}>
+              <Button w={'100%'} h={'45%'} 
+              type="submit" as={'button'}
+              bg={buttonbg} 
+              borderColor={textColor}
+              borderWidth="0.5px"
+              _hover={{bg : "#8aa0d7ff"}}
+              px={3}
+              mr={2}
+              >
+                <SiTicktick />
+              </Button>
+              <Spacer />
+              <Button w={'100%'} h={'45%'} onClick={closeChange}
+              bg={buttonbg2} 
+              borderColor={textColor}
+              borderWidth="0.5px"
+              _hover={{bg : "#df817dff"}}
+              px={3}>
+                <MdCancel />
+              </Button>
             </Flex>
+          </Flex>
         </Box>
       </Flex>
     ) : (
