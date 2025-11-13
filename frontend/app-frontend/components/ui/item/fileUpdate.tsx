@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useColorModeValue } from "../color-mode";
 import { 
@@ -15,11 +15,13 @@ import {
   createListCollection,
   Select,
   Span,
-  Stack} from "@chakra-ui/react";
+  Stack,
+  Wrap,
+  Tag} from "@chakra-ui/react";
 import { LuX } from "react-icons/lu";
 import { FileProp, getFolderDetails, fetchFolders } from "./fileForm";
 import { getFileDetails } from "./galleryItem";
-import { ViewItemProps, Version } from '../viewType/interfaces';
+import { ViewItemProps, Version, FileTag } from '../viewType/interfaces';
 
 export interface UpdateFileProps{
   filedata: ViewItemProps;
@@ -47,6 +49,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
   const [selectedFolder, setSelectedFolder] = useState<string>();
   const [versions, setVersions] = useState<Version>(); // Store fetched data
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState<FileTag[]>([]);
     
   const [allFolder, setAllFolder] = useState<FolderItem[]>([]);
 
@@ -196,6 +199,56 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
         }
       }
     }
+  }
+
+  useEffect(()=>{
+    setTags(props.filedata.tags);
+  }, [])
+
+  const removeTag = (index : number) => {
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+    setTags(newTags);
+  }
+
+  let tagComponents : React.JSX.Element[] | React.JSX.Element;
+  
+  if(tags){
+    tagComponents = tags.length>0 ? tags.map(
+      (tag, index)=>{
+        return <Tag.Root 
+          key={index}
+          variant="solid"
+          bg="gray"
+          color="white"
+          p="7px"
+          borderRadius={10}
+          h="fit-content">
+          <Tag.Label>{tag.type.name}</Tag.Label>
+          <Tag.EndElement>
+            <Tag.CloseTrigger asChild>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();// stop default CloseTrigger behavior
+                  e.stopPropagation();// stop bubbling up
+                  removeTag(index);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  width: "100%",
+                  height: "100%"
+                }}
+              >
+                ✕
+              </button>
+            </Tag.CloseTrigger>
+          </Tag.EndElement>
+        </Tag.Root>
+      }) : <Text>No tags yet</Text>;
+  }else{
+    tagComponents = <Text>No tags yet</Text>;
   }
   
   return (
@@ -390,14 +443,14 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
                             {/* Shared Tags */}
                             <Flex w={'100%'} h={'25%'} direction={'column'}>
                               <Text>Tags:</Text>
-                              <Box
-                                w={'100%'}
-                                h={'100%'}
-                                mt={4}
+                              <Wrap
+                                w='100%'
+                                h='70%'
                                 p={4}
+                                rounded={6}
                                 bg={contentbg}>
-                                add tags here
-                              </Box>
+                                {tagComponents}
+                              </Wrap>
                             </Flex>
 
                             <Spacer />
