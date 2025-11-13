@@ -411,8 +411,8 @@ export default function Main() {
 
       if(res.ok){
         const fileData = await res.json();
-        console.log(fileData);
-        setLastUpdated(fileData.id);
+        setLastUpdated(data.id);
+        console.log("Updated prop: ", lastUpdated);
         fetchSFS(SFS);
       }else{
         const errorData = await res.json();
@@ -467,7 +467,7 @@ export default function Main() {
   // handles gallery vs list view
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
-  const [lastUpdated, setLastUpdated] = useState<number>(-1);
+  const [lastUpdated, setLastUpdated] = useState<number|null>(-1);
   
   const view = viewType=="gallery" ? (
       <GalleryView 

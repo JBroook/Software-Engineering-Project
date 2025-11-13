@@ -28,7 +28,7 @@ export interface ViewItemProps {
   image: string;
   date: string;
   submitEvent: (data : FileProp) => void;
-  lastUpdatedItem: number;
+  lastUpdatedItem: number|null;
 }
 
 export interface Folder {
@@ -69,5 +69,5 @@ export interface ViewProps {
   loading : boolean;
   sortFileEvent : (sortOption : string, sortOrder : string) => void;
   sortFolderEvent : (sortOption : string, sortOrder : string) => void;
-  lastUpdatedItem: number;
+  lastUpdatedItem: number|null;
 }

@@ -69,13 +69,15 @@ export default function GalleryItem(props : ViewItemProps) {
     }
   }
 
-  if (props.lastUpdatedItem == props.id) {
-    console.log("opened updated item: ", props.lastUpdatedItem)
-    handleOpenDialog()
-  } else {
-    console.log("current item: ", props.id)
-    console.log("last updated item: ", props.lastUpdatedItem)
+  const updatedChecker = () => {
+    if (props.lastUpdatedItem == props.id) {
+      return handleOpenDialog();
+    }
   }
+
+  useEffect(() => {
+    updatedChecker();
+  }, [])
 
   return (
     <>
@@ -218,22 +220,27 @@ export default function GalleryItem(props : ViewItemProps) {
                         {/* File Version */}
                         <Tabs.Root
                           w={"100%"}
+                          h='auto'
                           variant="enclosed"
-                          activationMode='automatic'
                           fitted
+                          activationMode='automatic'
                           defaultValue={versions[0].version.toString()}
                           value={selectedVersion}
                           onValueChange={(v) => setSelectedVersion(v.value)}>
-                          <Tabs.List bg={contentbg}>
-                            {versions.map((versions: any) => (
-                              <Tabs.Trigger 
-                              key={versions.version.toString()}
-                              color={contentbg2} 
-                              value={versions.version.toString()}>
-                                Version {versions.version}
-                              </Tabs.Trigger>
-                            ))}
-                          </Tabs.List>
+                            
+                          <Flex overflowX="scroll" >
+                            <Tabs.List bg={contentbg} width={"auto"}>
+                              {versions.map((versions: any) => (
+                                <Tabs.Trigger 
+                                width='150px'
+                                key={versions.version.toString()}
+                                color={contentbg2} 
+                                value={versions.version.toString()}>
+                                  Version {versions.version}
+                                </Tabs.Trigger>
+                              ))}
+                            </Tabs.List>
+                          </Flex>
 
                           {versions.map((version: any) => (
                             <Tabs.Content key={version.version.toString()} value={version.version.toString()}>

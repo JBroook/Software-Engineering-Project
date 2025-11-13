@@ -155,16 +155,17 @@ export default function ListFolder(props : ListFolderProps) {
     { change ? (
       <Flex 
       w="100%"
-      maxW="74vw"
+      maxW="79vw"
       h="fit-content"
       bg={folderbg}
       color={textColor}
+      borderColor={textColor}
+      borderWidth="2px"
       // h={"2xs"}
       borderRadius={"xl"}
       py={2}
       px={4}
       cursor="pointer"
-      justify={'center'}
       align={'center'}
       >
         <FaFolder 
@@ -174,14 +175,14 @@ export default function ListFolder(props : ListFolderProps) {
           console.log("Folder Form submit event triggered"); // Debug log
           handleSubmit(onSubmit)(e);
         }} >
-          <Flex direction={'row'} w='70vw' pl={4} pr={4}>
+          <Flex direction={'row'} w='75vw' pl={4} pr={4}>
             <Flex direction={'row'} w='90%'>
-              <Field.Root key={0} mb={4} invalid={!!errors['foldername']}>
+              <Field.Root key={0} w='140%' mb={4} invalid={!!errors['foldername']}>
                 <Field.Label>
                   File Name
                 </Field.Label>
                 <Input
-                  w={'80%'}
+                  w={'95%'}
                   p={2}
                   {...register('foldername')}
                   defaultValue={props.foldername}
@@ -211,7 +212,7 @@ export default function ListFolder(props : ListFolderProps) {
                   const selectValue = field.value ?? undefined;
                   return(
                   <Select.Root
-                  w={'80%'}
+                    w={'80%'}
                     multiple={false}
                     value={selectValue as string[] | undefined}
                     onValueChange={(e) => field.onChange(e.value)}
@@ -249,10 +250,13 @@ export default function ListFolder(props : ListFolderProps) {
                 </Field.ErrorText>
               </Field.Root>
             </Flex>
-            <Flex  w='10%' direction={'row'} justify={'center'} align={'center'}>
+            <Spacer w ='20%'/>
+            <Flex  w='20%' direction={'row'} align={'center'}>
               <Button w={'40%'} h={'50%'} 
               type="submit" as={'button'}
               bg={buttonbg} 
+              borderColor={textColor}
+              borderWidth="0.5px"
               _hover={{bg : "#8aa0d7ff"}}
               px={3}>
                 <SiTicktick />
@@ -260,6 +264,8 @@ export default function ListFolder(props : ListFolderProps) {
               <Spacer />
               <Button w={'40%'} h={'50%'} onClick={closeChange}
               bg={buttonbg2} 
+              borderColor={textColor}
+              borderWidth="0.5px"
               _hover={{bg : "#df817dff"}}
               px={3}>
                 <MdCancel />

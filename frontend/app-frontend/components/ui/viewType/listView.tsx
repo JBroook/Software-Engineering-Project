@@ -42,7 +42,8 @@ export default function ListView(props : ViewProps){
     image={file.data} 
     date={file.date_created} 
     created_by={file.employee} 
-    submitEvent={props.submitEvent}/>
+    submitEvent={props.submitEvent}
+    lastUpdatedItem={props.lastUpdatedItem}/>
   ))
 
   return (<>
