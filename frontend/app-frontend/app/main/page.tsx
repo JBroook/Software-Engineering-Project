@@ -515,6 +515,7 @@ export default function Main() {
   );
 
   const changeViewType = () => {
+    setLastUpdated(-1);
     setViewType(viewType=="gallery"?"list" : "gallery" );
   }
 

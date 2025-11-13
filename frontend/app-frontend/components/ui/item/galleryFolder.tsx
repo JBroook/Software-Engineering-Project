@@ -179,7 +179,6 @@ export default function GalleryFolder(props : GalleryFolderProps) {
           handleSubmit(onSubmit)(e);
         }} >
             <Flex 
-              w="32vw" 
               justify="space-between"
               >
               <HStack>
@@ -189,7 +188,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                     size={25}/>
                 </Flex>
 
-                <Field.Root key={0} w="70%" mb={4} invalid={!!errors['foldername']}>
+                <Field.Root key={0} w="44%" mb={4} invalid={!!errors['foldername']}>
                   <Field.Label>
                     File Name
                   </Field.Label>
@@ -205,7 +204,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                   </Field.ErrorText>
                 </Field.Root>
                       
-                <Field.Root key={1} w="70%" mb={4} invalid={!!errors['parent_folder']}>
+                <Field.Root key={1} w="44%" mb={4} invalid={!!errors['parent_folder']}>
                   <Field.Label>
                     Parent Folder
                     <Field.RequiredIndicator
@@ -263,8 +262,8 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                 </Field.Root>
               </HStack>
               
-              <Flex w={'15%'} align='center'>
-                <Button w={'100%'} h={'45%'} 
+              <Flex w={'26%'} pt={2} align='center'>
+                <Button w={'49%'} h={'45%'} 
                 type="submit" as={'button'}
                 bg={buttonbg} 
                 borderColor={textColor}
@@ -276,7 +275,7 @@ export default function GalleryFolder(props : GalleryFolderProps) {
                   <SiTicktick />
                 </Button>
                 <Spacer />
-                <Button w={'100%'} h={'45%'} onClick={closeChange}
+                <Button w={'49%'} h={'45%'} onClick={closeChange}
                 bg={buttonbg2} 
                 borderColor={textColor}
                 borderWidth="0.5px"
@@ -319,11 +318,11 @@ export default function GalleryFolder(props : GalleryFolderProps) {
           </HStack>
         </Flex>
         
-        {props.isAllowedEdit == true ? (
-          <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
-        ):(
-          <></>
-        )}
+          {props.isAllowedEdit == true ? (
+            <FolderCRUD id={props.id} folderName={props.foldername} clickEvent={handleCRUD}/>
+          ):(
+            <></>
+          )}
       </Flex>
     )}
     </>

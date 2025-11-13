@@ -79,11 +79,16 @@ export default function ListView(props : ViewProps){
       ):(
         <></>
       )}
-      <ContentLoader 
+      {folderComponents.length == 0 ? (
+        <></>
+      ):(
+        <ContentLoader 
         loading={props.loading}
         color="white"
         content={folderComponents}
       />
+      )}
+      
     </Stack>
 
     <Separator size={"md"} />

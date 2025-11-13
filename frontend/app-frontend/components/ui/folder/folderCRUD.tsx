@@ -54,9 +54,9 @@ export default function FolderCRUD (props:folderCRUD) {
     return(
         <>
         <Menu.Root positioning={{ placement: "top" }} onSelect={(v) => handleCRUD(v.value)}>
-            <Menu.Trigger rounded="full" focusRing="outside">
+            <Menu.Trigger rounded="full" focusRing="outside"
+                    _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}>
                 <Icon
-                    _hover={{ bg: useColorModeValue("gray.300", '#202020ff') }}
                     borderRadius="100%" >
                     <SlOptionsVertical />
                 </Icon>

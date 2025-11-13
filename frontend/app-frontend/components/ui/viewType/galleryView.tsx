@@ -96,7 +96,7 @@ export default function GalleryView(props : ViewProps){
           content={folderComponents}
         />
       </SimpleGrid>
-      ) : folderComponents.length < 1 ? (
+      ) : folderComponents.length == 0 ? (
         <Flex 
           w="100%" 
           gap="6px" 
