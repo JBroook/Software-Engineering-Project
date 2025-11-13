@@ -183,7 +183,7 @@ class TagTypeAPITests(APITestCase):
             created_by= self.employee
         )
         
-        Tag.objects.create(file=self.file, type=self.tag_type)
+        Tag.objects.create(file_version=self.fileVersion, type=self.tag_type)
         self.tagtype_list_url = reverse('tagtype-list')
         self.tagtype_detail_url = reverse('tagtype-detail', args=[self.tag_type.id])
 

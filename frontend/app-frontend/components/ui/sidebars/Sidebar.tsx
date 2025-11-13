@@ -49,8 +49,11 @@ export default function SimpleSidebar() {
   const border = useColorModeValue('gray.200', 'gray.700')
   const buttonbg = useColorModeValue("#79EB99", '#5BB975');
   const buttonbg2 = useColorModeValue("#9AB3F2", '#325ECB');
+  const iconTextColor = useColorModeValue('black', 'white');
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
+  const [mounted, setMounted] = useState(false);
 
   const router = useRouter();
   useEffect(()=>{
@@ -68,7 +71,13 @@ export default function SimpleSidebar() {
     }
 
     onPageLoad()
-  })
+
+    setMounted(true);
+  }, [])
+
+  if (!mounted) {
+    return null;
+  }
 
   // logout user logic
   const handleLogout = async () => {
@@ -104,19 +113,17 @@ export default function SimpleSidebar() {
           </Text>
         </Flex>
         <Flex h={"75vh"} overflowY={"auto"} direction="column" mt="4">
-          {isAdmin == true ? (
+          {isAdmin === true ? (
             <>
             {AdminLinkItems.map((link) => (
-              <NavItem key={link.name} icon={link.icon} href={link.href}>
-                {link.name}
+              <NavItem key={link.name} icon={link.icon} href={link.href} name={link.name} iconTextColor={iconTextColor}>
               </NavItem>
             ))}
             </>
           ):(
             <>
             {ViewerLinkItems.map((link) => (
-              <NavItem key={link.name} icon={link.icon} href={link.href}>
-                {link.name}
+              <NavItem key={link.name} icon={link.icon} href={link.href} name={link.name} iconTextColor={iconTextColor}>
               </NavItem>
             ))}
             </>

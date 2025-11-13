@@ -7,13 +7,15 @@ import { Flex, Heading,
     Grid, GridItem, Button,
     AspectRatio, Toast,
     chakra,
-    Link
+    Link,
+    Wrap,
+    Tag
 } from '@chakra-ui/react';
 import { SlOptionsVertical } from "react-icons/sl";
 import { useColorModeValue } from '../color-mode';
 import UpdateFile from './fileUpdate';
 import { FileProp } from './fileForm';
-import { Version, ViewItemProps } from '../viewType/interfaces';
+import { FileTag, Version, ViewItemProps } from '../viewType/interfaces';
 import DeleteFile from './fileDelete';
 import VideoOnHover from '../preview/videoPreview';
 import ModelPreview from '../preview/model3dPreview';
@@ -319,14 +321,27 @@ export default function GalleryItem(props : ViewItemProps) {
                                 {/* Shared Tags */}
                                 <Flex w={'100%'} h={'25%'} direction={'column'}>
                                   <Text h={'20%'}>Tags:</Text>
-                                  <Box
-                                    w={'100%'}
-                                    h={'70%'}
+                                  <Wrap
+                                    w='100%'
+                                    h='70%'
                                     p={4}
                                     rounded={6}
                                     bg={contentbg}>
-                                    This Holds all tags that are able to view / edit
-                                  </Box>
+                                    {version.tags ? version.tags.map(
+                                      (tag : FileTag, index : number)=>{
+                                        return <Tag.Root 
+                                          key={index}
+                                          variant="solid"
+                                          bg="gray"
+                                          color="white"
+                                          p="7px"
+                                          borderRadius={10}
+                                          h="fit-content">
+                                          <Tag.Label>{tag.type.name}</Tag.Label>
+                                        </Tag.Root>
+                                      }):<Text>No tags yet  </Text>
+                                    }
+                                  </Wrap>
                                 </Flex>
 
                                 <Spacer />

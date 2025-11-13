@@ -46,6 +46,7 @@ const getFiles = async (currentParent: number) => {
     credentials: 'include',
   });
   const data = await res.json();
+  console.log("Fetched file:",data)
   return data;
 };
 
@@ -91,6 +92,16 @@ export default function Main() {
 
   const [currentFoldername, setCurrentFolderName] = useState<string>("All files");
   const [isAllowedEdit, setIsAllowedEdit] = useState<boolean>(false);
+  const [searchbar, setSearchbar] = useState(true);
+  const [viewType, setViewType] = useState("gallery");
+  const [mounted, setMounted] = useState(false);
+
+  //controls text and arrow color
+  const iconTextColor = useColorModeValue("black", 'white');
+  const buttonbg = useColorModeValue("#F6F6F6", '#0D1835');
+  const fileFormColor = useColorModeValue("#9AB3F2", '#335098');
+  const headerColor = useColorModeValue("#6082D6", '#0E1117');
+
   
   // handle folder functions when clicked
   const handleFolder = (data:clickEventProps) => {
@@ -189,7 +200,13 @@ export default function Main() {
     }
 
     fetchAssets()
+
+    setMounted(true);
   }, []);
+
+  if (!mounted) {
+    return null; // or a simple loader
+  }
 
   // sort function
   const sortFiles = (sortMethod : string, sortOrder : string) => {
@@ -331,6 +348,7 @@ export default function Main() {
       description: data.description,
       data: data.data,
       version: data.version,
+      tags: []
     }
 
     const formData = new FormData();
@@ -387,6 +405,7 @@ export default function Main() {
       description: data.description,
       data: data.data,
       version: data.version,
+      tags: data.tags
     }
 
     const formData = new FormData();
@@ -398,6 +417,7 @@ export default function Main() {
     formData.append('description', fileProp.description);
     formData.append('parent_folder', fileProp.parent_folder || "");
     formData.append('version', fileProp.version.toString());
+    formData.append('tags', JSON.stringify(fileProp.tags));
 
     try{
       const res = await fetch(`http://localhost:8000/api/files/?parent_folder=${fileProp.parent_folder}`, {
@@ -465,6 +485,7 @@ export default function Main() {
   }
 
   // handles gallery vs list view
+
   const [searchbar, setSearchbar] = useState(true);
   const [viewType, setViewType] = useState("gallery");
   const [lastUpdated, setLastUpdated] = useState<number|null>(-1);
@@ -502,9 +523,6 @@ export default function Main() {
   const changeViewType = () => {
     setViewType(viewType=="gallery"?"list" : "gallery" );
   }
-
-  //controls text and arrow color
-  const iconTextColor = useColorModeValue("black", 'white');
 
   //search-filter-sort function
   const fetchSFS = async (SFS : SFSParams) => {

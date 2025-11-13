@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, OuterRef, Subquery
 from django.utils.decorators import method_decorator
 from django.utils.encoding import escape_uri_path
 from django.views.decorators.csrf import csrf_exempt
@@ -45,9 +45,9 @@ class UserView(APIView):
 class StorageView(APIView):
     permission_classes = [IsAdmin]
     # returns info on storage size and file number
-    def get(self):
-        storage_size = FileVersion.objects.distinct('original_file').aggregate(total_size=Sum('size'))['total_size']
-        file_number = len(File.objects.all())
+    def get(self, request):
+        storage_size = FileVersion.objects.aggregate(total_size=Sum('size'))['total_size']
+        file_number = len(File.objects.all())   
         tag_count = len(Tag.objects.all())
         tag_types = len(TagType.objects.all())
         return Response({
@@ -111,6 +111,35 @@ class TagTypeViewSet(ModelViewSet):
                 ).order_by(sort_order+sort_criteria)
 
         return queryset
+    
+class TagViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, AssetPermission]
+    serializer_class = serializers.TagSerializer
+    
+    def get_queryset(self):
+        queryset = Tag.objects.all()
+        
+        file = self.request.query_params.get('file')
+        if file:
+            queryset = queryset.filter(file=file)
+
+    def create(self, request, *args, **kwargs):
+        file = File.objects.get(pk=request.data.get('file_version_id'))
+        tag_type = TagType.objects.get(pk=request.data.get('tagtype_id'))
+        
+        # completely custom creation logic
+        if not file or not tag_type:
+            return Response({"error": "Invalid details provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        tag = Tag.objects.create(
+            file=file,
+            type=tag_type
+        )
+
+        # serialize for response if you want to reuse DRF serializers
+        serializer = self.get_serializer(tag)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     
 class EmployeeViewSet(ModelViewSet):
     permission_classes = [UserPermission]
@@ -199,7 +228,13 @@ class FileViewSet(ModelViewSet):
     serializer_class = serializers.FileVersionSerializer
 
     def get_queryset(self):
-        queryset = FileVersion.objects.all().order_by('original_file', '-version', 'name').distinct('original_file')
+        latest_versions = FileVersion.objects.filter(
+            original_file=OuterRef('original_file')
+        ).order_by('-version')
+
+        queryset = FileVersion.objects.filter(
+            id=Subquery(latest_versions.values('id')[:1])
+        )
         
         parent_id = self.request.query_params.get('parent_folder')
 

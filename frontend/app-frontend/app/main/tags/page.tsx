@@ -381,7 +381,7 @@ export default function TagsPage(){
   }else{
     return (
     <Flex w="100%" h="100vh" justify="center" align="center">
-    <Spinner color={iconTextColor}></Spinner>
+    <Spinner color={"gray"}></Spinner>
     </Flex>);
   }
 }

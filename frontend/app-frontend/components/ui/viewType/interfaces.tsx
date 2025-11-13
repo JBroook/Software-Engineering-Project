@@ -15,6 +15,7 @@ export interface Version {
   created_by: string;
   data: File;
   employee: any;
+  tags : FileTag[];
 }
 
 export interface ViewItemProps {
@@ -29,6 +30,7 @@ export interface ViewItemProps {
   date: string;
   submitEvent: (data : FileProp) => void;
   lastUpdatedItem: number|null;
+  tags : FileTag[];
 }
 
 export interface Folder {
@@ -46,16 +48,35 @@ export interface EditFolder {
   parent_folder: number | null | undefined;
 }
 
+export type TagType = {
+  id : number;
+  name : string;
+  tag_count : number;
+  description : string;
+}
+
+type ParentFile = {
+  id : number;
+  parent_folder : number | null;
+}
+
+export type FileTag = {
+  id : number;
+  type : TagType;
+  file : ParentFile;
+}
+
 export interface File {
   id: string;
   name: string;
   filetype: string;
-  media: string;
+  media_type: string;
   parent_folder: number | null;
   original_file: number;
   data: string;
   date_created: string;
   employee: any;
+  tags : FileTag[];
 }
 
 export interface ViewProps {
