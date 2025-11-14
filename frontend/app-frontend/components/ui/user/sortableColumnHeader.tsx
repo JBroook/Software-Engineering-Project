@@ -1,9 +1,7 @@
 import React from 'react'
 import { HStack, Table, IconButton} from '@chakra-ui/react'
-import { RiLogoutBoxLine } from "react-icons/ri";
-import { IconType } from 'react-icons'
-import { useColorModeValue } from '../color-mode'
 import { FaSort } from "react-icons/fa";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type SortableColumnHeaderProps = {
   label : string;
@@ -15,9 +13,11 @@ export default function SortableColumnHeader(props : SortableColumnHeaderProps){
     <Table.ColumnHeader p={1}>
       <HStack justify="space-between">
         {props.label}
-        <IconButton onClick={props.clickEvent}>
-          <FaSort />
-        </IconButton>
+        <Tooltip content="Sort">
+          <IconButton onClick={props.clickEvent}>
+            <FaSort />
+          </IconButton>
+        </Tooltip>
       </HStack>
     </Table.ColumnHeader>
   </>);

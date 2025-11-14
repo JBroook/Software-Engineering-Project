@@ -3,19 +3,24 @@ import {
   Dialog, Heading,
   Portal, Field,
   Input, CloseButton, Stack,
-  NativeSelect
+  NativeSelect,
+  Box,
+  ColorPicker,
+  parseColor
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useColorModeValue } from "../color-mode";
 import { useForm, SubmitHandler } from "react-hook-form";
 import React from "react";
 import { TiTag, TiTags } from "react-icons/ti";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export type TagType = {
   id : number;
   name : string;
   tag_count : number;
   description : string;
+  color : string;
 }
 
 interface TagFormProps {
@@ -28,6 +33,7 @@ type TagFormChildfulProps = React.PropsWithChildren<TagFormProps>;
 
 function TagForm(props : TagFormChildfulProps) {
   // const [formData, setFormData] = useState({ name: "", email: "" });
+  const [color, setColor] = useState("#eb5e41");
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const {register, handleSubmit, setError, formState: {errors}} = useForm<TagType>();
@@ -39,6 +45,9 @@ function TagForm(props : TagFormChildfulProps) {
     if (props.tagType!==null){// if existing tag is given, populate data with tag info
       Object.assign(newTagTypeData, data)
     }
+
+    newTagTypeData.color = color;
+    console.log(newTagTypeData)
 
     try{
       await props.submitEvent(newTagTypeData);
@@ -68,7 +77,7 @@ function TagForm(props : TagFormChildfulProps) {
   }
   const userCrudFields: CrudField[] = [
   { label : 'Tag Name', value : 'name', requiredText : "Tag name is required"},
-  { label: 'Description', value: 'description', requiredText: 'Description is required' },
+  { label: 'Description', value: 'description', requiredText: 'Description is required' }
 ];
 
   const FieldComponents : React.JSX.Element[] = userCrudFields.map((field, index)=>{
@@ -96,9 +105,13 @@ function TagForm(props : TagFormChildfulProps) {
   return (
     <>
       <Dialog.Root open={isOpen} onOpenChange={handleOpen}>
-      <Dialog.Trigger asChild>
-        {props.children}
-      </Dialog.Trigger>
+        <Tooltip content="Edit">
+          <Box>
+          <Dialog.Trigger asChild>
+            {props.children}
+          </Dialog.Trigger>
+          </Box>
+        </Tooltip>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
@@ -120,6 +133,32 @@ function TagForm(props : TagFormChildfulProps) {
             <Stack w="90%" justifyContent="center" justifySelf="center">
               <form onSubmit={handleSubmit(onSubmit)}>
               {FieldComponents}
+
+              <ColorPicker.Root defaultValue={props.tagType!==null?parseColor(props.tagType.color):parseColor("#eb5e41")} 
+              maxW="200px" 
+              onValueChangeEnd={
+                (d)=>{
+                  const col = d.value.toHexInt();
+                  const hexString = `#${(col & 0xFFFFFF).toString(16).padStart(6, '0').toUpperCase()}`;
+                  setColor(hexString);
+                }
+              }>
+                <ColorPicker.HiddenInput />
+                <ColorPicker.Label>Color</ColorPicker.Label>
+                <ColorPicker.Control>
+                  <ColorPicker.Input />
+                  <ColorPicker.Trigger />
+                </ColorPicker.Control>
+                  <ColorPicker.Positioner>
+                    <ColorPicker.Content>
+                      <ColorPicker.Area />
+                      <HStack>
+                        <ColorPicker.EyeDropper size="xs" variant="outline" />
+                        <ColorPicker.Sliders />
+                      </HStack>
+                    </ColorPicker.Content>
+                  </ColorPicker.Positioner>
+              </ColorPicker.Root>
 
               <HStack w="100%" justify="center" mt={2} gap={5}>
                 <Button type="submit" 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { 
   Box, Heading,
   HStack, Flex, IconButton,
-  Button
+  Button, Text
 } from "@chakra-ui/react"
 
 // Icons
@@ -25,6 +25,9 @@ import UserForm from "@/components/ui/user/userForm";
 import FileForm, { FileProp, getFolderDetails } from "@/components/ui/item/fileForm";
 import { AiFillFileAdd } from "react-icons/ai";
 import { clickEventProps } from "@/components/ui/folder/folderCRUD";
+import { Tooltip } from "@/components/ui/tooltip";
+import { Toaster, toaster } from "@/components/ui/toaster"
+import FolderTitle from "@/components/ui/folder/folderTitle";
 
 function getCookie(name:string) {
   const value = document.cookie
@@ -63,8 +66,10 @@ type SFSParams = {
   searchKeyword : string;
   mediaType : string[];
   fileExtension : string[];
-  sortMethod : string;
-  sortOrder : string;
+  sortFileMethod : string;
+  sortFileOrder : string;
+  sortFolderMethod : string;
+  sortFolderOrder : string;
   tagType : string[];
 }
 
@@ -72,8 +77,10 @@ const defaultSFSParams : SFSParams = {
   searchKeyword : "",
   mediaType : [],
   fileExtension : [],
-  sortMethod : "name",
-  sortOrder : "asc",
+  sortFileMethod : "name",
+  sortFileOrder : "asc",
+  sortFolderMethod : "name",
+  sortFolderOrder : "asc",
   tagType : []
 }
 
@@ -162,6 +169,36 @@ export default function Main() {
     }
   }
 
+  // goes to any page instantly
+  const goToFolder = async (chainIndex : number) => {
+    const fChain = [...folderChain]
+    const splitLength = fChain.length-chainIndex
+    fChain.splice(chainIndex+1,splitLength);
+    const folderId = fChain[chainIndex];
+
+    console.log("Going to", folderId)
+
+    if(folderId!==undefined){
+      let f = await getFolders(folderId);
+      setFolders(f);
+
+      f = await getFiles(folderId);
+      setFiles(f);
+
+      setCurrentParent(folderId);
+    }
+
+    setFolderChain(fChain);
+    const nChain = [...nameChain];
+    nChain.splice(chainIndex+1,splitLength);
+    console.log("hello", nChain)
+    console.log("hello 2", fChain)
+    setNameChain(nChain);
+    if(nChain[chainIndex]!==undefined){
+      setCurrentFolderName(nChain[chainIndex]);
+    }
+  }
+
   // check if user is logged in, else return to login page
   const router = useRouter();
   useEffect(()=>{
@@ -201,6 +238,12 @@ export default function Main() {
 
     fetchAssets()
 
+    // set view type preference
+    const viewTypePreference = getCookie("viewType");
+    if(viewTypePreference!==""){
+      setViewType(viewTypePreference)
+    }
+
     setMounted(true);
   }, []);
 
@@ -211,8 +254,18 @@ export default function Main() {
   // sort function
   const sortFiles = (sortMethod : string, sortOrder : string) => {
     const newSFS = {...SFS};
-    newSFS.sortMethod = sortMethod;
-    newSFS.sortOrder = sortOrder;
+    newSFS.sortFileMethod = sortMethod;
+    newSFS.sortFileOrder = sortOrder;
+    console.log(sortMethod)
+    setSFS(newSFS)
+
+    fetchSFS(newSFS)
+  }
+
+  const sortFolders = (sortMethod : string, sortOrder : string) => {
+    const newSFS = {...SFS};
+    newSFS.sortFolderMethod = sortMethod;
+    newSFS.sortFolderOrder = sortOrder;
     console.log(sortMethod)
     setSFS(newSFS)
 
@@ -249,12 +302,23 @@ export default function Main() {
       if(res.ok){
         const folderData = await res.json();
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder created",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        
+        toaster.create({
+          description: "Error creating folder",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -265,7 +329,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     };
   }
 
@@ -292,12 +360,23 @@ export default function Main() {
       if(res.ok){
         const folderData = await res.json();
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder updated",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        
+        toaster.create({
+          description: "Error updating file",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -308,7 +387,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     };
   }
 
@@ -325,8 +408,18 @@ export default function Main() {
 
       if(res.ok){
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder deleted",
+          type: "info",
+          closable: true,
+        })
       }else{
-        throw new Error('Failed to delete file');
+        toaster.create({
+          description: "Failed to delete file",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       console.error('Error creating file:', err);
@@ -335,6 +428,12 @@ export default function Main() {
         // throw so form's catch block can use setError()
         throw err;
       }
+
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     }
   }
 
@@ -376,12 +475,21 @@ export default function Main() {
       if(res.ok){
         const fileData = await res.json();
         fetchSFS(SFS);
+        toaster.create({
+          description: "File uploaded successfully",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "File failed to upload with error: "+errorData,
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -389,10 +497,12 @@ export default function Main() {
       // handle DRF validation errors (400)
       if (err.response && err.response.status === 400) {
         // throw so form's catch block can use setError()
-        throw err;
+        toaster.create({
+          description: "400 Bad request",
+          type: "info",
+          closable: true,
+        })
       }
-
-      throw new Error('Unexpected server error');
     };
   }
 
@@ -434,12 +544,22 @@ export default function Main() {
         setLastUpdated(data.id);
         console.log("Updated prop: ", lastUpdated);
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "File updated successfully",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error updating file",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -450,7 +570,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     };
   }
 
@@ -471,17 +595,32 @@ export default function Main() {
         console.log(newFile.splice(removeId, 1))
         newFile.splice(removeId, 1);
         setFiles(newFile);
-        console.log(files)
+
+        toaster.create({
+          description: "File deleted",
+          type: "info",
+          closable: true,
+        })
       }else{
-        throw new Error('Failed to delete file');
+        toaster.create({
+          description: "Error deleting file",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       console.error('Error creating file:', err);
       // handle DRF validation errors (400)
       if (err.response && err.response.status === 400) {
         // throw so form's catch block can use setError()
-        throw err;
+        throw err
       }
+
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -501,7 +640,7 @@ export default function Main() {
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
-        sortFolderEvent={sortFiles}
+        sortFolderEvent={sortFolders}
         lastUpdatedItem={lastUpdated}
         afterOpened={handleReturnedLastUpdatedItem}
       />
@@ -516,14 +655,16 @@ export default function Main() {
         submitEvent={handleFileCRUD}
         loading={loading}
         sortFileEvent={sortFiles}
-        sortFolderEvent={sortFiles}
+        sortFolderEvent={sortFolders}
         lastUpdatedItem={lastUpdated}
         afterOpened={handleReturnedLastUpdatedItem}
       />
   );
 
   const changeViewType = () => {
-    setViewType(viewType=="gallery"?"list" : "gallery" );
+    const newViewType = viewType=="gallery"?"list" : "gallery";
+    document.cookie = "viewType="+newViewType;
+    setViewType(newViewType);
   }
 
   //search-filter-sort function
@@ -532,9 +673,7 @@ export default function Main() {
     const url1 = new URL('http://localhost:8000/api/folders/');
     url1.searchParams.set('parent_folder', currentParent.toString());
     url1.searchParams.set('name', SFS.searchKeyword);
-    if(SFS.sortMethod==='name' || SFS.sortMethod==='date_modified'){
-      url1.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
-    }
+    url1.searchParams.set('sort_method', SFS.sortFolderMethod+"__"+SFS.sortFolderOrder);
     const folderRes = await fetch(url1, {
       credentials: 'include',
     });
@@ -562,8 +701,8 @@ export default function Main() {
     }
 
     // sort
-    if(SFS.sortMethod!==""){
-      url2.searchParams.set('sort_method', SFS.sortMethod+"__"+SFS.sortOrder);
+    if(SFS.sortFileMethod!==""){
+      url2.searchParams.set('sort_method', SFS.sortFileMethod+"__"+SFS.sortFileOrder);
     }
     const fileRes = await fetch(url2.toString(), {
       credentials: 'include',
@@ -604,7 +743,9 @@ export default function Main() {
     fetchSFS(newSFS)
   }
 
-  return (
+  return (<>
+    <Toaster/>
+
     <Box bg={fileFormColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
@@ -616,7 +757,7 @@ export default function Main() {
         <HStack
         ml={8}>
           {/* Remove back button if in root folder */}
-          { (currentParent!=-1) &&
+          { (currentParent!==-1) &&
             <IconButton
             cursor="pointer"
             _hover={{ bg: 'gray.100' }}
@@ -625,22 +766,29 @@ export default function Main() {
             </IconButton>
           }
           {/* file path title */}
-          <Heading
-          fontFamily="var(--font-roboto-condensed)"
-          color={iconTextColor}
-          size={"3xl"}
-          >{nameChain.join(" / ")}</Heading>
+          {nameChain.map((name, index)=>{
+            return (<FolderTitle 
+              key={index}
+              title={name}
+              inputEvent={()=>goToFolder(index)}
+              iconTextColor={iconTextColor}
+              last={index===nameChain.length-1}
+            />)
+          })}
         </HStack>
 
         <HStack mr={10}>
+          <Tooltip content={"Search"}>
             <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={() => setSearchbar(!searchbar)}>
               <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
             </IconButton>
+          </Tooltip>
             
             {searchbar && <Searchbar color={iconTextColor} placeholder="Search a file" inputEvent={searchKeyword}/>}
 
+          
             <FilterOptions 
             iconTextColor={iconTextColor} 
             mediaTypeEvent={filterMediaType}
@@ -649,12 +797,14 @@ export default function Main() {
             tagEvent={filterTags}
             />
 
+          <Tooltip content={(viewType=="gallery"?"List":"Gallery")+" view"}>
             <IconButton borderRadius={"xl"} bg={buttonbg} cursor="pointer"
             _hover={{ bg: '#e0e0e0ff' }}
             onClick={changeViewType}>
               {viewType=="gallery"?<IoIosList color="#9AB3F2"/>:<RiGalleryView2 color="#9AB3F2"/>}
             </IconButton>
-
+          </Tooltip>
+          
           </HStack>
       </Flex>
 
@@ -678,6 +828,6 @@ export default function Main() {
       )}
       
     </Box>
-  );
+  </>);
 }
 

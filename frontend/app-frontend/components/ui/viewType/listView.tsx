@@ -86,7 +86,7 @@ export default function ListView(props : ViewProps){
       ):(
         <ContentLoader 
         loading={props.loading}
-        color="white"
+        color={textColor}
         content={folderComponents}
       />
       )}
@@ -125,10 +125,11 @@ export default function ListView(props : ViewProps){
     <Stack
     pl={8}
     pb={10}
-    bg={filebg}>
+    bg={filebg}
+    minH="60vh">
       <ContentLoader 
         loading={props.loading}
-        color="black"
+        color={textColor}
         content={fileComponents}
       />
     </Stack>

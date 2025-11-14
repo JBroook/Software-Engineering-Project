@@ -2,13 +2,15 @@ import {
   HStack, Text,
   Dialog, Heading,
   Portal, Spinner,
-  CloseButton, Stack, Button
+  CloseButton, Stack, Button,
+  Box
   } from "@chakra-ui/react";
 import { useColorModeValue } from "../color-mode";
 import { FaUser } from "react-icons/fa";
 import React from "react";
 import { User } from "./userForm";
 import { useState } from "react";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface DeleteConfirmationProps {
   objectId : number;
@@ -32,9 +34,13 @@ function DeleteConfirmation(props : DeleteConfirmationChildfulProps) {
     return (
     <>
       <Dialog.Root open={isOpen} onOpenChange={(details)=>setIsOpen(details.open)}>
-      <Dialog.Trigger asChild>
-        {props.children}
-      </Dialog.Trigger>
+        <Tooltip content="Delete">
+          <Box>
+          <Dialog.Trigger asChild>
+            {props.children}
+          </Dialog.Trigger>
+          </Box>
+        </Tooltip>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">

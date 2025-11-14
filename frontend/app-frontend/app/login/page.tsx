@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Spinner } from "@chakra-ui/react"
+import { Toaster, toaster } from "@/components/ui/toaster"
 
 const getCsrfToken = async () => {
   const res = await fetch('http://localhost:8000/api/login/', {
@@ -56,10 +57,22 @@ export default function LoginPage(){
 
     if (res.ok){
       router.push('/main');
+
+      toaster.create({
+        description: "Login successful",
+        type: "info",
+        closable: true,
+      })
     }else {
       console.log('Login failed');
       setTimeout(() => {
           setLoginClicked(false)
+
+          toaster.create({
+            description: "Login failed",
+            type: "info",
+            closable: true,
+          })
       }, 1000);
     }
   }
@@ -67,6 +80,7 @@ export default function LoginPage(){
   const loginButtonContent = loginClicked ? <Spinner /> : <Text>LOGIN</Text>;
 
   return (<>
+  <Toaster/>
   {/* background decoration boxes */}
   <Container h="100vh" overflow="hidden">
     <Heading 

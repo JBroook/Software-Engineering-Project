@@ -31,7 +31,7 @@ export default function TagSearchbar(props : TagSearchbarProps) {
     py={2}
     w="100%"
     cursor="pointer"
-    _hover={{bg : "green"}}
+    _hover={{bg : tag.color}}
     onMouseDown={()=>selectNewTag(tag)}>
       <Text>
         {tag.name}
@@ -40,25 +40,25 @@ export default function TagSearchbar(props : TagSearchbarProps) {
     );
   })
 
+  useEffect(()=>{
+    searchAndShow("");
+  }, [])
+
   return (<>
     <Input 
         type="text"
         placeholder="Add tags"
-        variant="flushed" 
         pl={2}
+        mt={2}
         color="white"
         _placeholder={{ color: "gray"}}
-        data-state="open"
-        onChange={(event) => searchAndShow(event.target.value)}
-        _open={{
-            animationName: "fade-in, scale-in",
-            animationDuration: "300ms",}}
         onFocus={()=>setFocus(true)}
         onBlur={()=>setFocus(false)}
+        onChange={(event) => searchAndShow(event.target.value)}
     />
 
     {focus && <Box position="relative" zIndex="3">
-      <Stack w="100%" bg="gray" position="absolute" zIndex="3" gap="0" p={1}>
+      <Stack w="100%" bg="gray" position="absolute" zIndex="3" gap="0" p={1} maxH="150px" overflowY="scroll">
         {availableTagsComponents}
       </Stack>
     </Box>}

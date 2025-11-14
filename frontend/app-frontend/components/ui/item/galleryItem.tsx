@@ -57,6 +57,7 @@ export default function GalleryItem(props : ViewItemProps) {
   const [selectedVersion, setSelectedVersion] = useState("0");
   const [versions, setVersions] = useState<Version[] | null>(); // Store fetched data
   const [loading, setLoading] = useState(false);
+  const [hasTags, setHasTags] = useState(false);
 
   const handleOpenDialog = async () => {
     setLoading(true);
@@ -112,8 +113,8 @@ export default function GalleryItem(props : ViewItemProps) {
             onClick={handleOpenDialog} // Manually open dialog
             role="button"
             >
-            <Flex justify="space-between">
-                <Heading fontFamily="var(--font-reddit-mono)">
+            <Flex justify="space-between" w="100%" h={10} whiteSpace="nowrap">
+                <Heading fontFamily="var(--font-reddit-mono)" overflow="hidden" textOverflow="ellipsis">
                     {props.filename}
                 </Heading>
             </Flex>
@@ -351,20 +352,15 @@ export default function GalleryItem(props : ViewItemProps) {
                                     p={4}
                                     rounded={6}
                                     bg={contentbg}>
-                                    {version.tags ? version.tags.map(
-                                      (tag : FileTag, index : number)=>{
-                                        return <Tag.Root 
-                                          key={index}
-                                          variant="solid"
-                                          bg="gray"
-                                          color="white"
-                                          p="7px"
-                                          borderRadius={10}
-                                          h="fit-content">
+                                    {version.tags?.length ? (
+                                      version.tags.map((tag: FileTag, index: number) => (
+                                        <Tag.Root key={index} variant="solid" bg={tag.type.color} color="white" p="7px" borderRadius={10} h="fit-content">
                                           <Tag.Label>{tag.type.name}</Tag.Label>
                                         </Tag.Root>
-                                      }):<Text>No tags yet  </Text>
-                                    }
+                                      ))
+                                    ) : (
+                                      <Text>No tags yet</Text>
+                                    )}
                                   </Wrap>
                                 </Flex>
 

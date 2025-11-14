@@ -54,6 +54,7 @@ export type TagType = {
   name : string;
   tag_count : number;
   description : string;
+  color : string;
 }
 
 type ParentFile = {

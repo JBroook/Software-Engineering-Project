@@ -1,5 +1,7 @@
+import re
 from django.db import models
 from users.models import Employee
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 class Folder(models.Model):
@@ -28,10 +30,16 @@ class FileVersion(models.Model):
     
     def __str__(self):
         return self.name
+    
+
+def validate_hex(value):
+    if not re.match(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value):
+        raise ValidationError("Invalid HEX color code")
 
 class TagType(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
+    color = models.CharField(max_length=7, default="#00db2c", validators=[validate_hex])
 
     def __str__(self):
         return self.name

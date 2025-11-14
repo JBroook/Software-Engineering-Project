@@ -372,7 +372,8 @@ export default function FileForm(props: FileFormChildfulProps) {
                     >
                       <FileUpload.HiddenInput />
                       <FileUpload.Dropzone asChild>
-                        <FileUpload.Label>Drag & drop an image here, or click to select</FileUpload.Label>
+                        <FileUpload.Label>
+                          <Text maxW="80%" textAlign="center">Drag & drop an image here, or click to select</Text></FileUpload.Label>
                       </FileUpload.Dropzone>
                         <FileUploadList />
                     </FileUpload.RootProvider>

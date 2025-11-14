@@ -233,7 +233,7 @@ export default function UpdateFile(props: UpdateFileChildfulProps) {
           return <Tag.Root 
             key={index}
             variant="solid"
-            bg="gray"
+            bg={tag.type.color}
             color="white"
             p="7px"
             borderRadius={10}

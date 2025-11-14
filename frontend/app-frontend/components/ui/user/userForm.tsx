@@ -3,13 +3,14 @@ import {
   Dialog, Heading,
   Portal, Field,
   Input, CloseButton, Stack,
-  NativeSelect
+  NativeSelect, Box
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useColorModeValue } from "../color-mode";
 import { FaUser } from "react-icons/fa";
 import { useForm, SubmitHandler } from "react-hook-form";
 import React from "react";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export type User = {
   id : number;
@@ -103,9 +104,13 @@ function UserForm(props : UserFormChildfulProps) {
   return (
     <>
       <Dialog.Root open={isOpen} onOpenChange={handleOpen}>
-      <Dialog.Trigger asChild>
-        {props.children}
-      </Dialog.Trigger>
+        <Tooltip content="Edit">
+        <Box>
+          <Dialog.Trigger asChild>
+            {props.children}
+          </Dialog.Trigger>
+        </Box>
+        </Tooltip>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner justifyContent="center" alignItems="center">
