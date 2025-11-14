@@ -24,6 +24,7 @@ import UpdateFile from './fileUpdate';
 import VideoOnHover from '../preview/videoPreview';
 import ModelPreview from '../preview/model3dPreview';
 import { toaster } from '../toaster';
+import { EmbedPDF } from '@simplepdf/react-embed-pdf';
 
 const getFileDetails = async (currentID: number):Promise<Version[]> => {
   const res = await fetch(`http://localhost:8000/api/files/?file=${currentID}`, {
@@ -167,7 +168,18 @@ export default function ListItem(props : ViewItemProps) {
                         <VideoOnHover src={props.image} mediatype={props.media}/>
                         </>
                       ): props.media == "application" ?(
-                        <ModelPreview src={props.image}/>
+                        <>
+                          {props.filetype == "octet-stream" ? (
+                            <ModelPreview src={props.image}/>
+                          ) : (
+                            <EmbedPDF
+                              companyIdentifier="react-viewer"
+                              mode="inline"
+                              style={{ width: 'full', height: 'full' }}
+                              documentURL={props.image}
+                            />
+                          )}
+                        </>
                       ): (
                         <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
                       )}
@@ -228,7 +240,18 @@ export default function ListItem(props : ViewItemProps) {
                         <VideoOnHover src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()} mediatype={props.media}/>
                         </>
                       ): props.media == "application" ?(
-                        <ModelPreview src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()}/>
+                        <>
+                          {props.filetype == "octet-stream" ? (
+                                <ModelPreview src={versions.find((v) => v.version.toString() === selectedVersion.toString())?.data.toString()}/>
+                          ) : (
+                            <EmbedPDF
+                              companyIdentifier="react-viewer"
+                              mode="inline"
+                              style={{ width: 900, height: 800 }}
+                              documentURL={props.image}
+                            />
+                          )}
+                        </>
                       ): (
                         <Box><Text>Item cannot be shown. Please Contact Customer Service.</Text></Box>
                       )}

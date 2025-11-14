@@ -279,8 +279,23 @@ class FileViewSet(ModelViewSet):
 
         return queryset
     
+    def get_object(self):
+        pk = self.kwargs.get(self.lookup_url_kwarg or self.lookup_field)
+        if self.request.method == 'DELETE':
+            # Allow deleting any version
+            obj = get_object_or_404(File, pk=pk)
+        else:
+            # For list/retrieve: use filtered latest versions
+            obj = get_object_or_404(self.get_queryset(), pk=pk)
+        
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def perform_destroy(self, instance):
-        instance = File.objects.get(id=instance.original_file.id)
+        print("I have reached destroy")
+        print(instance.id)
+        instance = File.objects.get(id=instance.id)
+        # print(instance)
         instance.delete()
         return Response(
             {"message": "Delete successful"},
