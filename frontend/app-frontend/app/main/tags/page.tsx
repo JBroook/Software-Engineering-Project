@@ -172,6 +172,7 @@ export default function TagsPage(){
         body : JSON.stringify({
           "name" : data.name,
           "description" : data.description,
+          "color" : data.color
         })
       });
 
