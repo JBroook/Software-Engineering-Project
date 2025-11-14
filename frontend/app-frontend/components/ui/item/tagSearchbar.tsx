@@ -4,6 +4,7 @@ import { Box, Flex, Input, Stack, Text
 import Searchbar from '../searchbar/searchbar';
 import { FileTag } from '../viewType/interfaces';
 import { TagType } from '../viewType/interfaces';
+import { useColorModeValue } from '../color-mode';
 
 type TagSearchbarProps = {
   inputEvent : (value : string)=>Promise<any>;
@@ -13,6 +14,7 @@ type TagSearchbarProps = {
 export default function TagSearchbar(props : TagSearchbarProps) {
   const [focus, setFocus] = useState<boolean>(false);
   const [availableTags, setAvailableTags] = useState<TagType[]>([]);
+  const iconTextColor = useColorModeValue("black","white");
 
   const searchAndShow = async (input : string) => {
     const data = await props.inputEvent(input);
@@ -50,7 +52,6 @@ export default function TagSearchbar(props : TagSearchbarProps) {
         placeholder="Add tags"
         pl={2}
         mt={2}
-        color="white"
         _placeholder={{ color: "gray"}}
         onFocus={()=>setFocus(true)}
         onBlur={()=>setFocus(false)}

@@ -391,6 +391,7 @@ export default function TagsPage(){
                   </TagForm>
 
                   <DeleteConfirmation
+                  title="Delete this tag?"
                   objectId={item.id}
                   objectName={"this tag ("+item.name+")"}
                   deleteEvent={deleteTagType}
