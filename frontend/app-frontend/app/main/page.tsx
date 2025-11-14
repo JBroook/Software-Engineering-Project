@@ -592,7 +592,6 @@ export default function Main() {
         const newFile = [...files];
         
         const removeId = newFile.findIndex(file => file.original_file.toString()===data.id?.toString())
-        console.log(newFile.splice(removeId, 1))
         newFile.splice(removeId, 1);
         setFiles(newFile);
 
