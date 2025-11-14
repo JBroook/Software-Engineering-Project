@@ -145,7 +145,7 @@ class FileVersionSerializer(serializers.ModelSerializer):
 
     # @transaction.atomic
     def create(self, validated_data):
-        print(validated_data)
+        # print(validated_data)
         user = self.context['request'].user
         if not user.is_authenticated:
             raise serializers.ValidationError("User must be authenticated")
@@ -191,7 +191,7 @@ class FileVersionSerializer(serializers.ModelSerializer):
             fetched_old_file_data = FileVersion.objects.filter(original_file__id=file_id).order_by('original_file', '-version').distinct('original_file')
             if not fetched_old_file_data:
                 raise serializers.ValidationError("No previous version to copy.")
-            print("Getting old data: \n",fetched_old_file_data)
+            # print("Getting old data: \n",fetched_old_file_data)
             data = fetched_old_file_data[0].data
             size = fetched_old_file_data[0].size
             filetype = fetched_old_file_data[0].filetype

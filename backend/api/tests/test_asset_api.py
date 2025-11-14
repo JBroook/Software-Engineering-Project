@@ -122,7 +122,7 @@ class FileAPITests(APITestCase):
         self.assertEqual(response.data['name'], "Existing File")
 
     def test_delete_file(self):
-        response = self.client.delete(self.file_detail_url)
+        response = self.client.delete(self.file_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(File.objects.filter(id=self.file_instance.id).exists())
     

@@ -292,8 +292,6 @@ class FileViewSet(ModelViewSet):
         return obj
 
     def perform_destroy(self, instance):
-        print("I have reached destroy")
-        print(instance.id)
         instance = File.objects.get(id=instance.id)
         # print(instance)
         instance.delete()
