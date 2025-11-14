@@ -36,6 +36,7 @@ export default function DeleteFile (props: UpdateFileProps){
         parent_folder: null,
         data: null,
         version: 1, 
+        tags:[],
     }
 
     return (
