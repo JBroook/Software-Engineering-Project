@@ -6,7 +6,8 @@ import {
   Box, Heading, Spinner,
   HStack, Flex, Text,
   IconButton, Stack, Icon,
-  Table, Button, SimpleGrid
+  Table, Button, SimpleGrid,
+  ColorSwatch
 } from "@chakra-ui/react"
 import { useState, useEffect } from "react"
 import { MdEdit } from "react-icons/md";
@@ -21,6 +22,7 @@ import { IoMdPricetags } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import TagForm, { TagType } from "@/components/ui/tags/tagForm";
 import { Tooltip } from "@/components/ui/tooltip";
+import { Toaster, toaster } from "@/components/ui/toaster"
 
 type SFSParams = {
   searchKeyword : string;
@@ -121,6 +123,7 @@ export default function TagsPage(){
     { label : "Name", value : "name"},
     { label : "Tag Count", value : "tag_count"},
     { label : "Description", value : "description"},
+    { label : "Color", value : "color"},
   ]
 
   //search-filter-sort function
@@ -156,7 +159,7 @@ export default function TagsPage(){
     fetchSFS(newSFS);
   }
 
-  // handle creating and updating users
+  // handle creating tags
   const createTagType = async (data : TagType) => {
     try{
       const res = await fetch('http://localhost:8000/api/tagtypes/', {
@@ -177,11 +180,18 @@ export default function TagsPage(){
         const newUsers = [...tagTypes];
         newUsers.push(userData)
         setTagTypes(newUsers);
+
+        toaster.create({
+          description: "Tag created",
+          type: "info",
+          closable: true,
+        })
       }else{
-        const errorData = await res.json();
-        const error = new Error('Validation failed');
-        (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error creating tag",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       // handle DRF validation errors (400)
@@ -190,11 +200,15 @@ export default function TagsPage(){
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
-  // update existing user
+  // update existing tag
   const updateTagType = async (data : TagType) => {
     try{
       const res = await fetch(`http://localhost:8000/api/tagtypes/${data.id}/`, {
@@ -206,7 +220,8 @@ export default function TagsPage(){
         },
         body : JSON.stringify({
           "name" : data.name,
-          "description" : data.description
+          "description" : data.description,
+          "color" : data.color
         })
       });
 
@@ -218,11 +233,18 @@ export default function TagsPage(){
           newTagTypes[oldIndex] = tagTypeData
         }
         setTagTypes(newTagTypes);
+
+        toaster.create({
+          description: "Tag updated",
+          type: "info",
+          closable: true,
+        })
       }else{
-        const errorData = await res.json();
-        const error = new Error('Validation failed');
-        (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error updating tag",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       // handle DRF validation errors (400)
@@ -231,7 +253,11 @@ export default function TagsPage(){
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -251,8 +277,17 @@ export default function TagsPage(){
       const removeId = newTagTypes.findIndex(tagType => tagType.id===tagTypeId)
       newTagTypes.splice(removeId, 1);
       setTagTypes(newTagTypes);
+      toaster.create({
+        description: "Tag deleted",
+        type: "info",
+        closable: true,
+      })
     }else{
-      throw new Error('Failed to delete tag type');
+      toaster.create({
+        description: "Failed to delete tag",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -281,6 +316,8 @@ export default function TagsPage(){
 
   if(hasRoles){
     return (<>
+      <Toaster/>
+
       <Box bg={upperPortionColor} w="100%">
         {/* Header box for title, search bar and others */}
         <Flex 
@@ -334,6 +371,12 @@ export default function TagsPage(){
               <Table.Cell>{item.tag_count}</Table.Cell>
               <Table.Cell>{item.description}</Table.Cell>
               <Table.Cell>
+                <HStack>
+                  <ColorSwatch value={item.color} />
+                  <Text>{item.color}</Text>
+                </HStack>
+                </Table.Cell>
+              <Table.Cell>
                 <HStack w="100%" justify="center">
 
                   <TagForm 
@@ -341,11 +384,9 @@ export default function TagsPage(){
                   tagType={item}
                   submitEvent={updateTagType}
                   >
-                    <Tooltip content="Edit">
-                      <IconButton _hover={{color : "#4ceb34"}}>
-                        <MdEdit />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton _hover={{color : "#4ceb34"}}>
+                      <MdEdit />
+                    </IconButton>
                   </TagForm>
 
                   <DeleteConfirmation
@@ -353,11 +394,9 @@ export default function TagsPage(){
                   objectName={"this tag ("+item.name+")"}
                   deleteEvent={deleteTagType}
                   >
-                    <Tooltip content="Delete">
-                      <IconButton _hover={{color : "red"}}>
-                        <MdDelete />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton _hover={{color : "red"}}>
+                      <MdDelete />
+                    </IconButton>
                   </DeleteConfirmation>
                 </HStack>
               </Table.Cell>

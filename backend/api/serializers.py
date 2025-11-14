@@ -10,7 +10,7 @@ class TagTypeSerializer(serializers.ModelSerializer):
     tag_count = serializers.SerializerMethodField()
     class Meta:
         model = TagType
-        fields = ['id', 'name', 'tag_count', 'description']
+        fields = ['id', 'name', 'tag_count', 'description', 'color']
 
     def get_tag_count(self, obj):
         return len(Tag.objects.filter(type=obj))

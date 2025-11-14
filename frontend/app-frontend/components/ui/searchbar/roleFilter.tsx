@@ -1,6 +1,7 @@
 import {
   Stack, IconButton,Popover, Checkbox,
-  Menu, Button, Portal
+  Menu, Button, Portal,
+  Box
 } from "@chakra-ui/react"
 import { IoFilter } from "react-icons/io5";
 import { useColorModeValue } from "../color-mode";
@@ -24,14 +25,16 @@ export default function RoleFilter(props : RoleFilterProps){
 
     return (<>
         <Popover.Root>
-            <Popover.Trigger asChild>
-            <Tooltip content="Filter by role">
-                <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
+            <Tooltip content={"Filter by role"}>
+                <Box>
+                    <Popover.Trigger asChild>
+                    <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
                     _hover={{ bg: '#e0e0e0ff' }}>
                     <IoFilter color="#9AB3F2"/>
                 </IconButton>
-            </Tooltip>
-            </Popover.Trigger>
+                    </Popover.Trigger>
+                </Box>
+            </Tooltip>  
             <Popover.Positioner>
             <Popover.Content>
                 <Popover.CloseTrigger />

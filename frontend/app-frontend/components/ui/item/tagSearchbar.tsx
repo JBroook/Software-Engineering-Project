@@ -31,7 +31,7 @@ export default function TagSearchbar(props : TagSearchbarProps) {
     py={2}
     w="100%"
     cursor="pointer"
-    _hover={{bg : "green"}}
+    _hover={{bg : tag.color}}
     onMouseDown={()=>selectNewTag(tag)}>
       <Text>
         {tag.name}

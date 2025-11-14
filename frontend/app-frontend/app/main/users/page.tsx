@@ -25,6 +25,7 @@ import { FaFile } from "react-icons/fa6";
 import { GrStorage } from "react-icons/gr";
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@/components/ui/tooltip";
+import { Toaster, toaster } from "@/components/ui/toaster"
 
 type SFSParams = {
   searchKeyword : string;
@@ -235,11 +236,18 @@ export default function UsersPage(){
         const newUsers = [...users];
         newUsers.push(userData)
         setUsers(newUsers);
+
+        toaster.create({
+          description: "User created",
+          type: "info",
+          closable: true,
+        })
       }else{
-        const errorData = await res.json();
-        const error = new Error('Validation failed');
-        (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error creating user",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       // handle DRF validation errors (400)
@@ -248,7 +256,11 @@ export default function UsersPage(){
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -281,11 +293,18 @@ export default function UsersPage(){
           newUsers[oldIndex] = userData
         }
         setUsers(newUsers);
+
+        toaster.create({
+          description: "User updated",
+          type: "info",
+          closable: true,
+        })
       }else{
-        const errorData = await res.json();
-        const error = new Error('Validation failed');
-        (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error updating user",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       // handle DRF validation errors (400)
@@ -294,7 +313,11 @@ export default function UsersPage(){
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -314,8 +337,18 @@ export default function UsersPage(){
       const removeId = newUsers.findIndex(user => user.id===userId)
       newUsers.splice(removeId, 1);
       setUsers(newUsers);
+
+      toaster.create({
+        description: "User deleted",
+        type: "info",
+        closable: true,
+      })
     }else{
-      throw new Error('Failed to delete employee');
+      toaster.create({
+        description: "Failed to delete user",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -348,6 +381,8 @@ export default function UsersPage(){
 
   if(isAdmin){
     return (<>
+      <Toaster/>
+
       <Box bg={upperPortionColor} w="100%">
         {/* Header box for title, search bar and others */}
         <Flex 
@@ -366,26 +401,6 @@ export default function UsersPage(){
           </HStack>
 
           <HStack mr={10}>
-              {/* <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-              _hover={{ bg: '#e0e0e0ff' }}
-              onClick={() => setSearchbar(!searchbar)}>
-                <IoSearchCircleOutline color="#9AB3F2" size={"sm"}/>
-              </IconButton>
-              
-              {searchbar && <Searchbar placeholder="Search a file" inputEvent={searchKeyword}/>}
-
-              <FilterOptions 
-              iconTextColor={iconTextColor} 
-              mediaTypeEvent={filterMediaType}
-              fileExtensionEvent={filterFileExtension}
-              />
-
-              <IconButton borderRadius={"xl"} bg="#F6F6F6" cursor="pointer"
-              _hover={{ bg: '#e0e0e0ff' }}
-              onClick={changeViewType}>
-                {viewType=="gallery"?<RiGalleryView2 color="#9AB3F2"/>:<IoIosList color="#9AB3F2"/>}
-              </IconButton> */}
-
             </HStack>
         </Flex>
               
@@ -438,11 +453,9 @@ export default function UsersPage(){
                   user={item}
                   submitEvent={updateUser}
                   >
-                    <Tooltip content="Edit">
-                      <IconButton _hover={{color : "#4ceb34"}}>
-                        <MdEdit />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton _hover={{color : "#4ceb34"}}>
+                      <MdEdit />
+                    </IconButton>
                   </UserForm>
 
                   <DeleteConfirmation
@@ -450,11 +463,9 @@ export default function UsersPage(){
                   objectName={item.first_name+"s account"}
                   deleteEvent={deleteUser}
                   >
-                    <Tooltip content="Delete">
-                      <IconButton _hover={{color : "red"}}>
-                        <MdDelete />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton _hover={{color : "red"}}>
+                      <MdDelete />
+                    </IconButton>
                   </DeleteConfirmation>
                 </HStack>
               </Table.Cell>

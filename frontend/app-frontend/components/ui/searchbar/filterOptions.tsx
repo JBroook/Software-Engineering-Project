@@ -1,6 +1,7 @@
 import {
   Stack, IconButton,Popover, Checkbox,
-  Menu, Button, Portal
+  Menu, Button, Portal,
+  Box
 } from "@chakra-ui/react"
 import { IoFilter } from "react-icons/io5";
 import { useColorModeValue } from "../color-mode";
@@ -38,14 +39,16 @@ export default function FilterOptions(props : FilterOptionsProps){
 
     return (<>
         <Popover.Root>
-            <Popover.Trigger asChild>
             <Tooltip content={"Filter"}>
-                <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
-                    _hover={{ bg: '#e0e0e0ff' }}>
-                    <IoFilter color="#9AB3F2"/>
-                </IconButton>
+                <Box>
+                    <Popover.Trigger asChild>
+                    <IconButton borderRadius={"xl"} bg={useColorModeValue("#F6F6F6", '#0D1835')} cursor="pointer"
+                        _hover={{ bg: '#e0e0e0ff' }}>
+                        <IoFilter color="#9AB3F2"/>
+                    </IconButton>
+                    </Popover.Trigger>
+                </Box>
             </Tooltip>  
-            </Popover.Trigger>
             <Popover.Positioner>
             <Popover.Content>
                 <Popover.CloseTrigger />

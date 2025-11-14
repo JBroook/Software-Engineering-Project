@@ -355,7 +355,7 @@ export default function ListItem(props : ViewItemProps) {
                               bg={contentbg}>
                               {version.tags?.length ? (
                                 version.tags.map((tag: FileTag, index: number) => (
-                                  <Tag.Root key={index} variant="solid" bg="gray" color="white" p="7px" borderRadius={10} h="fit-content">
+                                  <Tag.Root key={index} variant="solid" bg={tag.type.color} color="white" p="7px" borderRadius={10} h="fit-content">
                                     <Tag.Label>{tag.type.name}</Tag.Label>
                                   </Tag.Root>
                                 ))

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { 
   Box, Heading,
   HStack, Flex, IconButton,
-  Button
+  Button, Text
 } from "@chakra-ui/react"
 
 // Icons
@@ -26,6 +26,8 @@ import FileForm, { FileProp, getFolderDetails } from "@/components/ui/item/fileF
 import { AiFillFileAdd } from "react-icons/ai";
 import { clickEventProps } from "@/components/ui/folder/folderCRUD";
 import { Tooltip } from "@/components/ui/tooltip";
+import { Toaster, toaster } from "@/components/ui/toaster"
+import FolderTitle from "@/components/ui/folder/folderTitle";
 
 function getCookie(name:string) {
   const value = document.cookie
@@ -167,6 +169,36 @@ export default function Main() {
     }
   }
 
+  // goes to any page instantly
+  const goToFolder = async (chainIndex : number) => {
+    const fChain = [...folderChain]
+    const splitLength = fChain.length-chainIndex
+    fChain.splice(chainIndex+1,splitLength);
+    const folderId = fChain[chainIndex];
+
+    console.log("Going to", folderId)
+
+    if(folderId!==undefined){
+      let f = await getFolders(folderId);
+      setFolders(f);
+
+      f = await getFiles(folderId);
+      setFiles(f);
+
+      setCurrentParent(folderId);
+    }
+
+    setFolderChain(fChain);
+    const nChain = [...nameChain];
+    nChain.splice(chainIndex+1,splitLength);
+    console.log("hello", nChain)
+    console.log("hello 2", fChain)
+    setNameChain(nChain);
+    if(nChain[chainIndex]!==undefined){
+      setCurrentFolderName(nChain[chainIndex]);
+    }
+  }
+
   // check if user is logged in, else return to login page
   const router = useRouter();
   useEffect(()=>{
@@ -270,12 +302,23 @@ export default function Main() {
       if(res.ok){
         const folderData = await res.json();
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder created",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        
+        toaster.create({
+          description: "Error creating folder",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -286,7 +329,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     };
   }
 
@@ -313,12 +360,23 @@ export default function Main() {
       if(res.ok){
         const folderData = await res.json();
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder updated",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        
+        toaster.create({
+          description: "Error updating file",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -329,7 +387,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     };
   }
 
@@ -346,8 +408,18 @@ export default function Main() {
 
       if(res.ok){
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "Folder deleted",
+          type: "info",
+          closable: true,
+        })
       }else{
-        throw new Error('Failed to delete file');
+        toaster.create({
+          description: "Failed to delete file",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       console.error('Error creating file:', err);
@@ -356,6 +428,12 @@ export default function Main() {
         // throw so form's catch block can use setError()
         throw err;
       }
+
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     }
   }
 
@@ -397,12 +475,21 @@ export default function Main() {
       if(res.ok){
         const fileData = await res.json();
         fetchSFS(SFS);
+        toaster.create({
+          description: "File uploaded successfully",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "File failed to upload with error: "+errorData,
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -410,10 +497,12 @@ export default function Main() {
       // handle DRF validation errors (400)
       if (err.response && err.response.status === 400) {
         // throw so form's catch block can use setError()
-        throw err;
+        toaster.create({
+          description: "400 Bad request",
+          type: "info",
+          closable: true,
+        })
       }
-
-      throw new Error('Unexpected server error');
     };
   }
 
@@ -455,12 +544,22 @@ export default function Main() {
         setLastUpdated(data.id);
         console.log("Updated prop: ", lastUpdated);
         fetchSFS(SFS);
+
+        toaster.create({
+          description: "File updated successfully",
+          type: "info",
+          closable: true,
+        })
       }else{
         const errorData = await res.json();
         console.log("error data:",errorData)
         const error = new Error('Validation failed');
         (error as any).response = {status: res.status, data:errorData}
-        throw error;
+        toaster.create({
+          description: "Error updating file",
+          type: "info",
+          closable: true,
+        })
       }
 
     }catch (err:any){
@@ -471,7 +570,11 @@ export default function Main() {
         throw err;
       }
 
-      throw new Error('Unexpected server error');
+      toaster.create({
+          description: "Unexpected server error",
+          type: "info",
+          closable: true,
+        })
     };
   }
 
@@ -492,16 +595,32 @@ export default function Main() {
         const removeId = newFile.findIndex(file => file.id===data.id?.toString())
         newFile.splice(removeId, 1);
         setFiles(newFile);
+
+        toaster.create({
+          description: "File deleted",
+          type: "info",
+          closable: true,
+        })
       }else{
-        throw new Error('Failed to delete file');
+        toaster.create({
+          description: "Error deleting file",
+          type: "info",
+          closable: true,
+        })
       }
     }catch (err:any){
       console.error('Error creating file:', err);
       // handle DRF validation errors (400)
       if (err.response && err.response.status === 400) {
         // throw so form's catch block can use setError()
-        throw err;
+        throw err
       }
+
+      toaster.create({
+        description: "Unexpected server error",
+        type: "info",
+        closable: true,
+      })
     }
   }
 
@@ -624,7 +743,9 @@ export default function Main() {
     fetchSFS(newSFS)
   }
 
-  return (
+  return (<>
+    <Toaster/>
+
     <Box bg={fileFormColor} minH="100vh">
       {/* Header box for title, search bar and others */}
       <Flex 
@@ -636,7 +757,7 @@ export default function Main() {
         <HStack
         ml={8}>
           {/* Remove back button if in root folder */}
-          { (currentParent!=-1) &&
+          { (currentParent!==-1) &&
             <IconButton
             cursor="pointer"
             _hover={{ bg: 'gray.100' }}
@@ -645,11 +766,15 @@ export default function Main() {
             </IconButton>
           }
           {/* file path title */}
-          <Heading
-          fontFamily="var(--font-roboto-condensed)"
-          color={iconTextColor}
-          size={"3xl"}
-          >{nameChain.join(" / ")}</Heading>
+          {nameChain.map((name, index)=>{
+            return (<FolderTitle 
+              key={index}
+              title={name}
+              inputEvent={()=>goToFolder(index)}
+              iconTextColor={iconTextColor}
+              last={index===nameChain.length-1}
+            />)
+          })}
         </HStack>
 
         <HStack mr={10}>
@@ -703,6 +828,6 @@ export default function Main() {
       )}
       
     </Box>
-  );
+  </>);
 }
 
