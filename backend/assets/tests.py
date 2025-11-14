@@ -74,3 +74,61 @@ class FileModelTest(TestCase):
 
     def test_auto_timestamps(self):
         self.assertIsNotNone(self.fileVersion.date_created)
+
+@override_settings(MEDIA_ROOT=temp_dir)
+class TagTypeModelTest(TestCase):
+    def setUp(self):
+        self.tag_type = TagType.objects.create(
+            name="Important",
+            description="Marks important files"
+        )
+
+    def test_tag_type_creation(self):
+        self.assertEqual(self.tag_type.name, "Important")
+        self.assertEqual(self.tag_type.description, "Marks important files")
+
+    def test_str_method(self):
+        self.assertEqual(str(self.tag_type), "Important")
+
+
+@override_settings(MEDIA_ROOT=temp_dir)
+class TagModelTest(TestCase):
+    def setUp(self):
+       # create a Django user
+        self.user = User.objects.create_user(
+            username='johndoe',
+            password='testpassword123',
+            email='johndoe@example.com'
+        )
+        # create an Employee linked to that user
+        self.employee = Employee.objects.create(
+            user=self.user,
+            role='editor',
+        )
+    
+        self.folder = Folder.objects.create(name="Test Folder") # Create Folder Object
+        test_file = SimpleUploadedFile("example.txt", b"Dummy content")
+        self.file = File.objects.create(parent_folder=self.folder) # Create File Object
+        self.fileVersion = FileVersion.objects.create( # Create FileVersion Object
+            original_file=self.file,
+            name="example.txt",
+            description="this is a sample description",
+            size=test_file.size,
+            filetype="txt",
+            media_type="text",
+            data=test_file,
+            version=1,
+            created_by= self.employee
+        )
+
+        self.tag_type = TagType.objects.create(name="Category", description="File category")
+        self.tag = Tag.objects.create(file_version=self.fileVersion, type=self.tag_type)
+
+    def test_tag_creation(self):
+        self.assertEqual(self.tag.file_version, self.fileVersion)
+        self.assertEqual(self.tag.type, self.tag_type)
+        self.assertEqual(str(self.tag), "Category")
+
+    def test_related_name_access(self):
+        self.assertIn(self.tag, self.fileVersion.tag.all())
+        self.assertIn(self.tag, self.tag_type.tag.all())

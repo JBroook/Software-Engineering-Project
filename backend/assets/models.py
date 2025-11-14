@@ -3,6 +3,7 @@ from django.db import models
 from users.models import Employee
 from django.core.exceptions import ValidationError
 
+
 # Create your models here.
 class Folder(models.Model):
     name = models.CharField(max_length=100)
@@ -53,3 +54,4 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.type.name
+    

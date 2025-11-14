@@ -199,3 +199,4 @@ class TagTypeAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], "Important")
         self.assertEqual(response.data['tag_count'], 1)
+
