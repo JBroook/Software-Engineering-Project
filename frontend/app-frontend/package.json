@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
+    "@simplepdf/react-embed-pdf": "^1.9.0",
     "framer-motion": "^12.23.22",
     "js-file-download": "^0.4.12",
     "next": "15.5.4",
@@ -22,6 +23,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.65.0",
     "react-icons": "^5.5.0",
+    "react-pdf": "^10.2.0",
     "react-threejs": "^0.0.4",
     "three": "^0.181.0",
     "zod": "^4.1.12"

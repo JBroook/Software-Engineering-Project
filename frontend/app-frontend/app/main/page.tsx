@@ -584,7 +584,6 @@ export default function Main() {
         credentials : 'include',
         method : 'DELETE',
         headers : {
-          'Content-Type' : 'application/json',
           'X-CSRFToken': getCookie('csrftoken'),// give csrf token
         }
       });
@@ -592,7 +591,8 @@ export default function Main() {
       if(res.ok){
         const newFile = [...files];
         
-        const removeId = newFile.findIndex(file => file.id===data.id?.toString())
+        const removeId = newFile.findIndex(file => file.original_file.toString()===data.id?.toString())
+        console.log(newFile.splice(removeId, 1))
         newFile.splice(removeId, 1);
         setFiles(newFile);
 

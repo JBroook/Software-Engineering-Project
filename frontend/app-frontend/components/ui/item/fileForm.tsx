@@ -132,7 +132,7 @@ export default function FileForm(props: FileFormChildfulProps) {
 
   const fileUpload = useFileUpload({
     maxFiles: 1,
-    accept: ["image/*", ".glb,.obj,.fbx,.stl,.dae,.3ds", "audio/*", "video/*"],
+    accept: ["image/*", ".pdf,.pdf,.glb,.obj,.fbx,.stl,.dae,.3ds", "audio/*", "video/*"],
   })
 
   const FileUploadList = () => {
@@ -158,7 +158,7 @@ export default function FileForm(props: FileFormChildfulProps) {
                   </FileUpload.ItemDeleteTrigger>
                 </Float>
               </>
-            ):(
+            ): (
               <>
                 <Flex w={'auto'}>No preview available</Flex>
                 <Float placement="top-end">
