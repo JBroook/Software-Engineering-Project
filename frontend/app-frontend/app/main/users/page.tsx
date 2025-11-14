@@ -462,6 +462,7 @@ export default function UsersPage(){
                   objectId={item.id}
                   objectName={item.first_name+"s account"}
                   deleteEvent={deleteUser}
+                  title="Delete this user?"
                   >
                     <IconButton _hover={{color : "red"}}>
                       <MdDelete />

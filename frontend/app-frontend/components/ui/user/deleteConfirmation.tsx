@@ -16,6 +16,7 @@ interface DeleteConfirmationProps {
   objectId : number;
   objectName : string;
   deleteEvent : (userId : number) => void;
+  title : string;
 }
 
 type DeleteConfirmationChildfulProps = React.PropsWithChildren<DeleteConfirmationProps>;
@@ -52,7 +53,7 @@ function DeleteConfirmation(props : DeleteConfirmationChildfulProps) {
                 color={iconTextColor}>
                 <HStack w="100%" justify="center" mb={3}>
                   <FaUser />
-                  <Heading fontFamily="var(--font-roboto-condensed)">Delete this user?</Heading>
+                  <Heading fontFamily="var(--font-roboto-condensed)">{props.title}</Heading>
                 </HStack>
               </Dialog.Title>
             </Dialog.Header>
