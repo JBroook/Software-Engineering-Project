@@ -60,10 +60,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
@@ -77,8 +73,12 @@ CSRF_COOKIE_SECURE = False
 
 ROOT_URLCONF = 'backend.urls'
 
-CORS_ALLOWED_ORIGIN_REGEXES = r"^/api/.*$"
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+CORS_ALLOWED_ORIGIN_REGEXES = [r"^/api/.*$"]
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
 
 TEMPLATES = [
     {
