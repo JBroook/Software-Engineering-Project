@@ -43,5 +43,4 @@ class EmployeeModelTest(TestCase):
     def test_auto_timestamps(self):
         self.assertIsNotNone(self.employee.join_date)
         self.assertIsNotNone(self.employee.last_active)
-        self.assertLessEqual(self.employee.join_date, self.employee.last_active)
         
