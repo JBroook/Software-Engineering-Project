@@ -1,17 +1,13 @@
-import mimetypes
 import os
 from pathlib import Path
-from wsgiref.types import FileWrapper
 from django.conf import settings
-from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
-from django.views import View
+from django.http import FileResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
 from .permissions import IsAdmin, AssetPermission, UserPermission
 
 from django.contrib.auth import authenticate, login, logout
@@ -19,9 +15,6 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Sum, Count, OuterRef, Subquery
-from django.utils.decorators import method_decorator
-from django.utils.encoding import escape_uri_path
-from django.views.decorators.csrf import csrf_exempt
 
 from assets.models import Folder, File, FileVersion, TagType, Tag
 from users.models import Employee
